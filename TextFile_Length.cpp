@@ -11,8 +11,8 @@ size_t getTextFileLength(const char* fileName)
 	if (!file.is_open())
 		return 0;
 
-	size_t count = 0; 
-	while (!file.eof()) // there are better ways  to do that
+	size_t count = 0;
+	while (!file.eof())
 	{
 		file.get();
 		count++;
@@ -21,6 +21,6 @@ size_t getTextFileLength(const char* fileName)
 	return count - 1;
 }
 int main()
-{	
+{
 	std::cout << getTextFileLength("test.txt");
 }
