@@ -25,7 +25,7 @@ size_t getNumberLength(int number)
 
 bool isPalindrome(int number)
 {
-	
+	//think about negative numbers, don't forget numbers starting with 0!
 }
 
 class Interval
