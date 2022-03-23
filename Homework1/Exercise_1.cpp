@@ -14,13 +14,16 @@ size_t getFileSize(std::ifstream& file)
 
 int main()
 {
-	int x = 25409;
-	std::ofstream file("source.txt");
+	const int BUFF = 1024;
+	/*int x = 25409;
+	std::ofstream file("source.dat");
 	file.write((const char*)&x, sizeof(x));
+	file.close();*/
+
 	std::cout << "Enter a file path:" << std::endl;
-	char filePath[1024];
 	std::cout << ">";
-	std::cin.getline(filePath, 1024);
+	char filePath[BUFF];
+	std::cin.getline(filePath, BUFF);
 
 	std::ifstream sourceFile(filePath, std::ios::binary);
 
