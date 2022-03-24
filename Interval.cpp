@@ -1,7 +1,5 @@
 #include <iostream>
 
-using namespace std;
-
 bool isPrime(size_t currentNumber)
 {
 	size_t maxPrimeBorder = sqrt(currentNumber);
