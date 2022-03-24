@@ -12,16 +12,22 @@ size_t getFileSize(std::fstream& file)
 	return result;
 }
 
-void convertHexToDec()
+void convertDecToHex(size_t number, char* hexNumber)
 {
-
+	while (number!=0)
+	{
+		size_t lastDigit = number % 10;
+		hexNumber[0] = lastDigit;
+		number /= 16;
+	}
 }
 
 void convertArrayToHex(int*& arr, size_t length)
 {
+	char hexNumber[2];
 	for (size_t i = 0; i < length; i++)
 	{
-		convertDecToHex(arr[i]);
+		convertDecToHex(arr[i], hexNumber);
 	}
 }
 
