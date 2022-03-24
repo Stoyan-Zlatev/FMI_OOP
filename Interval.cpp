@@ -160,7 +160,7 @@ void Interval::setLeftBorder(int a)
 
 size_t Interval::calcInvervalLength() const
 {
-	return absNumber(b - a);
+	return absNumber(getRightBorder() - getLeftBorder());
 }
 
 size_t Interval::countNumbers(bool (*func)(size_t)) const
@@ -191,7 +191,7 @@ size_t Interval::countNonRepeatingDigitNumbers() const
 
 bool Interval::isInInterval(int number) const
 {
-	return (number <= b) && (number >= a);
+	return (number <= getRightBorder()) && (number >= getLeftBorder());
 }
 
 bool Interval::areBordersPowerOfTwo() const
@@ -224,28 +224,24 @@ Interval Interval::unionInterval(const Interval& otherInterval) const
 
 bool Interval::containsInterval(const Interval& otherInterval) const
 {
-	return isInInterval(otherInterval.a) && isInInterval(otherInterval.b);
+	return isInInterval(otherInterval.getLeftBorder()) && isInInterval(otherInterval.getRightBorder());
 }
 
 int main()
 {
-	Interval t(-5, 14), t1(399, 45);
-	cout << "Interval: " << t.calcInvervalLength() << endl;
-	cout << "Is 5 in the interval: " << t.isInInterval(5) << endl;
-	cout << "Total Prime numbers " << t.calcPrimeNumbersInTheInterval() << endl;
-	cout << "Palindromes " << t.countPalindromes() << endl;
-	cout << "Different Numbers " << t.countNonRepeatingDigitNumbers() << endl;
-	t.setInterval(2, 16);
-	cout << "Power of 2: " << t.areBordersPowerOfTwo() << endl;
-	cout << t1.getLeftBorder() << " " << t1.getRightBorder() << endl;
-	t1.setInterval(3, 12);
-	Interval intersection = t.intersect(t1);
+	Interval t1(3, 10); // [3, 10]
+	Interval t2(4, 14); // [4, 14]
+	Interval t3(1, 130); // [1, 130]
+	Interval t4(2, 32); // [2, 2^5]
 
-	cout << "Intersection: " << intersection.getLeftBorder() << " " << intersection.getRightBorder() << endl;
-
-	intersection = t.unionInterval(t1);
-
-	cout << "Union: " << intersection.getLeftBorder() << " " << intersection.getRightBorder() << endl;
-
-	cout << "Superinterval: " << intersection.isSuperInterval(t1) << endl;
+	Interval result = t1.intersect(t2); // [4, 10]
+	std::cout << t1.calcInvervalLength() << std::endl;
+	std::cout << t2.calcPrimeNumbersInTheInterval() << std::endl; //4 (5,7,11,13)
+	std::cout << t3.countPalindromes() << std::endl; //12 (11 22 33 44 55 66 77 88 99 101 111 121)
+	std::cout << t3.countNonRepeatingDigitNumbers() << std::endl; //107
+	std::cout << std::boolalpha << t2.areBordersPowerOfTwo() << std::endl;//[4,14] false
+	std::cout << std::boolalpha << t4.areBordersPowerOfTwo() << std::endl;//[2,32] true
+	std::cout << std::boolalpha << t2.isSuperInterval(result) << std::endl; //true
+	std::cout << std::boolalpha << t2.isInInterval(7) << std::endl; //true
+	std::cout << result.calcPrimeNumbersInTheInterval() << std::endl; // 2 (only 5 and 7)
 }
