@@ -103,10 +103,10 @@ int main()
 	}
 	//delete
 	char* hexInput = new char[fileSize * 2]; //new array with decimal to hexadecimal bytes
-	
+
 	convertArrayToHex(input, fileSize, hexInput);
 	printHex(hexInput, fileSize);
-	
+
 	for (size_t i = 0; i < fileSize; i++)
 	{
 		if ((input[i] <= 90 && input[i] >= 65) || (input[i] >= 97 && input[i] <= 122))
