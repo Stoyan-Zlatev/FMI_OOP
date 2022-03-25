@@ -32,6 +32,11 @@ void convertDecToHex(size_t number, char* hexNumber)
 		hexNumber[0] = 48;
 		hexNumber[1] = 48;
 	}
+	else if (number < 16)
+	{
+		hexNumber[0] = 0;
+		hexNumber[1] = number % 16;
+	}
 	else
 	{
 		for (size_t i = numberLength; i > 0; i--)
@@ -97,7 +102,7 @@ int main()
 		std::cout << input[i] << std::endl;
 	}
 	//delete
-	char* hexInput = new char[fileSize * 2];
+	char* hexInput = new char[fileSize * 2]; //new array with decimal to hexadecimal bytes
 	
 	convertArrayToHex(input, fileSize, hexInput);
 	printHex(hexInput, fileSize);
