@@ -1,0 +1,27 @@
+void convertDecToHex(size_t number, char* hexNumber)
+{
+	size_t numberLength = getNumberLength(number);
+
+	if (numberLength == 0)
+	{
+		hexNumber[0] = 48;
+		hexNumber[1] = 48;
+	}
+	else if (number < 16)
+	{
+		hexNumber[0] = 0;
+		hexNumber[1] = number % 16;
+	}
+	else
+	{
+		for (size_t i = numberLength; i > 0; i--)
+		{
+			size_t lastDigit = number % 16;
+			if (lastDigit < 10)
+				hexNumber[i - 1] = lastDigit + 48;
+			else
+				hexNumber[i - 1] = lastDigit + 55;
+			number /= 16;
+		}
+	}
+}
