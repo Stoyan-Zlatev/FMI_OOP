@@ -323,10 +323,14 @@ int main()
 			delete[] buffer;
 			delete[] newFileName;
 			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
+			if (sourceFile.good())
+				std::cout << "File successfully saved!" << std::endl;
 		}
 		else if (isPrefix(command, "save"))
 		{
 			sourceFile.close();
+			if (sourceFile.good())
+				std::cout << "File successfully saved!" << std::endl;
 		}
 		else
 		{
