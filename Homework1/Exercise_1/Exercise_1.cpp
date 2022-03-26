@@ -2,6 +2,8 @@
 #include <fstream>
 #include <cstring>
 
+const int hexByteLegth = 2;
+
 size_t getFileSize(std::fstream& file)
 {
 	size_t currentPosition = file.tellg();
@@ -75,7 +77,7 @@ void convertDecToHex(size_t number, char* hexNumber)
 	}
 	else
 	{
-		for (size_t i = 2; i > 0; i--)
+		for (size_t i = hexByteLegth; i > 0; i--)
 		{
 			size_t lastDigit = number % 16;
 			if (lastDigit < 10)
@@ -89,7 +91,7 @@ void convertDecToHex(size_t number, char* hexNumber)
 
 void convertArrayToHex(const int* input, size_t length, char* hexInput)
 {
-	char hexNumber[2];
+	char hexNumber[hexByteLegth];
 	for (size_t i = 0; i < length; i++)
 	{
 		convertDecToHex(input[i], hexNumber);
@@ -100,7 +102,7 @@ void convertArrayToHex(const int* input, size_t length, char* hexInput)
 
 void printHex(std::fstream& file, size_t fileSize)
 {
-	char hexNumber[2];
+	char hexNumber[hexByteLegth];
 	file.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
@@ -162,17 +164,18 @@ void view(std::fstream& file, size_t fileSize)
 bool change(const char* command, std::fstream& file, size_t fileSize)
 {
 	const size_t currentCommandLength = 7;
-	size_t index = getNumber(command, 7);
+	const size_t byteCapacity = 255;
+	size_t index = getNumber(command, currentCommandLength);
 	if (index >= fileSize)
 	{
 		return false;
 	}
 	size_t number = getNumber(command, currentCommandLength + getNumberLength(index) + 1);
-	char hexNumber[2];
+	char hexNumber[hexByteLegth];
 	hexNumber[0] = parseIntToChar(number / 10);
 	hexNumber[1] = parseIntToChar(number % 10);
 	size_t decNumber = convertHexToDec(hexNumber);
-	if (decNumber > 255)
+	if (decNumber > byteCapacity)
 	{
 		return false;
 	}
@@ -183,11 +186,11 @@ bool change(const char* command, std::fstream& file, size_t fileSize)
 	return true;
 }
 
-void substr(size_t startIndex, const char* text, char*& subStr, size_t textLength)
+void substr(size_t startIndex, const char* text, char*& subStr, size_t textLength, size_t currentCommandLength)
 {
 	for (size_t i = startIndex; i < textLength; i++)
 	{
-		subStr[i - 8] = text[i];
+		subStr[i - currentCommandLength] = text[i];
 	}
 }
 
@@ -207,7 +210,7 @@ void rewriteFile(std::fstream& file, const char* buffer, size_t& fileSize) {
 void add(const char* command, std::fstream& file, size_t& fileSize)
 {
 	const size_t currentCommandLength = 4;
-	char hexNumber[2];
+	char hexNumber[hexByteLegth];
 	getHexNumber(command, hexNumber, currentCommandLength);
 	size_t value = convertHexToDec(hexNumber);
 	file.seekp(0, std::ios::end);
@@ -218,6 +221,7 @@ void add(const char* command, std::fstream& file, size_t& fileSize)
 int main()
 {
 	const int BUFF = 1024;
+	const int minFileSize = 1;
 	int x = 25409;
 	std::ofstream file("source.dat");
 	file.write((const char*)&x, sizeof(x));
@@ -245,6 +249,7 @@ int main()
 	{
 		std::cout << ">";
 		std::cin.getline(command, BUFF);
+
 		if (isPrefix(command, "view"))
 		{
 			view(sourceFile, fileSize);
@@ -258,7 +263,7 @@ int main()
 		}
 		else if (isPrefix(command, "remove"))
 		{
-			if (fileSize >= 1)
+			if (fileSize >= minFileSize)
 			{
 				char* buffer = new char[fileSize];
 				for (size_t i = 0; i < fileSize; i++)
@@ -285,15 +290,16 @@ int main()
 		else if (isPrefix(command, "save as"))
 		{
 			char* buffer = new char[fileSize];
+			const size_t currentCommandLength = 8;
 			for (size_t i = 0; i < fileSize; i++)
 			{
 				buffer[i] = (char)sourceFile.get();
 			}
 			sourceFile.close();
 			size_t textLength = strlen(command);
-			char* newFileName = new char[textLength - 7];
-			substr(8, command, newFileName, textLength);
-			newFileName[textLength - 8] = '\0';
+			char* newFileName = new char[(textLength - currentCommandLength)+1];
+			substr(currentCommandLength, command, newFileName, textLength, currentCommandLength);
+			newFileName[textLength - currentCommandLength] = '\0';
 			std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::ate);
 			rewriteFile(newFile, buffer, fileSize);
 			newFile.close();
