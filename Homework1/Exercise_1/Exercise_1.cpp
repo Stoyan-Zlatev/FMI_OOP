@@ -122,6 +122,13 @@ bool isPrefix(const char* text, const char* prefix)
 	return true;
 }
 
+void getHexNumber(const char* command, char* hexNumber, size_t numberLength)
+{
+	size_t currentIndex = numberLength;
+	hexNumber[0] = command[currentIndex];
+	hexNumber[1] = command[currentIndex + 1];
+}
+
 size_t getNumber(const char* command, size_t numberLength)
 {
 	size_t currentIndex = numberLength;
@@ -191,22 +198,19 @@ void removeLastByte(const char* input, std::fstream& file, size_t& fileSize)
 	file.write(input, fileSize);
 }
 
-void removeFileData(std::fstream& file, const char* buffer, size_t& fileSize) {
-	file.seekp(0, std::ios::beg);
-	file.write(buffer, --fileSize);
-	file.seekp(0, std::ios::beg);
-}
-
 void rewriteFile(std::fstream& file, const char* buffer, size_t& fileSize) {
 	file.seekp(0, std::ios::beg);
 	file.write(buffer, fileSize);
+	file.seekp(0, std::ios::beg);
 }
 
 void add(const char* command, std::fstream& file, size_t& fileSize)
 {
 	const size_t currentCommandLength = 4;
-	size_t value = convertHexToDec(getNumber(command, currentCommandLength));
-	file<<(char(value));
+	char hexNumber[2];
+	getHexNumber(command, hexNumber, currentCommandLength);
+	size_t value = convertHexToDec(hexNumber);
+	file << (char(value));
 	fileSize++;
 }
 
@@ -259,8 +263,9 @@ int main()
 				buffer[i] = (char)sourceFile.get();
 			}
 			sourceFile.close();
+			fileSize--;
 			std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
-			removeFileData(removeFile, buffer, fileSize);
+			rewriteFile(removeFile, buffer, fileSize);
 			removeFile.close();
 			delete[] buffer;
 			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
@@ -282,7 +287,7 @@ int main()
 			}
 			sourceFile.close();
 			size_t textLength = strlen(command);
-			char* newFileName = new char[textLength -7];
+			char* newFileName = new char[textLength - 7];
 			substr(8, command, newFileName, textLength);
 			newFileName[textLength - 8] = '\0';
 			std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::app);
@@ -299,5 +304,3 @@ int main()
 	sourceFile.close();
 
 }
-
-//TODO getNumber must be char[2] because hex
