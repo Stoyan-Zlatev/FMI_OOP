@@ -12,12 +12,9 @@ size_t getFileSize(std::fstream& file)
 	return result;
 }
 
-void getData(int*& input, std::fstream& sourceFile, size_t fileSize)
+void getData(char*& input, std::fstream& sourceFile, size_t fileSize)
 {
-	for (size_t i = 0; i < fileSize; i++)
-	{
-		input[i] = sourceFile.get();
-	}
+	sourceFile.read(input, sizeof(input));
 }
 
 size_t getNumberLength(size_t number)
@@ -29,6 +26,16 @@ size_t getNumberLength(size_t number)
 		counter++;
 	}
 	return counter;
+}
+
+bool isCapitalLetter(char element)
+{
+	return element <= 90 && element >= 65;
+}
+
+bool isSmallLetter(char element)
+{
+	return element >= 97 && element <= 122;
 }
 
 bool isDigit(char element)
@@ -52,9 +59,9 @@ char parseIntToChar(size_t digit)
 		return (digit % 10) + 'A';
 }
 
-size_t convertHexToDec(const char* hexNumber, size_t currentIndex)
+size_t convertHexToDec(const char* hexNumber)
 {
-	return parseCharToInt(hexNumber[currentIndex * 2 + 1]) + 16 * parseCharToInt(hexNumber[currentIndex * 2]);
+	return parseCharToInt(hexNumber[1]) + 16 * parseCharToInt(hexNumber[0]);
 }
 
 void convertDecToHex(size_t number, char* hexNumber)
@@ -73,7 +80,7 @@ void convertDecToHex(size_t number, char* hexNumber)
 	}
 	else
 	{
-		for (size_t i = numberLength; i > 0; i--)
+		for (size_t i = 2; i > 0; i--)
 		{
 			size_t lastDigit = number % 16;
 			if (lastDigit < 10)
@@ -96,11 +103,13 @@ void convertArrayToHex(const int* input, size_t length, char* hexInput)
 	}
 }
 
-void printHex(const char* hexInput, size_t fileSize)
+void printHex(const char* input, size_t fileSize)
 {
-	for (size_t i = 0; i < fileSize * 2; i += 2)
+	char hexNumber[2];
+	for (size_t i = 0; i < fileSize; i++)
 	{
-		std::cout << hexInput[i] << hexInput[i + 1] << " ";
+		convertDecToHex((int)input[i], hexNumber);
+		std::cout << hexNumber[0] << hexNumber[1] << " ";
 	}
 	std::cout << std::endl;
 }
@@ -117,16 +126,6 @@ bool isPrefix(const char* text, const char* prefix)
 	return true;
 }
 
-bool isCapitalLetter(char element)
-{
-	return element <= 90 && element >= 65;
-}
-
-bool isSmallLetter(char element)
-{
-	return element >= 97 && element <= 122;
-}
-
 size_t getNumber(const char* command, size_t numberLength)
 {
 	//command x
@@ -141,10 +140,9 @@ size_t getNumber(const char* command, size_t numberLength)
 	return number;
 }
 
-//ref?
-void view(const char* hexInput, const int* input, size_t fileSize)
+void view(const char* input, size_t fileSize)
 {
-	printHex(hexInput, fileSize);
+	printHex(input, fileSize);
 
 	for (size_t i = 0; i < fileSize; i++)
 	{
@@ -156,7 +154,7 @@ void view(const char* hexInput, const int* input, size_t fileSize)
 	std::cout << std::endl;
 }
 
-bool change(const char* command, char* hexInput, int* input, std::fstream& file, size_t fileSize)
+bool change(const char* command, char* input, std::fstream& file, size_t fileSize)
 {
 	const size_t currentCommandLength = 7;
 	size_t index = getNumber(command, 7);
@@ -165,9 +163,10 @@ bool change(const char* command, char* hexInput, int* input, std::fstream& file,
 		return false;
 	}
 	size_t number = getNumber(command, currentCommandLength + getNumberLength(index) + 1);
-	hexInput[index * 2] = parseIntToChar(number / 10);
-	hexInput[index * 2 + 1] = parseIntToChar(number % 10);
-	size_t decNumber = convertHexToDec(hexInput, index);
+	char hexNumber[2];
+	hexNumber[0] = parseIntToChar(number / 10);
+	hexNumber[1] = parseIntToChar(number % 10);
+	size_t decNumber = convertHexToDec(hexNumber);
 	if (decNumber > 255)
 	{
 		return false;
@@ -180,24 +179,21 @@ bool change(const char* command, char* hexInput, int* input, std::fstream& file,
 	return true;
 }
 
-void removeLastByte(const char* filePath, int* input, char* hexInput, std::fstream& file, size_t& fileSize)
+void removeLastByte(const char* input, std::fstream& file, size_t& fileSize)
 {
 	fileSize--;
-	file.close();
-	file.open(filePath, std::ios::binary | std::ios::trunc);
-	for (size_t i = 0; i < fileSize; i++)
-	{
-		file.seekg(i);
-		file << (char)input[i];
-	}
-	file.seekg(std::ios::beg);
-	/*input = new int[fileSize];
-	hexInput = new char[fileSize * 2];
-	getData(input, file, fileSize);
-	convertArrayToHex(input, fileSize, hexInput);*/
+	file.seekp(0, std::ios::beg);
+	file.write(input, fileSize);
+	/*input = new char[fileSize];
+	getData(input, file, fileSize);*/
 }
 
-void add(const char* command, int* input, char* hexInput, std::fstream& file, size_t& fileSize)
+void removeFileData(std::fstream& file, int size, const char* buffer) {
+	file.seekp(0, std::ios::beg);
+	file.write(buffer, size - 1);
+}
+
+void add(const char* command, char* input, std::fstream& file, size_t& fileSize)
 {
 	const size_t currentCommandLength = 4;
 	file.seekg(fileSize);
@@ -205,18 +201,16 @@ void add(const char* command, int* input, char* hexInput, std::fstream& file, si
 	file.putback(char(value));
 	fileSize++;
 	/*input = new int[fileSize];
-	hexInput = new char[fileSize * 2];
-	getData(input, file, fileSize);
-	convertArrayToHex(input, fileSize, hexInput);*/
+	getData(input, file, fileSize);*/
 }
 
 int main()
 {
 	const int BUFF = 1024;
-	int x = 25409;
-	std::ofstream file("source.dat");
-	file.write((const char*)&x, sizeof(x));
-	file.close();
+	//int x = 25409;
+	//std::ofstream file("source.dat");
+	//file.write((const char*)&x, sizeof(x));
+	//file.close();
 
 	std::cout << "Enter a file path:" << std::endl;
 	std::cout << ">";
@@ -234,13 +228,9 @@ int main()
 	size_t fileSize = getFileSize(sourceFile);
 	std::cout << "File loaded successfully! Size: " << fileSize << " bytes" << std::endl;
 	//delete
-	int* input = new int[fileSize];
+	char* input = new char[fileSize];
+
 	getData(input, sourceFile, fileSize);
-	//delete
-	char* hexInput = new char[fileSize * 2]; //new array with decimal to hexadecimal bytes
-
-	convertArrayToHex(input, fileSize, hexInput);
-
 	char command[BUFF] = "";
 	while (!isPrefix(command, "save"))
 	{
@@ -248,31 +238,43 @@ int main()
 		std::cin.getline(command, BUFF);
 		if (isPrefix(command, "view"))
 		{
-			view(hexInput, input, fileSize);
+			view(input, fileSize);
 		}
 		else if (isPrefix(command, "change"))
 		{
-			if (change(command, hexInput, input, sourceFile, fileSize) && file.good())
+			if (change(command, input, sourceFile, fileSize) && sourceFile.good())
 				std::cout << "Operation successfully executed!" << std::endl;
 			else
 				std::cout << "Error, incorrect input!" << std::endl;
 		}
 		else if (isPrefix(command, "remove"))
 		{
-			removeLastByte(filePath, input, hexInput, sourceFile, fileSize);
+			sourceFile.close();
+			std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
+			removeFileData(removeFile, fileSize, input);
+			removeFile.close();
+			input[fileSize--] = '\0';
+			getData(input, removeFile, fileSize);
+			//sourceFile.close();
+			//std::fstream newFile(filePath, std::ios::out, std::ios::trunc);
+			////newFile.flush();
+			//newFile.seekp(0, std::ios::beg);
+			//newFile.write(input, fileSize);
+			////removeLastByte(input, newFile, fileSize);
+			//newFile.close();
+			////sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
 		}
 		else if (isPrefix(command, "add"))
 		{
-			add(command, input, hexInput, sourceFile, fileSize);
+			add(command, input, sourceFile, fileSize);
 		}
 		else if (isPrefix(command, "save as"))
 		{
-
+			sourceFile.close();
 		}
 		else if (isPrefix(command, "save"))
 		{
 
 		}
 	}
-
 }
