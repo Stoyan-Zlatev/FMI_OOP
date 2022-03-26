@@ -27,25 +27,25 @@ size_t getNumberLength(size_t number)
 
 bool isCapitalLetter(char element)
 {
-	return element <= 90 && element >= 65;
+	return element <= 'Z' && element >= 'A';
 }
 
 bool isSmallLetter(char element)
 {
-	return element >= 97 && element <= 122;
+	return element >= 'a' && element <= 'z';
 }
 
 bool isDigit(char element)
 {
-	return element >= 48 && element <= 57;
+	return element >= '0' && element <= '9';
 }
 
 size_t parseCharToInt(char element)
 {
 	if (isDigit(element))
-		return element - 48;
+		return element - '0';
 	else
-		return element - 55;
+		return (element - 'A') + 10;
 }
 
 char parseIntToChar(size_t digit)
@@ -81,9 +81,9 @@ void convertDecToHex(size_t number, char* hexNumber)
 		{
 			size_t lastDigit = number % 16;
 			if (lastDigit < 10)
-				hexNumber[i - 1] = lastDigit + 48;
+				hexNumber[i - 1] = lastDigit + '0';
 			else
-				hexNumber[i - 1] = lastDigit + 55;
+				hexNumber[i - 1] = (lastDigit - 10) + 'A';
 			number /= 16;
 		}
 	}
@@ -95,8 +95,8 @@ void convertArrayToHex(const int* input, size_t length, char* hexInput)
 	for (size_t i = 0; i < length; i++)
 	{
 		convertDecToHex(input[i], hexNumber);
-		hexInput[i * 2] = hexNumber[0];
-		hexInput[i * 2 + 1] = hexNumber[1];
+		hexInput[i * hexByteLegth] = hexNumber[0];
+		hexInput[i * hexByteLegth + 1] = hexNumber[1];
 	}
 }
 
@@ -107,7 +107,10 @@ void printHex(std::fstream& file, size_t fileSize)
 	for (size_t i = 0; i < fileSize; i++)
 	{
 		convertDecToHex(file.get(), hexNumber);
-		std::cout << hexNumber[0] << hexNumber[1] << " ";
+		if (hexNumber[0] == '\0')
+			std::cout << parseIntToChar(hexNumber[0]) << parseIntToChar(hexNumber[1]) << " ";
+		else
+			std::cout << hexNumber[0] << hexNumber[1] << " ";
 	}
 	std::cout << std::endl;
 }
@@ -126,7 +129,8 @@ bool isPrefix(const char* text, const char* prefix)
 
 bool isValidHexNumber(const char* command, const size_t currentCommandIndex)
 {
-	if (parseCharToInt(command[currentCommandIndex]) > 15 || parseCharToInt(command[currentCommandIndex + 1]) > 15)
+	const size_t hexCapacity = 15;
+	if (parseCharToInt(command[currentCommandIndex]) > hexCapacity || parseCharToInt(command[currentCommandIndex + 1]) > hexCapacity)
 		return false;
 	return true;
 
@@ -200,13 +204,6 @@ void substr(size_t startIndex, const char* text, char*& subStr, size_t textLengt
 	{
 		subStr[i - currentCommandLength] = text[i];
 	}
-}
-
-void removeLastByte(const char* input, std::fstream& file, size_t& fileSize)
-{
-	fileSize--;
-	file.seekp(0, std::ios::beg);
-	file.write(input, fileSize);
 }
 
 void rewriteFile(std::fstream& file, const char* buffer, size_t& fileSize) {
