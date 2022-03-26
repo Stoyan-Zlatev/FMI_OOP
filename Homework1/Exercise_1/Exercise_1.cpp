@@ -12,11 +12,6 @@ size_t getFileSize(std::fstream& file)
 	return result;
 }
 
-void getData(char*& input, std::fstream& sourceFile, size_t fileSize)
-{
-	sourceFile.read(input, sizeof(input));
-}
-
 size_t getNumberLength(size_t number)
 {
 	size_t counter = 0;
@@ -103,12 +98,13 @@ void convertArrayToHex(const int* input, size_t length, char* hexInput)
 	}
 }
 
-void printHex(const char* input, size_t fileSize)
+void printHex(std::fstream& file, size_t fileSize)
 {
 	char hexNumber[2];
+	file.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
-		convertDecToHex((int)input[i], hexNumber);
+		convertDecToHex(file.get(), hexNumber);
 		std::cout << hexNumber[0] << hexNumber[1] << " ";
 	}
 	std::cout << std::endl;
@@ -140,21 +136,24 @@ size_t getNumber(const char* command, size_t numberLength)
 	return number;
 }
 
-void view(const char* input, size_t fileSize)
+void view(std::fstream& file, size_t fileSize)
 {
-	printHex(input, fileSize);
+	printHex(file, fileSize);
 
+	file.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
-		if (isCapitalLetter(input[i]) || isSmallLetter(input[i]))
-			std::cout << (char)input[i] << "  ";
+		size_t currentByte = file.get();
+		if (isCapitalLetter(currentByte) || isSmallLetter(currentByte))
+			std::cout << (char)currentByte << "  ";
 		else
 			std::cout << ".  ";
 	}
 	std::cout << std::endl;
+	file.seekg(0, std::ios::beg);
 }
 
-bool change(const char* command, char* input, std::fstream& file, size_t fileSize)
+bool change(const char* command, std::fstream& file, size_t fileSize)
 {
 	const size_t currentCommandLength = 7;
 	size_t index = getNumber(command, 7);
@@ -171,10 +170,9 @@ bool change(const char* command, char* input, std::fstream& file, size_t fileSiz
 	{
 		return false;
 	}
-	input[index] = decNumber;
 	file.seekp(index);
 	file << char(decNumber);
-	file.seekp(0, std::ios::beg);
+	file.seekg(0, std::ios::beg);
 
 	return true;
 }
@@ -188,9 +186,10 @@ void removeLastByte(const char* input, std::fstream& file, size_t& fileSize)
 	getData(input, file, fileSize);*/
 }
 
-void removeFileData(std::fstream& file, int size, const char* buffer) {
+void removeFileData(std::fstream& file, const char* buffer, size_t& fileSize) {
 	file.seekp(0, std::ios::beg);
-	file.write(buffer, size - 1);
+	file.write(buffer, --fileSize);
+	file.seekp(0, std::ios::beg);
 }
 
 void add(const char* command, char* input, std::fstream& file, size_t& fileSize)
@@ -207,10 +206,10 @@ void add(const char* command, char* input, std::fstream& file, size_t& fileSize)
 int main()
 {
 	const int BUFF = 1024;
-	//int x = 25409;
-	//std::ofstream file("source.dat");
-	//file.write((const char*)&x, sizeof(x));
-	//file.close();
+	int x = 25409;
+	std::ofstream file("source.dat");
+	file.write((const char*)&x, sizeof(x));
+	file.close();
 
 	std::cout << "Enter a file path:" << std::endl;
 	std::cout << ">";
@@ -226,11 +225,11 @@ int main()
 	}
 
 	size_t fileSize = getFileSize(sourceFile);
+
 	std::cout << "File loaded successfully! Size: " << fileSize << " bytes" << std::endl;
 	//delete
-	char* input = new char[fileSize];
+	//char* input = new char[fileSize];
 
-	getData(input, sourceFile, fileSize);
 	char command[BUFF] = "";
 	while (!isPrefix(command, "save"))
 	{
@@ -238,23 +237,25 @@ int main()
 		std::cin.getline(command, BUFF);
 		if (isPrefix(command, "view"))
 		{
-			view(input, fileSize);
+			view(sourceFile, fileSize);
 		}
 		else if (isPrefix(command, "change"))
 		{
-			if (change(command, input, sourceFile, fileSize) && sourceFile.good())
+			if (change(command, sourceFile, fileSize) && sourceFile.good())
 				std::cout << "Operation successfully executed!" << std::endl;
 			else
 				std::cout << "Error, incorrect input!" << std::endl;
 		}
 		else if (isPrefix(command, "remove"))
 		{
+			char* input = new char[fileSize];
+			sourceFile.read(input, sizeof(input));
 			sourceFile.close();
 			std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
-			removeFileData(removeFile, fileSize, input);
+			removeFileData(removeFile, input, fileSize);
 			removeFile.close();
-			input[fileSize--] = '\0';
-			getData(input, removeFile, fileSize);
+			delete[] input;
+			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
 			//sourceFile.close();
 			//std::fstream newFile(filePath, std::ios::out, std::ios::trunc);
 			////newFile.flush();
@@ -266,7 +267,7 @@ int main()
 		}
 		else if (isPrefix(command, "add"))
 		{
-			add(command, input, sourceFile, fileSize);
+			//add(command, input, sourceFile, fileSize);
 		}
 		else if (isPrefix(command, "save as"))
 		{
@@ -277,4 +278,5 @@ int main()
 
 		}
 	}
+
 }
