@@ -210,7 +210,8 @@ void add(const char* command, std::fstream& file, size_t& fileSize)
 	char hexNumber[2];
 	getHexNumber(command, hexNumber, currentCommandLength);
 	size_t value = convertHexToDec(hexNumber);
-	file << (char(value));
+	file.seekp(0, std::ios::end);
+	file.put(char(value));
 	fileSize++;
 }
 
@@ -227,7 +228,7 @@ int main()
 	char filePath[BUFF];
 	std::cin.getline(filePath, BUFF);
 
-	std::fstream sourceFile(filePath, std::ios::in | std::ios::out | std::ios::binary);
+	std::fstream sourceFile(filePath, std::ios::in | std::ios::out | std::ios::binary | std::ios::ate);
 
 	if (!sourceFile.is_open())
 	{
@@ -257,26 +258,29 @@ int main()
 		}
 		else if (isPrefix(command, "remove"))
 		{
-			char* buffer = new char[fileSize];
-			for (size_t i = 0; i < fileSize; i++)
+			if (fileSize >= 1)
 			{
-				buffer[i] = (char)sourceFile.get();
+				char* buffer = new char[fileSize];
+				for (size_t i = 0; i < fileSize; i++)
+				{
+					buffer[i] = (char)sourceFile.get();
+				}
+				sourceFile.close();
+				fileSize--;
+				std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
+				rewriteFile(removeFile, buffer, fileSize);
+				removeFile.close();
+				delete[] buffer;
+				sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in | std::ios::ate);
 			}
-			sourceFile.close();
-			fileSize--;
-			std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
-			rewriteFile(removeFile, buffer, fileSize);
-			removeFile.close();
-			delete[] buffer;
-			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
+			else
+			{
+				std::cout << "File is already empty" << std::endl;
+			}
 		}
 		else if (isPrefix(command, "add"))
 		{
-			sourceFile.close();
-			std::fstream addFile(filePath, std::ios::binary | std::ios::app);
-			add(command, addFile, fileSize);
-			addFile.close();
-			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
+			add(command, sourceFile, fileSize);
 		}
 		else if (isPrefix(command, "save as"))
 		{
@@ -290,7 +294,7 @@ int main()
 			char* newFileName = new char[textLength - 7];
 			substr(8, command, newFileName, textLength);
 			newFileName[textLength - 8] = '\0';
-			std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::app);
+			std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::ate);
 			rewriteFile(newFile, buffer, fileSize);
 			newFile.close();
 			delete[] buffer;
@@ -299,6 +303,10 @@ int main()
 		else if (isPrefix(command, "save"))
 		{
 			sourceFile.close();
+		}
+		else
+		{
+			std::cout << "Incorrect command" << std::endl;
 		}
 	}
 	sourceFile.close();
