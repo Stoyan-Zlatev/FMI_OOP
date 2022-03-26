@@ -1,0 +1,10 @@
+size_t getNumberLength(size_t number)
+{
+	size_t counter = 0;
+	while (number != 0)
+	{
+		number /= 10;
+		counter++;
+	}
+	return counter;
+}
