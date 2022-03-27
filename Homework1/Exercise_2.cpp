@@ -25,6 +25,18 @@ bool contains(const char* text, const char letter)
 	}
 	return false;
 }
+
+void getContent(const char* text, char* content, size_t startIndex)
+{
+	size_t textLength = strlen(text);
+	for (size_t i = startIndex; i < textLength; i++)
+	{
+		if (isPrefix(text + i, "</"))
+			return;
+		content[i - startIndex] = text[i];
+	}
+}
+
 enum Gender
 {
 	male,
@@ -101,20 +113,63 @@ void Student::setAvg(double avg)
 int main()
 {
 	const size_t maxStudents = 20;
+	const size_t FieldsCount = 6;
 	Student students[maxStudents];
 	const size_t BUFF = 1024;
-	std::fstream sourceFile("students.xml-fmi", std::ios::out | std::ios::in | std::ios::app);
+	char filePath[BUFF];
+	std::cout << "Enter a file path:"<<std::endl;
+	std::cout << ">";
+	std::cin.getline(filePath, BUFF);
+	std::fstream sourceFile(filePath, std::ios::out | std::ios::in | std::ios::app);
 	char line[BUFF];
 	size_t counter = 0;
+	size_t fieldsCounter = 0;
+	size_t tagLength;
+	char content[BUFF];
 	while (!sourceFile.eof())
 	{
 		sourceFile.getline(line, BUFF);
 		if (isPrefix(line, "<student>"))
 		{
-			
-		}
-		else if (isPrefix(line, "</student>"))
-		{
+			fieldsCounter = 0;
+			while (!isPrefix(line, "</student>"))
+			{
+				if(isPrefix(line, "<grade>"))
+				{ 
+					tagLength = 7;
+					fieldsCounter++;
+					//Moje da ne e kontent a promenliva za vsqko otdelno
+					getContent(line, content, tagLength);
+				}
+				else if (isPrefix(line, "<name>"))
+				{
+					tagLength = 6;
+					fieldsCounter++;
+				}
+				else if (isPrefix(line, "<fn>"))
+				{
+					tagLength = 4;
+					fieldsCounter++;
+
+				}
+				else if (isPrefix(line, "<age>"))
+				{
+					tagLength = 5;
+					fieldsCounter++;
+				}
+				else if (isPrefix(line, "<gender>"))
+				{
+					tagLength = 8;
+					fieldsCounter++;
+
+				}
+				else if (isPrefix(line, "<email>"))
+				{
+					tagLength = 7;
+					fieldsCounter++;
+				}
+			}
+			if(fieldsCounter = FieldsCount)
 			counter++;
 		}
 	}
