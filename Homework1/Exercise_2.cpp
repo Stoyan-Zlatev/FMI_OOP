@@ -26,15 +26,116 @@ bool contains(const char* text, const char letter)
 	return false;
 }
 
-void getContent(const char* text, char* content, size_t startIndex)
+void getTagLength(const char* text, size_t& startIndex)
 {
-	size_t textLength = strlen(text);
-	for (size_t i = startIndex; i < textLength; i++)
+	while (text[startIndex] != '>')
 	{
-		if (isPrefix(text + i, "</"))
-			return;
-		content[i - startIndex] = text[i];
+		startIndex++;
 	}
+	startIndex++;
+}
+
+void getContent(const char* text, char* content, size_t& startIndex, bool& isFinishedLine)
+{
+	getTagLength(text, startIndex);
+	size_t textLength = strlen(text);
+	size_t contentIndex = 0;
+	for (startIndex; startIndex < textLength; startIndex++)
+	{
+		if (isPrefix(text + startIndex, "<\\"))
+			break;
+		content[contentIndex++] = text[startIndex];
+	}
+	content[contentIndex] = '\0';
+	getTagLength(text, startIndex);
+	if (startIndex < textLength)
+		isFinishedLine = false;
+	else
+		isFinishedLine = true;
+}
+
+void swap(char& element1, char& element2)
+{
+	char temp = element1;
+	element1 = element2;
+	element2 = temp;
+}
+
+void trimWhiteSpaces(char* text)
+{
+	size_t index = 0;
+	size_t frontSpaces = 0;
+	while (text[index] == ' ')
+	{
+		index++;
+		frontSpaces++;
+	}
+	size_t textLength = strlen(text);
+	size_t backSpaces = 0;
+	for (size_t i = textLength-1; text[i] == ' '; i--)
+	{
+		backSpaces++;
+	}
+	size_t newLength = textLength - (frontSpaces + backSpaces);
+	char* resultText = new char[newLength];
+	if (frontSpaces > 0)
+		for (size_t i = 0; i < newLength; i++)
+		{
+			swap(text[i], text[i + frontSpaces]);
+		}
+	text[newLength] = '\0';
+}
+
+bool isDigit(char element)
+{
+	return element >= '0' && element <= '9';
+}
+
+size_t parseCharToInt(char element)
+{
+	return element - '0';
+}
+double parseStringToDouble(const char* content)
+{
+	double grade = 0;
+	size_t index = 0;
+	while (content[index] != '.')
+	{
+		if (isDigit(content[index]))
+		{
+			grade *= 10;
+			grade += parseCharToInt(content[index]);
+			index++;
+		}
+	}
+	index++;
+	double divider = 10;
+	while (content[index] != '\0')
+	{
+		if (isDigit(content[index]))
+		{
+			grade += ((double)parseCharToInt(content[index])) / divider;
+			index++;
+		}
+	}
+	return grade;
+}
+
+size_t parseStringToInt(const char* content)
+{
+	double number = 0;
+	size_t index = 0;
+	while (content[index] != '\0')
+	{
+		if (isDigit(content[index]))
+		{
+			number *= 10;
+			number += parseCharToInt(content[index]);
+			index++;
+		}
+	}
+	
+	return number;
 }
 
 enum Gender
@@ -52,6 +153,8 @@ class Student
 	char email[25];//contains(@)
 	double avg;//[2,6]
 public:
+	Student();
+	Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg);
 	void setName(const char* name);
 	void setFn(size_t fn);
 	void setAge(size_t age);
@@ -59,6 +162,16 @@ public:
 	void setEmail(const char* email);
 	void setAvg(double avg);
 };
+
+Student::Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg)
+{
+	setName(name);
+	setFn(fn);
+	setAge(age);
+	setGender(gender);
+	setEmail(email);
+	setAvg(avg);
+}
 
 void Student::setName(const char* name)
 {
@@ -95,7 +208,7 @@ void Student::setEmail(const char* email)
 {
 	if (strlen(email) > 25)
 		std::cout << "Email name is too long!" << std::endl;
-	
+
 	if (!contains(email, '@'))
 		std::cout << "Email must contain '@'!" << std::endl;
 	strcpy(this->email, email);
@@ -117,60 +230,71 @@ int main()
 	Student students[maxStudents];
 	const size_t BUFF = 1024;
 	char filePath[BUFF];
-	std::cout << "Enter a file path:"<<std::endl;
+	std::cout << "Enter a file path:" << std::endl;
 	std::cout << ">";
 	std::cin.getline(filePath, BUFF);
 	std::fstream sourceFile(filePath, std::ios::out | std::ios::in | std::ios::app);
 	char line[BUFF];
 	size_t counter = 0;
 	size_t fieldsCounter = 0;
-	size_t tagLength;
+	size_t currentLineIndex = 0;;
 	char content[BUFF];
+	bool isFinishedLine = true;
 	while (!sourceFile.eof())
 	{
 		sourceFile.getline(line, BUFF);
 		if (isPrefix(line, "<student>"))
 		{
 			fieldsCounter = 0;
-			while (!isPrefix(line, "</student>"))
+			while (!isPrefix(line, "<\\student>"))
 			{
-				if(isPrefix(line, "<grade>"))
-				{ 
-					tagLength = 7;
-					fieldsCounter++;
-					//Moje da ne e kontent a promenliva za vsqko otdelno
-					getContent(line, content, tagLength);
-				}
-				else if (isPrefix(line, "<name>"))
+				if (isFinishedLine)
 				{
-					tagLength = 6;
-					fieldsCounter++;
+					currentLineIndex = 0;
+					sourceFile.getline(line, BUFF);
 				}
-				else if (isPrefix(line, "<fn>"))
+				if (isPrefix(line + currentLineIndex, "<grade>"))
 				{
-					tagLength = 4;
 					fieldsCounter++;
-
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
+					double grade = parseStringToDouble(content);
 				}
-				else if (isPrefix(line, "<age>"))
+				else if (isPrefix(line + currentLineIndex, "<name>"))
 				{
-					tagLength = 5;
 					fieldsCounter++;
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
 				}
-				else if (isPrefix(line, "<gender>"))
+				else if (isPrefix(line + currentLineIndex, "<fn>"))
 				{
-					tagLength = 8;
 					fieldsCounter++;
-
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
+					size_t fn = parseStringToInt(content);
 				}
-				else if (isPrefix(line, "<email>"))
+				else if (isPrefix(line + currentLineIndex, "<age>"))
 				{
-					tagLength = 7;
 					fieldsCounter++;
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
+					size_t age = parseStringToInt(content);
+				}
+				else if (isPrefix(line + currentLineIndex, "<gender>"))
+				{
+					fieldsCounter++;
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
+				}
+				else if (isPrefix(line + currentLineIndex, "<email>"))
+				{
+					fieldsCounter++;
+					getContent(line, content, currentLineIndex, isFinishedLine);
+					trimWhiteSpaces(content);
 				}
 			}
-			if(fieldsCounter = FieldsCount)
-			counter++;
+			if (fieldsCounter = FieldsCount)
+				counter++;
 		}
 	}
 }
