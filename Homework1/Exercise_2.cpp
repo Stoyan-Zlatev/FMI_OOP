@@ -65,14 +65,14 @@ void trimWhiteSpaces(char* text)
 {
 	size_t index = 0;
 	size_t frontSpaces = 0;
-	while (text[index] == ' ')
+	while (text[index] == ' ' || text[index] == '\t')
 	{
 		index++;
 		frontSpaces++;
 	}
 	size_t textLength = strlen(text);
 	size_t backSpaces = 0;
-	for (size_t i = textLength-1; text[i] == ' '; i--)
+	for (size_t i = textLength - 1; (text[i] == ' ' || text[index] == '\t'); i--)
 	{
 		backSpaces++;
 	}
@@ -95,6 +95,7 @@ size_t parseCharToInt(char element)
 {
 	return element - '0';
 }
+
 double parseStringToDouble(const char* content)
 {
 	double grade = 0;
@@ -134,11 +135,11 @@ size_t parseStringToInt(const char* content)
 			index++;
 		}
 	}
-	
+
 	return number;
 }
 
-enum Gender
+enum class Gender
 {
 	male,
 	female
@@ -155,13 +156,23 @@ class Student
 public:
 	Student();
 	Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg);
+
 	void setName(const char* name);
 	void setFn(size_t fn);
 	void setAge(size_t age);
 	void setGender(Gender gender);
 	void setEmail(const char* email);
 	void setAvg(double avg);
+
+	size_t getName() const;
+	size_t getFn() const;
+	size_t getAge() const;
+	size_t getGender() const;
+	size_t getEmail() const;
+	size_t getAvg() const;
 };
+
+Student::Student() {}
 
 Student::Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg)
 {
@@ -216,11 +227,73 @@ void Student::setEmail(const char* email)
 
 void Student::setAvg(double avg)
 {
-	if (avg < 2 || avg > 6)
+	const size_t minGrade = 2;
+	const size_t maxGrade = 6;
+
+	if (avg < minGrade || avg > maxGrade)
 	{
 		std::cout << "Invalid average grade!" << std::endl;
 	}
 	this->avg = avg;
+}
+
+size_t Student::getFn() const
+{
+	return this->fn;
+}
+
+int findByFn(Student* students, size_t fn, size_t studentsCount)
+{
+	for (size_t i = 0; i < studentsCount; i++)
+	{
+		if (students[i].getFn() == fn)
+			return i;
+	}
+	return -1;
+}
+
+void swap(Student& a, Student& b)
+{
+	Student temp = a;
+	a = b;
+	b = temp;
+}
+
+void selectionSort(Student* students, size_t studentCount)
+{
+	for (size_t i = 0; i < studentCount - 1; i++)
+	{
+		int minElementIndex = i;
+		for (size_t j = i + 1; j < studentCount; j++)
+		{
+			if (students[j].getFn() < students[minElementIndex].getFn())
+				minElementIndex = j;
+		}
+		if (minElementIndex != i)
+			swap(students[i], students[minElementIndex]);
+	}
+}
+
+void orderByFn(Student* students, size_t fn, size_t studentsCount)
+{
+	size_t searchedIndex = findByFn(students, fn, studentsCount);
+	if (searchedIndex == -1)
+	{
+		std::cout << "Student not found" << std::endl;
+		return;
+	}
+	selectionSort(students, studentsCount);
+}
+
+void edit(Student* students,size_t fn, size_t studentsCount)
+{
+	size_t searchedIndex = findByFn(students,fn, studentsCount);
+	if (searchedIndex == -1)
+	{
+		std::cout << "Student not found" << std::endl;
+		return;
+	}
+	students[searchedIndex].setFn(fn);
 }
 
 int main()
@@ -234,8 +307,17 @@ int main()
 	std::cout << ">";
 	std::cin.getline(filePath, BUFF);
 	std::fstream sourceFile(filePath, std::ios::out | std::ios::in | std::ios::app);
+
+	if (!sourceFile.is_open())
+	{
+		std::cout << "Error" << std::endl;
+		return -1;
+	}
+
+	std::cout << "File loaded successfully!" << std::endl;
+
 	char line[BUFF];
-	size_t counter = 0;
+	size_t studentsCounter = 0;
 	size_t fieldsCounter = 0;
 	size_t currentLineIndex = 0;;
 	char content[BUFF];
@@ -245,6 +327,7 @@ int main()
 		sourceFile.getline(line, BUFF);
 		if (isPrefix(line, "<student>"))
 		{
+			Student student;
 			fieldsCounter = 0;
 			while (!isPrefix(line, "<\\student>"))
 			{
@@ -258,43 +341,59 @@ int main()
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
-					double grade = parseStringToDouble(content);
+					student.setAvg(parseStringToDouble(content));
 				}
 				else if (isPrefix(line + currentLineIndex, "<name>"))
 				{
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
+					student.setName(content);
 				}
 				else if (isPrefix(line + currentLineIndex, "<fn>"))
 				{
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
-					size_t fn = parseStringToInt(content);
+					student.setFn(parseStringToInt(content));
 				}
 				else if (isPrefix(line + currentLineIndex, "<age>"))
 				{
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
-					size_t age = parseStringToInt(content);
+					student.setAge(parseStringToInt(content));
 				}
 				else if (isPrefix(line + currentLineIndex, "<gender>"))
 				{
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
+					//student.setGender(content);
 				}
 				else if (isPrefix(line + currentLineIndex, "<email>"))
 				{
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
+					student.setEmail(content);
 				}
 			}
-			if (fieldsCounter = FieldsCount)
-				counter++;
+			if (fieldsCounter == FieldsCount)
+			{
+				students[studentsCounter] = student;
+				studentsCounter++;
+			}
 		}
+	}
+
+	std::fstream resultFile(filePath, std::ios::trunc | std::ios::out | std::ios::app);
+	//Writing the new file in the right format
+	for (size_t i = 0; i < studentsCounter; i++)
+	{
+		resultFile << "<student>";
+		resultFile << "\t<name>";
+		resultFile << "</name>";
+		resultFile << "</student>";
 	}
 }
