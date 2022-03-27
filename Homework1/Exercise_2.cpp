@@ -139,50 +139,71 @@ size_t parseStringToInt(const char* content)
 	return number;
 }
 
-enum class Gender
+enum class GenderType
 {
-	male,
-	female
+	Male,
+	Female,
+	Unknown
 };
+
+static class GenderUtils
+{
+	static char male[5];
+	static char female[7];
+public:
+	GenderUtils();
+	static GenderType getGenderType(const char* gender);
+	static const char* getGenderTypeAsString(GenderType gender);
+};
+
+GenderUtils::GenderUtils()
+{
+	strcpy(male, "Male");
+	strcpy(female, "Female");
+}
+
+GenderType GenderUtils::getGenderType(const char* gender)
+{
+	if (strcmp(gender, "Male"))
+		return GenderType::Male;
+	else if (strcmp(gender, "Female"))
+		return GenderType::Female;
+	else
+		return GenderType::Unknown;
+}
+
+
+const char* GenderUtils::getGenderTypeAsString(GenderType gender)
+{
+	if (gender == GenderType::Male)
+		return male;
+	else if (gender == GenderType::Female)
+		return female;
+}
 
 class Student
 {
 	char name[25];
 	size_t fn;//unique
 	size_t age;//[15,65]
-	Gender gender;
+	GenderType gender;
 	char email[25];//contains(@)
 	double avg;//[2,6]
 public:
-	Student();
-	Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg);
-
 	void setName(const char* name);
 	void setFn(size_t fn);
 	void setAge(size_t age);
-	void setGender(Gender gender);
+	void setGender(GenderType gender);
 	void setEmail(const char* email);
 	void setAvg(double avg);
 
-	size_t getName() const;
+	char* getName() const;
 	size_t getFn() const;
 	size_t getAge() const;
-	size_t getGender() const;
-	size_t getEmail() const;
-	size_t getAvg() const;
+	GenderType getGender() const;
+	char* getEmail() const;
+	double getAvg() const;
 };
-
-Student::Student() {}
-
-Student::Student(const char* name, size_t fn, size_t age, Gender gender, const char* email, double avg)
-{
-	setName(name);
-	setFn(fn);
-	setAge(age);
-	setGender(gender);
-	setEmail(email);
-	setAvg(avg);
-}
 
 void Student::setName(const char* name)
 {
@@ -210,7 +231,7 @@ void Student::setAge(size_t age)
 	this->age = age;
 }
 
-void Student::setGender(Gender gender)
+void Student::setGender(GenderType gender)
 {
 	this->gender = gender;
 }
@@ -240,6 +261,16 @@ void Student::setAvg(double avg)
 size_t Student::getFn() const
 {
 	return this->fn;
+}
+
+size_t Student::getAge() const
+{
+	return this->age;
+}
+
+GenderType Student::getGender() const
+{
+	return this->gender;
 }
 
 int findByFn(Student* students, size_t fn, size_t studentsCount)
@@ -285,9 +316,9 @@ void orderByFn(Student* students, size_t fn, size_t studentsCount)
 	selectionSort(students, studentsCount);
 }
 
-void edit(Student* students,size_t fn, size_t studentsCount)
+void editFn(Student* students, size_t fn, size_t studentsCount)
 {
-	size_t searchedIndex = findByFn(students,fn, studentsCount);
+	size_t searchedIndex = findByFn(students, fn, studentsCount);
 	if (searchedIndex == -1)
 	{
 		std::cout << "Student not found" << std::endl;
@@ -369,7 +400,7 @@ int main()
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
-					//student.setGender(content);
+					student.setGender(GenderUtils::getGenderType(content));
 				}
 				else if (isPrefix(line + currentLineIndex, "<email>"))
 				{
@@ -393,7 +424,11 @@ int main()
 	{
 		resultFile << "<student>";
 		resultFile << "\t<name>";
+		resultFile << students[i].getName();
 		resultFile << "</name>";
+		resultFile << '\n';
 		resultFile << "</student>";
+		resultFile << '\n';
+
 	}
 }
