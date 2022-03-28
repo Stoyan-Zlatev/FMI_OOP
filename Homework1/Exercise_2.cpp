@@ -143,42 +143,22 @@ enum class GenderType
 {
 	Male,
 	Female,
-	Unknown
 };
 
-static class GenderUtils
+const char* convertGenderToString(GenderType genderType)
 {
-	static char male[5];
-	static char female[7];
-public:
-	GenderUtils();
-	static GenderType getGenderType(const char* gender);
-	static const char* getGenderTypeAsString(GenderType gender);
-};
-
-GenderUtils::GenderUtils()
-{
-	strcpy(male, "Male");
-	strcpy(female, "Female");
+	if (GenderType::Male == genderType)
+		return "Male";
+	else if (GenderType::Female == genderType)
+		return "Female";
 }
 
-GenderType GenderUtils::getGenderType(const char* gender)
+GenderType convertStringToGender(const char* str)
 {
-	if (strcmp(gender, "Male"))
+	if (str == "Male")
 		return GenderType::Male;
-	else if (strcmp(gender, "Female"))
+	else if (str == "Female")
 		return GenderType::Female;
-	else
-		return GenderType::Unknown;
-}
-
-
-const char* GenderUtils::getGenderTypeAsString(GenderType gender)
-{
-	if (gender == GenderType::Male)
-		return male;
-	else if (gender == GenderType::Female)
-		return female;
 }
 
 class Student
@@ -197,11 +177,11 @@ public:
 	void setEmail(const char* email);
 	void setAvg(double avg);
 
-	char* getName() const;
+	const char* getName() const;
 	size_t getFn() const;
 	size_t getAge() const;
 	GenderType getGender() const;
-	char* getEmail() const;
+	const char* getEmail() const;
 	double getAvg() const;
 };
 
@@ -273,6 +253,21 @@ GenderType Student::getGender() const
 	return this->gender;
 }
 
+const char* Student::getName() const
+{
+	return this->name;
+}
+
+const char* Student::getEmail() const
+{
+	return this->email;
+}
+
+double Student::getAvg() const
+{
+	return this->avg;
+}
+
 int findByFn(Student* students, size_t fn, size_t studentsCount)
 {
 	for (size_t i = 0; i < studentsCount; i++)
@@ -325,6 +320,33 @@ void editFn(Student* students, size_t fn, size_t studentsCount)
 		return;
 	}
 	students[searchedIndex].setFn(fn);
+}
+
+void saveFile(const Student* students, std::fstream& resultFile, size_t studentsCounter)
+{
+	for (size_t i = 0; i < studentsCounter; i++)
+	{
+		resultFile << "<student>\n";
+		resultFile << "\t<name>";
+		resultFile << students[i].getName();
+		resultFile << "</name>\n";
+		resultFile << "\t<fn>";
+		resultFile << students[i].getFn();
+		resultFile << "</fn>\n";
+		resultFile << "\t<age>";
+		resultFile << students[i].getAge();
+		resultFile << "</age>\n";
+		resultFile << "\t<gender>";
+		resultFile << convertGenderToString(students[i].getGender());
+		resultFile << "</gender>\n";
+		resultFile << "\t<email>";
+		resultFile << students[i].getEmail();
+		resultFile << "</email>\n";
+		resultFile << "\t<grade>";
+		resultFile << students[i].getAvg();
+		resultFile << "</grade>\n";
+		resultFile << "</student>\n\n";
+	}
 }
 
 int main()
@@ -400,7 +422,7 @@ int main()
 					fieldsCounter++;
 					getContent(line, content, currentLineIndex, isFinishedLine);
 					trimWhiteSpaces(content);
-					student.setGender(GenderUtils::getGenderType(content));
+					student.setGender(convertStringToGender(content));
 				}
 				else if (isPrefix(line + currentLineIndex, "<email>"))
 				{
@@ -420,15 +442,6 @@ int main()
 
 	std::fstream resultFile(filePath, std::ios::trunc | std::ios::out | std::ios::app);
 	//Writing the new file in the right format
-	for (size_t i = 0; i < studentsCounter; i++)
-	{
-		resultFile << "<student>";
-		resultFile << "\t<name>";
-		resultFile << students[i].getName();
-		resultFile << "</name>";
-		resultFile << '\n';
-		resultFile << "</student>";
-		resultFile << '\n';
-
-	}
+	
+	saveFile(students, resultFile, studentsCounter);
 }
