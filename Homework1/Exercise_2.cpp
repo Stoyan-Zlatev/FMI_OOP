@@ -311,7 +311,8 @@ void orderByFn(Student* students, size_t fn, size_t studentsCount)
 	selectionSort(students, studentsCount);
 }
 
-void editFn(Student* students, size_t fn, size_t studentsCount)
+//Do a parent function that searches by fn and edit by number and string and sort by number and string
+void editNumber(Student* students, double number, size_t fn, size_t studentsCount)
 {
 	size_t searchedIndex = findByFn(students, fn, studentsCount);
 	if (searchedIndex == -1)
@@ -319,11 +320,14 @@ void editFn(Student* students, size_t fn, size_t studentsCount)
 		std::cout << "Student not found" << std::endl;
 		return;
 	}
+
+
 	students[searchedIndex].setFn(fn);
 }
 
-void saveFile(const Student* students, std::fstream& resultFile, size_t studentsCounter)
+void saveFile(const Student* students, const char* filePath, size_t studentsCounter)
 {
+	std::fstream resultFile(filePath, std::ios::trunc | std::ios::out | std::ios::app);
 	for (size_t i = 0; i < studentsCounter; i++)
 	{
 		resultFile << "<student>\n";
@@ -347,6 +351,7 @@ void saveFile(const Student* students, std::fstream& resultFile, size_t students
 		resultFile << "</grade>\n";
 		resultFile << "</student>\n\n";
 	}
+	resultFile.close();
 }
 
 int main()
@@ -440,8 +445,5 @@ int main()
 		}
 	}
 
-	std::fstream resultFile(filePath, std::ios::trunc | std::ios::out | std::ios::app);
-	//Writing the new file in the right format
-	
-	saveFile(students, resultFile, studentsCounter);
+	saveFile(students, filePath, studentsCounter);
 }
