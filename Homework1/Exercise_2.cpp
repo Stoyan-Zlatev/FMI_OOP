@@ -28,10 +28,12 @@ bool contains(const char* text, const char letter)
 
 void getTagLength(const char* text, size_t& startIndex)
 {
-	while (text[startIndex] != '>')
+	while (text[startIndex] != '>' && text[startIndex]!='\0')
 	{
 		startIndex++;
 	}
+
+	if(text[startIndex!='\0'])
 	startIndex++;
 }
 
@@ -377,9 +379,10 @@ int main()
 	char line[BUFF];
 	size_t studentsCounter = 0;
 	size_t fieldsCounter = 0;
-	size_t currentLineIndex = 0;;
+	size_t currentLineIndex = 0;
+	size_t lastLineIndex = 0;
 	char content[BUFF];
-	bool isFinishedLine = true;
+	bool isFinishedLine = false;
 	while (!sourceFile.eof())
 	{
 		sourceFile.getline(line, BUFF);
@@ -387,55 +390,51 @@ int main()
 		{
 			Student student;
 			fieldsCounter = 0;
+			isFinishedLine = false;
 			while (!isPrefix(line, "<\\student>"))
 			{
 				if (isFinishedLine)
 				{
 					currentLineIndex = 0;
-					sourceFile.getline(line, BUFF);
+					lastLineIndex = 0;
+					sourceFile.getline(line, BUFF);				
 				}
-				if (isPrefix(line + currentLineIndex, "<grade>"))
+
+				getContent(line, content, currentLineIndex, isFinishedLine);
+				//trim all spaces
+				trimWhiteSpaces(content); 
+				
+				if (isPrefix(line + lastLineIndex, "<grade>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setAvg(parseStringToDouble(content));
 				}
-				else if (isPrefix(line + currentLineIndex, "<name>"))
+				else if (isPrefix(line + lastLineIndex, "<name>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setName(content);
 				}
-				else if (isPrefix(line + currentLineIndex, "<fn>"))
+				else if (isPrefix(line + lastLineIndex, "<fn>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setFn(parseStringToInt(content));
 				}
-				else if (isPrefix(line + currentLineIndex, "<age>"))
+				else if (isPrefix(line + lastLineIndex, "<age>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setAge(parseStringToInt(content));
 				}
-				else if (isPrefix(line + currentLineIndex, "<gender>"))
+				else if (isPrefix(line + lastLineIndex, "<gender>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setGender(convertStringToGender(content));
 				}
-				else if (isPrefix(line + currentLineIndex, "<email>"))
+				else if (isPrefix(line + lastLineIndex, "<email>"))
 				{
 					fieldsCounter++;
-					getContent(line, content, currentLineIndex, isFinishedLine);
-					trimWhiteSpaces(content);
 					student.setEmail(content);
 				}
+				lastLineIndex = currentLineIndex;
 			}
 			if (fieldsCounter == FieldsCount)
 			{
