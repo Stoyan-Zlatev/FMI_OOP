@@ -76,13 +76,6 @@ void getContent(const char* text, char* content, size_t whiteSpaces, size_t& sta
 		isFinishedLine = true;
 }
 
-void swap(char& element1, char& element2)
-{
-	char temp = element1;
-	element1 = element2;
-	element2 = temp;
-}
-
 size_t trimwhiteSpaces(const char* text)
 {
 	size_t index = 0;
@@ -264,25 +257,19 @@ int findByFn(Student* students, size_t fn, size_t studentsCount)
 	return -1;
 }
 
+void swap(char*& element1, char*& element2)
+{
+	char* temp = element1;
+	element1 = element2;
+	element2 = temp;
+}
+
 void swap(Student& a, Student& b)
 {
 	Student temp = a;
 	a = b;
 	b = temp;
 }
-
-//size_t getFn(const char* command, size_t startIndex)
-//{
-//	size_t currentIndex = startIndex;
-//	size_t fn = 0;
-//	while (isDigit(command[currentIndex]))
-//	{
-//		fn *= 10;
-//		fn += parseCharToInt(command[currentIndex]);
-//		currentIndex++;
-//	}
-//	return fn;
-//}
 
 double getNumberValue(const char* command, size_t& startIndex)
 {
@@ -297,7 +284,6 @@ double getNumberValue(const char* command, size_t& startIndex)
 	{
 		startIndex++;
 		size_t divider = 10;
-		//use getFn and getValue together 
 		while (isDigit(command[startIndex]))
 		{
 			value += (parseCharToInt(command[startIndex])) / divider;
@@ -308,18 +294,21 @@ double getNumberValue(const char* command, size_t& startIndex)
 	return value;
 }
 
-void selectionSort(Student* students, size_t studentCount)
+void selectionSort(Student* students, char** stringArray, size_t studentCount)
 {
 	for (size_t i = 0; i < studentCount - 1; i++)
 	{
 		int minElementIndex = i;
 		for (size_t j = i + 1; j < studentCount; j++)
 		{
-			if (students[j].getFn() < students[minElementIndex].getFn())
+			if (strcmp(stringArray[i],stringArray[minElementIndex]))
 				minElementIndex = j;
 		}
 		if (minElementIndex != i)
+		{
+			swap(stringArray[i], stringArray[minElementIndex]);
 			swap(students[i], students[minElementIndex]);
+		}
 	}
 }
 
@@ -331,40 +320,6 @@ void getStringValue(const char* command, char* field, size_t startIndex)
 		field[index++] = command[startIndex++];
 	}
 	field[index] = '\0';
-}
-
-void change(const char* command, Student* students, size_t studentsCount)
-{
-	const size_t commandMaxLength = 4;
-	char changeCommand[commandMaxLength];
-	size_t startIndex = 0;
-	getStringValue(command, changeCommand, startIndex);
-	const size_t spaceSize = 1;
-	size_t fn = getNumberValue(command, startIndex);
-	startIndex += spaceSize;
-	size_t fnLength = getNumberLength(fn);
-	size_t searchedIndex = findByFn(students, fn, studentsCount);
-
-	if (searchedIndex == -1)
-	{
-		std::cout << "Student not found" << std::endl;
-		return;
-	}
-
-	char field[maxFieldLength];
-	getStringValue(command, field, startIndex);
-	if (strcmp(changeCommand, "edit"))
-		edit(students, startIndex, searchedIndex, field, command, spaceSize);
-	else if (strcmp(changeCommand, "sort"))
-		sort(students, field, studentsCount);
-}
-
-void sort(Student* students, const char* field, size_t studentsCount)
-{
-	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
-		sortNumber(students, studentsCount, field);
-	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
-		sortNumber(students, studentsCount, field);
 }
 
 void sortNumber(Student* students, size_t studentsCount, const char* field)
@@ -395,7 +350,7 @@ void sortNumber(Student* students, size_t studentsCount, const char* field)
 
 void sortString(Student* students, size_t studentsCount, const char* field)
 {
-	char** stringArray = new char*[studentsCount];
+	char** stringArray = new char* [studentsCount];
 	if (strcmp(field, "name") == 0)
 	{
 		for (size_t i = 0; i < studentsCount; i++)
@@ -420,16 +375,6 @@ void sortString(Student* students, size_t studentsCount, const char* field)
 			strcpy(stringArray[i], convertGenderToString(students[i].getGender()));
 		}
 	}
-}
-
-void edit(Student* students, size_t startIndex, size_t searchedIndex, char* field, const char* command, const size_t spaceSize)
-{
-	startIndex += spaceSize;
-	startIndex += strlen(field);
-	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
-		editNumber(searchedIndex, startIndex, field, command, students);
-	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
-		editString(searchedIndex, startIndex, field, command, students);
 }
 
 void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
@@ -458,6 +403,50 @@ void editString(size_t searchedIndex, size_t startIndex, const char* field, cons
 		students[searchedIndex].setEmail(value);
 	else if (strcmp(field, "gender") == 0)
 		students[searchedIndex].setGender(convertStringToGender(value));
+}
+
+void edit(Student* students, size_t startIndex, size_t searchedIndex, char* field, const char* command, const size_t spaceSize)
+{
+	startIndex += spaceSize;
+	startIndex += strlen(field);
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		editNumber(searchedIndex, startIndex, field, command, students);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		editString(searchedIndex, startIndex, field, command, students);
+}
+
+void sort(Student* students, const char* field, size_t studentsCount)
+{
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		sortNumber(students, studentsCount, field);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		sortNumber(students, studentsCount, field);
+}
+
+void change(const char* command, Student* students, size_t studentsCount)
+{
+	const size_t commandMaxLength = 4;
+	char changeCommand[commandMaxLength];
+	size_t startIndex = 0;
+	getStringValue(command, changeCommand, startIndex);
+	const size_t spaceSize = 1;
+	size_t fn = getNumberValue(command, startIndex);
+	startIndex += spaceSize;
+	size_t fnLength = getNumberLength(fn);
+	size_t searchedIndex = findByFn(students, fn, studentsCount);
+
+	if (searchedIndex == -1)
+	{
+		std::cout << "Student not found" << std::endl;
+		return;
+	}
+
+	char field[maxFieldLength];
+	getStringValue(command, field, startIndex);
+	if (strcmp(changeCommand, "edit"))
+		edit(students, startIndex, searchedIndex, field, command, spaceSize);
+	else if (strcmp(changeCommand, "sort"))
+		sort(students, field, studentsCount);
 }
 
 bool isUniqueFn(Student* students, int fn, size_t studentsCount)
