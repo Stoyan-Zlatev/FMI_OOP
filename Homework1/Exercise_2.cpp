@@ -588,7 +588,10 @@ int main()
 	std::cin.getline(line, BUFF);
 	while (!isPrefix(line, "save"))
 	{
-		change(line, students, studentsCounter);
+		if (isPrefix(line, "edit") || isPrefix(line, "sort"))
+			change(line, students, studentsCounter);
+		else
+			std::cout << "Invalid command" << std::endl;
 		std::cout << ">";
 		std::cin.getline(line, BUFF);
 	}
