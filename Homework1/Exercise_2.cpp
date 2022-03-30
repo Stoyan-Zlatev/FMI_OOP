@@ -323,17 +323,6 @@ void selectionSort(Student* students, size_t studentCount)
 	}
 }
 
-void orderByFn(Student* students, size_t fn, size_t studentsCount)
-{
-	size_t searchedIndex = findByFn(students, fn, studentsCount);
-	if (searchedIndex == -1)
-	{
-		std::cout << "Student not found" << std::endl;
-		return;
-	}
-	selectionSort(students, studentsCount);
-}
-
 void getStringValue(const char* command, char* field, size_t startIndex)
 {
 	size_t index = 0;
@@ -344,62 +333,13 @@ void getStringValue(const char* command, char* field, size_t startIndex)
 	field[index] = '\0';
 }
 
-//Do a parent function that searches by fn and edit by number and string and sort by number and string
-//void edit(const char* command, Student* students, size_t studentsCount, bool (*func)(size_t, size_t, const char*,const char*, Student*))
-//{
-//	const size_t editTagLength = 5;
-//	const size_t spaceSize = 1;
-//	size_t startIndex = editTagLength;
-//	size_t fn = getNumberValue(command, startIndex);
-//	startIndex += spaceSize;
-//	size_t fnLength = getNumberLength(fn);
-//	size_t searchedIndex = findByFn(students, fn, studentsCount);
-//
-//	if (searchedIndex == -1)
-//	{
-//		std::cout << "Student not found" << std::endl;
-//		return;
-//	}
-//
-//	char field[maxFieldLength];
-//	getStringValue(command, field, startIndex);
-//	startIndex += spaceSize;
-//	startIndex += strlen(field);
-//}
-//
-//void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
-//{
-//	double value = getNumberValue(command, startIndex);
-//
-//
-//	if (strcmp(field, "fn") == 0)
-//		students[searchedIndex].setFn(value);
-//	else if (strcmp(field, "grade") == 0)
-//		students[searchedIndex].setAvg(value);
-//	else if (strcmp(field, "age") == 0)
-//		students[searchedIndex].setAge(value);
-//}
-//
-//void editString(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
-//{
-//	const size_t maxStringFieldLength = 25;
-//	char value[maxStringFieldLength];
-//	getStringValue(command, value, startIndex);
-//
-//
-//	if (strcmp(field, "name") == 0)
-//		students[searchedIndex].setName(value);
-//	else if (strcmp(field, "email") == 0)
-//		students[searchedIndex].setEmail(value);
-//	else if (strcmp(field, "gender") == 0)
-//		students[searchedIndex].setGender(convertStringToGender(value));
-//}
-
-void editNumber(const char* command, Student* students, size_t studentsCount)
+void change(const char* command, Student* students, size_t studentsCount)
 {
-	const size_t editTagLength = 5;
+	const size_t commandMaxLength = 4;
+	char changeCommand[commandMaxLength];
+	size_t startIndex = 0;
+	getStringValue(command, changeCommand, startIndex);
 	const size_t spaceSize = 1;
-	size_t startIndex = editTagLength;
 	size_t fn = getNumberValue(command, startIndex);
 	startIndex += spaceSize;
 	size_t fnLength = getNumberLength(fn);
@@ -413,8 +353,87 @@ void editNumber(const char* command, Student* students, size_t studentsCount)
 
 	char field[maxFieldLength];
 	getStringValue(command, field, startIndex);
+	if (strcmp(changeCommand, "edit"))
+		edit(students, startIndex, searchedIndex, field, command, spaceSize);
+	else if (strcmp(changeCommand, "sort"))
+		sort(students, field, studentsCount);
+}
+
+void sort(Student* students, const char* field, size_t studentsCount)
+{
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		sortNumber(students, studentsCount, field);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		sortNumber(students, studentsCount, field);
+}
+
+void sortNumber(Student* students, size_t studentsCount, const char* field)
+{
+	double* numberArray = new double[studentsCount];
+	if (strcmp(field, "fn") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			numberArray[i] = students[i].getFn();
+		}
+	}
+	else if (strcmp(field, "grade") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			numberArray[i] = students[i].getAvg();
+		}
+	}
+	else if (strcmp(field, "age") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			numberArray[i] = students[i].getAge();
+		}
+	}
+}
+
+void sortString(Student* students, size_t studentsCount, const char* field)
+{
+	char** stringArray = new char*[studentsCount];
+	if (strcmp(field, "name") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			stringArray[i] = new char[strlen(students[i].getName())];
+			strcpy(stringArray[i], students[i].getName());
+		}
+	}
+	else if (strcmp(field, "email") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			stringArray[i] = new char[strlen(students[i].getEmail())];
+			strcpy(stringArray[i], students[i].getEmail());
+		}
+	}
+	else if (strcmp(field, "gender") == 0)
+	{
+		for (size_t i = 0; i < studentsCount; i++)
+		{
+			stringArray[i] = new char[strlen(convertGenderToString(students[i].getGender()))];
+			strcpy(stringArray[i], convertGenderToString(students[i].getGender()));
+		}
+	}
+}
+
+void edit(Student* students, size_t startIndex, size_t searchedIndex, char* field, const char* command, const size_t spaceSize)
+{
 	startIndex += spaceSize;
 	startIndex += strlen(field);
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		editNumber(searchedIndex, startIndex, field, command, students);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		editString(searchedIndex, startIndex, field, command, students);
+}
+
+void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
+{
 	double value = getNumberValue(command, startIndex);
 
 
@@ -426,26 +445,8 @@ void editNumber(const char* command, Student* students, size_t studentsCount)
 		students[searchedIndex].setAge(value);
 }
 
-void editString(const char* command, Student* students, size_t studentsCount)
+void editString(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
 {
-	const size_t editTagLength = 5;
-	const size_t spaceSize = 1;
-	size_t startIndex = editTagLength;
-	size_t fn = getNumberValue(command, startIndex);
-	startIndex += spaceSize;
-	size_t fnLength = getNumberLength(fn);
-	size_t searchedIndex = findByFn(students, fn, studentsCount);
-
-	if (searchedIndex == -1)
-	{
-		std::cout << "Student not found" << std::endl;
-		return;
-	}
-
-	char field[maxFieldLength];
-	getStringValue(command, field, startIndex);
-	startIndex += spaceSize;
-	startIndex += strlen(field);
 	const size_t maxStringFieldLength = 25;
 	char value[maxStringFieldLength];
 	getStringValue(command, value, startIndex);
@@ -591,20 +592,14 @@ int main()
 			}
 		}
 	}
+	//here?
 	sourceFile.close();
 
 	std::cout << ">";
 	std::cin.getline(line, BUFF);
 	while (!isPrefix(line, "save"))
 	{
-		if (isPrefix(line, "edit"))
-		{
-			editNumber(line, students, studentsCounter);
-		}
-		if (isPrefix(line, "sort"))
-		{
-			editNumber(line, students, studentsCounter);
-		}
+		change(line, students, studentsCounter);
 		std::cout << ">";
 		std::cin.getline(line, BUFF);
 	}
