@@ -4,6 +4,8 @@
 
 #pragma warning(disable:4996)
 
+const size_t maxFieldLength = 6;
+
 bool isPrefix(const char* text, const char* prefix)
 {
 	int i = 0;
@@ -26,21 +28,36 @@ bool contains(const char* text, const char letter)
 	return false;
 }
 
+size_t getNumberLength(size_t number)
+{
+	if (number == 0)
+	{
+		return 1;
+	}
+	size_t counter = 0;
+	while (number != 0)
+	{
+		number /= 10;
+		counter++;
+	}
+	return counter;
+}
+
 void getTagLength(const char* text, size_t& startIndex)
 {
-	while (text[startIndex] != '>' && text[startIndex]!='\0')
+	while (text[startIndex] != '>' && text[startIndex] != '\0')
 	{
 		startIndex++;
 	}
 
-	if(text[startIndex!='\0'])
-	startIndex++;
+	if (text[startIndex != '\0'])
+		startIndex++;
 }
 
 void getContent(const char* text, char* content, size_t& startIndex, bool& isFinishedLine)
 {
+	size_t textLength = strlen(text) + startIndex;
 	getTagLength(text, startIndex);
-	size_t textLength = strlen(text);
 	size_t contentIndex = 0;
 	for (startIndex; startIndex < textLength; startIndex++)
 	{
@@ -63,29 +80,14 @@ void swap(char& element1, char& element2)
 	element2 = temp;
 }
 
-void trimWhiteSpaces(char* text)
+size_t trimwhiteSpaces(const char* text)
 {
 	size_t index = 0;
-	size_t frontSpaces = 0;
 	while (text[index] == ' ' || text[index] == '\t')
 	{
 		index++;
-		frontSpaces++;
 	}
-	size_t textLength = strlen(text);
-	size_t backSpaces = 0;
-	for (size_t i = textLength - 1; (text[i] == ' ' || text[index] == '\t'); i--)
-	{
-		backSpaces++;
-	}
-	size_t newLength = textLength - (frontSpaces + backSpaces);
-	char* resultText = new char[newLength];
-	if (frontSpaces > 0)
-		for (size_t i = 0; i < newLength; i++)
-		{
-			swap(text[i], text[i + frontSpaces]);
-		}
-	text[newLength] = '\0';
+	return index;
 }
 
 bool isDigit(char element)
@@ -145,6 +147,7 @@ enum class GenderType
 {
 	Male,
 	Female,
+	Unknown
 };
 
 const char* convertGenderToString(GenderType genderType)
@@ -153,14 +156,18 @@ const char* convertGenderToString(GenderType genderType)
 		return "Male";
 	else if (GenderType::Female == genderType)
 		return "Female";
+	else
+		return "Unkown";
 }
 
 GenderType convertStringToGender(const char* str)
 {
-	if (str == "Male")
+	if (strcmp(str, "Male") == 0)
 		return GenderType::Male;
-	else if (str == "Female")
+	else if (strcmp(str, "Female") == 0)
 		return GenderType::Female;
+	else
+		return GenderType::Unknown;
 }
 
 class Student
@@ -172,12 +179,12 @@ class Student
 	char email[25];//contains(@)
 	double avg;//[2,6]
 public:
-	void setName(const char* name);
+	bool setName(const char* name);
 	void setFn(size_t fn);
-	void setAge(size_t age);
-	void setGender(GenderType gender);
-	void setEmail(const char* email);
-	void setAvg(double avg);
+	bool setAge(size_t age);
+	bool setGender(GenderType gender);
+	bool setEmail(const char* email);
+	bool setAvg(double avg);
 
 	const char* getName() const;
 	size_t getFn() const;
@@ -187,14 +194,15 @@ public:
 	double getAvg() const;
 };
 
-void Student::setName(const char* name)
+bool Student::setName(const char* name)
 {
 	if (strlen(name) > 25)
 	{
 		std::cout << "Entered name is too long";
-		return;
+		return false;
 	}
 	strcpy(this->name, name);
+	return true;
 }
 
 void Student::setFn(size_t fn)
@@ -203,32 +211,46 @@ void Student::setFn(size_t fn)
 	this->fn = fn;
 }
 
-void Student::setAge(size_t age)
+bool Student::setAge(size_t age)
 {
 	if (age > 65 || age < 15)
 	{
 		std::cout << "Invalid age!" << std::endl;
-		return;
+		return false;
 	}
 	this->age = age;
+	return true;
 }
 
-void Student::setGender(GenderType gender)
+bool Student::setGender(GenderType gender)
 {
+	if (gender == GenderType::Unknown)
+	{
+		std::cout << "Invalid gender" << std::endl;
+		return false;
+	}
 	this->gender = gender;
+	return true;
 }
 
-void Student::setEmail(const char* email)
+bool Student::setEmail(const char* email)
 {
 	if (strlen(email) > 25)
+	{
 		std::cout << "Email name is too long!" << std::endl;
+		return false;
+	}
 
 	if (!contains(email, '@'))
+	{
 		std::cout << "Email must contain '@'!" << std::endl;
+		return false;
+	}
+
 	strcpy(this->email, email);
 }
 
-void Student::setAvg(double avg)
+bool Student::setAvg(double avg)
 {
 	const size_t minGrade = 2;
 	const size_t maxGrade = 6;
@@ -236,8 +258,10 @@ void Student::setAvg(double avg)
 	if (avg < minGrade || avg > maxGrade)
 	{
 		std::cout << "Invalid average grade!" << std::endl;
+		return false;
 	}
 	this->avg = avg;
+	return true;
 }
 
 size_t Student::getFn() const
@@ -287,6 +311,43 @@ void swap(Student& a, Student& b)
 	b = temp;
 }
 
+//size_t getFn(const char* command, size_t startIndex)
+//{
+//	size_t currentIndex = startIndex;
+//	size_t fn = 0;
+//	while (isDigit(command[currentIndex]))
+//	{
+//		fn *= 10;
+//		fn += parseCharToInt(command[currentIndex]);
+//		currentIndex++;
+//	}
+//	return fn;
+//}
+
+double getNumberValue(const char* command, size_t& startIndex)
+{
+	double value = 0;
+	while (isDigit(command[startIndex]))
+	{
+		value *= 10;
+		value += parseCharToInt(command[startIndex]);
+		startIndex++;
+	}
+	if (command[startIndex] == '.')
+	{
+		startIndex++;
+		size_t divider = 10;
+		//use getFn and getValue together 
+		while (isDigit(command[startIndex]))
+		{
+			value += (parseCharToInt(command[startIndex])) / divider;
+			startIndex++;
+			divider *= 10;
+		}
+	}
+	return value;
+}
+
 void selectionSort(Student* students, size_t studentCount)
 {
 	for (size_t i = 0; i < studentCount - 1; i++)
@@ -313,23 +374,144 @@ void orderByFn(Student* students, size_t fn, size_t studentsCount)
 	selectionSort(students, studentsCount);
 }
 
-//Do a parent function that searches by fn and edit by number and string and sort by number and string
-void editNumber(Student* students, double number, size_t fn, size_t studentsCount)
+void getStringValue(const char* command, char* field, size_t startIndex)
 {
+	size_t index = 0;
+	while (command[startIndex] != ' ' && command[startIndex] != '\t')
+	{
+		field[index++] = command[startIndex++];
+	}
+	field[index] = '\0';
+}
+
+//Do a parent function that searches by fn and edit by number and string and sort by number and string
+//void edit(const char* command, Student* students, size_t studentsCount, bool (*func)(size_t, size_t, const char*,const char*, Student*))
+//{
+//	const size_t editTagLength = 5;
+//	const size_t spaceSize = 1;
+//	size_t startIndex = editTagLength;
+//	size_t fn = getNumberValue(command, startIndex);
+//	startIndex += spaceSize;
+//	size_t fnLength = getNumberLength(fn);
+//	size_t searchedIndex = findByFn(students, fn, studentsCount);
+//
+//	if (searchedIndex == -1)
+//	{
+//		std::cout << "Student not found" << std::endl;
+//		return;
+//	}
+//
+//	char field[maxFieldLength];
+//	getStringValue(command, field, startIndex);
+//	startIndex += spaceSize;
+//	startIndex += strlen(field);
+//}
+//
+//void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
+//{
+//	double value = getNumberValue(command, startIndex);
+//
+//
+//	if (strcmp(field, "fn") == 0)
+//		students[searchedIndex].setFn(value);
+//	else if (strcmp(field, "grade") == 0)
+//		students[searchedIndex].setAvg(value);
+//	else if (strcmp(field, "age") == 0)
+//		students[searchedIndex].setAge(value);
+//}
+//
+//void editString(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
+//{
+//	const size_t maxStringFieldLength = 25;
+//	char value[maxStringFieldLength];
+//	getStringValue(command, value, startIndex);
+//
+//
+//	if (strcmp(field, "name") == 0)
+//		students[searchedIndex].setName(value);
+//	else if (strcmp(field, "email") == 0)
+//		students[searchedIndex].setEmail(value);
+//	else if (strcmp(field, "gender") == 0)
+//		students[searchedIndex].setGender(convertStringToGender(value));
+//}
+
+void editNumber(const char* command, Student* students, size_t studentsCount)
+{
+	const size_t editTagLength = 5;
+	const size_t spaceSize = 1;
+	size_t startIndex = editTagLength;
+	size_t fn = getNumberValue(command, startIndex);
+	startIndex += spaceSize;
+	size_t fnLength = getNumberLength(fn);
 	size_t searchedIndex = findByFn(students, fn, studentsCount);
+
 	if (searchedIndex == -1)
 	{
 		std::cout << "Student not found" << std::endl;
 		return;
 	}
 
+	char field[maxFieldLength];
+	getStringValue(command, field, startIndex);
+	startIndex += spaceSize;
+	startIndex += strlen(field);
+	double value = getNumberValue(command, startIndex);
 
-	students[searchedIndex].setFn(fn);
+
+	if (strcmp(field, "fn") == 0)
+		students[searchedIndex].setFn(value);
+	else if (strcmp(field, "grade") == 0)
+		students[searchedIndex].setAvg(value);
+	else if (strcmp(field, "age") == 0)
+		students[searchedIndex].setAge(value);
+}
+
+void editString(const char* command, Student* students, size_t studentsCount)
+{
+	const size_t editTagLength = 5;
+	const size_t spaceSize = 1;
+	size_t startIndex = editTagLength;
+	size_t fn = getNumberValue(command, startIndex);
+	startIndex += spaceSize;
+	size_t fnLength = getNumberLength(fn);
+	size_t searchedIndex = findByFn(students, fn, studentsCount);
+
+	if (searchedIndex == -1)
+	{
+		std::cout << "Student not found" << std::endl;
+		return;
+	}
+
+	char field[maxFieldLength];
+	getStringValue(command, field, startIndex);
+	startIndex += spaceSize;
+	startIndex += strlen(field);
+	const size_t maxStringFieldLength = 25;
+	char value[maxStringFieldLength];
+	getStringValue(command, value, startIndex);
+
+
+	if (strcmp(field, "name") == 0)
+		students[searchedIndex].setName(value);
+	else if (strcmp(field, "email") == 0)
+		students[searchedIndex].setEmail(value);
+	else if (strcmp(field, "gender") == 0)
+		students[searchedIndex].setGender(convertStringToGender(value));
+}
+
+bool isUniqueFn(Student* students, int fn, size_t studentsCount)
+{
+	for (size_t i = 0; i < studentsCount; i++)
+	{
+		if (fn == students[i].getFn())
+			return false;
+	}
+	return true;
 }
 
 void saveFile(const Student* students, const char* filePath, size_t studentsCounter)
 {
-	std::fstream resultFile(filePath, std::ios::trunc | std::ios::out | std::ios::app);
+	std::fstream resultFile(filePath, std::ios::trunc | std::ios::in | std::ios::out | std::ios::ate);
 	for (size_t i = 0; i < studentsCounter; i++)
 	{
 		resultFile << "<student>\n";
@@ -397,42 +579,45 @@ int main()
 				{
 					currentLineIndex = 0;
 					lastLineIndex = 0;
-					sourceFile.getline(line, BUFF);				
+					sourceFile.getline(line, BUFF);
 				}
 
-				getContent(line, content, currentLineIndex, isFinishedLine);
-				//trim all spaces
-				trimWhiteSpaces(content); 
-				
-				if (isPrefix(line + lastLineIndex, "<grade>"))
+				size_t whiteSpaces = trimwhiteSpaces(line + lastLineIndex);
+				getContent(line + whiteSpaces, content, currentLineIndex, isFinishedLine);
+
+				if (isPrefix(line + lastLineIndex + whiteSpaces, "<grade>"))
 				{
-					fieldsCounter++;
-					student.setAvg(parseStringToDouble(content));
+					if (student.setAvg(parseStringToDouble(content)))
+						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex, "<name>"))
+				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<name>"))
 				{
-					fieldsCounter++;
-					student.setName(content);
+					if (student.setName(content))
+						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex, "<fn>"))
+				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<fn>"))
 				{
-					fieldsCounter++;
-					student.setFn(parseStringToInt(content));
+					int fn = parseStringToInt(content);
+					if (isUniqueFn(students, fn, studentsCounter))
+					{
+						student.setFn(fn);
+						fieldsCounter++;
+					}
 				}
-				else if (isPrefix(line + lastLineIndex, "<age>"))
+				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<age>"))
 				{
-					fieldsCounter++;
-					student.setAge(parseStringToInt(content));
+					if (student.setAge(parseStringToInt(content)))
+						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex, "<gender>"))
+				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<gender>"))
 				{
-					fieldsCounter++;
-					student.setGender(convertStringToGender(content));
+					if (student.setGender(convertStringToGender(content)))
+						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex, "<email>"))
+				else if (isPrefix(line + (lastLineIndex + whiteSpaces), "<email>"))
 				{
-					fieldsCounter++;
-					student.setEmail(content);
+					if (student.setEmail(content))
+						fieldsCounter++;
 				}
 				lastLineIndex = currentLineIndex;
 			}
@@ -442,6 +627,19 @@ int main()
 				studentsCounter++;
 			}
 		}
+	}
+	sourceFile.close();
+
+	std::cout << ">";
+	std::cin.getline(line, BUFF);
+	while (!isPrefix(line, "save"))
+	{
+		if (isPrefix(line, "edit"))
+		{
+			editNumber(line, students, studentsCounter);
+		}
+		std::cout << ">";
+		std::cin.getline(line, BUFF);
 	}
 
 	saveFile(students, filePath, studentsCounter);
