@@ -16,6 +16,10 @@ size_t getFileSize(std::fstream& file)
 
 size_t getNumberLength(size_t number)
 {
+	if (number == 0)
+	{
+		return 1;
+	}
 	size_t counter = 0;
 	while (number != 0)
 	{
@@ -100,13 +104,12 @@ void convertArrayToHex(const int* input, size_t length, char* hexInput)
 	}
 }
 
-void printHex(std::fstream& file, size_t fileSize)
+void printHex(const char* buffer, size_t fileSize)
 {
 	char hexNumber[hexByteLegth];
-	file.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
-		convertDecToHex(file.get(), hexNumber);
+		convertDecToHex(buffer[i], hexNumber);
 		if (hexNumber[0] == '\0')
 			std::cout << parseIntToChar(hexNumber[0]) << parseIntToChar(hexNumber[1]) << " ";
 		else
@@ -156,24 +159,22 @@ size_t getNumber(const char* command, size_t numberLength)
 	return number;
 }
 
-void view(std::fstream& file, size_t fileSize)
+void view(const char* buffer, size_t fileSize)
 {
-	printHex(file, fileSize);
+	printHex(buffer, fileSize);
 
-	file.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
-		size_t currentByte = file.get();
+		size_t currentByte = buffer[i];
 		if (isCapitalLetter(currentByte) || isSmallLetter(currentByte))
 			std::cout << (char)currentByte << "  ";
 		else
 			std::cout << ".  ";
 	}
 	std::cout << std::endl;
-	file.seekg(0, std::ios::beg);
 }
 
-bool change(const char* command, std::fstream& file, size_t fileSize)
+bool change(const char* command, char* buffer, size_t fileSize)
 {
 	const size_t currentCommandLength = 7;
 	const size_t byteCapacity = 255;
@@ -191,11 +192,26 @@ bool change(const char* command, std::fstream& file, size_t fileSize)
 	{
 		return false;
 	}
-	file.seekp(index);
-	file << char(decNumber);
-	file.seekg(0, std::ios::beg);
+	buffer[index] = char(decNumber);
 
 	return true;
+}
+
+void copyArray(const char* buffer, char*& tempBuffer, size_t newSize)
+{
+	for (size_t i = 0; i < newSize; i++)
+	{
+		tempBuffer[i] = buffer[i];
+	}
+}
+
+void removeLastByte(char*& buffer, size_t& fileSize)
+{
+	fileSize--;
+	char* tempBuffer = new char[fileSize];
+	copyArray(buffer, tempBuffer, fileSize);
+	delete[] buffer;
+	buffer = tempBuffer;
 }
 
 void substr(size_t startIndex, const char* text, char*& subStr, size_t textLength, size_t currentCommandLength)
@@ -212,7 +228,7 @@ void rewriteFile(std::fstream& file, const char* buffer, size_t& fileSize) {
 	file.seekp(0, std::ios::beg);
 }
 
-bool add(const char* command, std::fstream& file, size_t& fileSize)
+bool add(const char* command, char*& buffer, size_t& fileSize)
 {
 	const size_t currentCommandLength = 4;
 	if (!isValidHexNumber(command, currentCommandLength))
@@ -220,28 +236,55 @@ bool add(const char* command, std::fstream& file, size_t& fileSize)
 	char hexNumber[hexByteLegth];
 	getHexNumber(command, hexNumber, currentCommandLength);
 	size_t value = convertHexToDec(hexNumber);
-	file.seekp(0, std::ios::end);
-	file.put(char(value));
+	char* tempArray = new char[fileSize + 1];
+	copyArray(buffer, tempArray, fileSize);
+	tempArray[fileSize] = char(value);
 	fileSize++;
+	delete[] buffer;
+	buffer = tempArray;
 	return true;
 }
 
 void loadBuffer(char*& buffer, std::fstream& sourceFile, size_t fileSize)
 {
+	sourceFile.seekg(0, std::ios::beg);
 	for (size_t i = 0; i < fileSize; i++)
 	{
 		buffer[i] = (char)sourceFile.get();
 	}
 }
 
+void saveAs(std::fstream& sourceFile, const char* command, const char* buffer, const char* filePath, size_t fileSize)
+{
+	const size_t currentCommandLength = 8;
+	sourceFile.close();
+	size_t textLength = strlen(command);
+	char* newFileName = new char[(textLength - currentCommandLength) + 1];
+	substr(currentCommandLength, command, newFileName, textLength, currentCommandLength);
+	newFileName[textLength - currentCommandLength] = '\0';
+	std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::ate);
+	rewriteFile(newFile, buffer, fileSize);
+	newFile.close();
+	delete[] newFileName;
+}
+
+void save(std::fstream& sourceFile, const char* buffer, const char* filePath, size_t fileSize)
+{
+	sourceFile.close();
+	std::fstream newFile(filePath,std::ios::trunc | std::ios::binary |std::ios::in | std::ios::out | std::ios::ate);
+	rewriteFile(newFile, buffer, fileSize);
+	newFile.close();
+}
+
 int main()
 {
-	const int BUFF = 1024;
-	const int minFileSize = 1;
 	int x = 25409;
 	std::ofstream file("source.dat");
 	file.write((const char*)&x, sizeof(x));
 	file.close();
+
+	const int BUFF = 1024;
+	const int minFileSize = 1;
 
 	std::cout << "Enter a file path:" << std::endl;
 	std::cout << ">";
@@ -260,6 +303,9 @@ int main()
 
 	std::cout << "File loaded successfully! Size: " << fileSize << " bytes" << std::endl;
 
+	char* buffer = new char[fileSize];
+	loadBuffer(buffer, sourceFile, fileSize);
+
 	char command[BUFF] = "";
 	while (!isPrefix(command, "save"))
 	{
@@ -268,11 +314,11 @@ int main()
 
 		if (isPrefix(command, "view"))
 		{
-			view(sourceFile, fileSize);
+			view(buffer, fileSize);
 		}
 		else if (isPrefix(command, "change"))
 		{
-			if (change(command, sourceFile, fileSize) && sourceFile.good())
+			if (change(command, buffer, fileSize))
 				std::cout << "Operation successfully executed!" << std::endl;
 			else
 				std::cout << "Error, incorrect input!" << std::endl;
@@ -281,15 +327,7 @@ int main()
 		{
 			if (fileSize >= minFileSize)
 			{
-				char* buffer = new char[fileSize];
-				loadBuffer(buffer, sourceFile, fileSize);
-				sourceFile.close();
-				fileSize--;
-				std::fstream removeFile(filePath, std::ios::binary | std::ios::out | std::ios::trunc);
-				rewriteFile(removeFile, buffer, fileSize);
-				removeFile.close();
-				delete[] buffer;
-				sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in | std::ios::ate);
+				removeLastByte(buffer, fileSize);
 			}
 			else
 			{
@@ -298,7 +336,7 @@ int main()
 		}
 		else if (isPrefix(command, "add"))
 		{
-			if (add(command, sourceFile, fileSize) && sourceFile.good())
+			if (add(command, buffer, fileSize))
 			{
 				std::cout << "Byte added successfuly!" << std::endl;
 			}
@@ -309,26 +347,14 @@ int main()
 		}
 		else if (isPrefix(command, "save as"))
 		{
-			char* buffer = new char[fileSize];
-			const size_t currentCommandLength = 8;
-			loadBuffer(buffer, sourceFile, fileSize);
-			sourceFile.close();
-			size_t textLength = strlen(command);
-			char* newFileName = new char[(textLength - currentCommandLength) + 1];
-			substr(currentCommandLength, command, newFileName, textLength, currentCommandLength);
-			newFileName[textLength - currentCommandLength] = '\0';
-			std::fstream newFile(newFileName, std::ios::binary | std::ios::out | std::ios::ate);
-			rewriteFile(newFile, buffer, fileSize);
-			newFile.close();
-			delete[] buffer;
-			delete[] newFileName;
-			sourceFile.open(filePath, std::ios::binary | std::ios::out | std::ios::in);
+			saveAs(sourceFile, command, buffer, filePath, fileSize);
+			//Should not be sourceFile
 			if (sourceFile.good())
 				std::cout << "File successfully saved!" << std::endl;
 		}
 		else if (isPrefix(command, "save"))
 		{
-			sourceFile.close();
+			save(sourceFile, buffer, filePath, fileSize);
 			if (sourceFile.good())
 				std::cout << "File successfully saved!" << std::endl;
 		}
@@ -337,5 +363,4 @@ int main()
 			std::cout << "Incorrect command" << std::endl;
 		}
 	}
-	sourceFile.close();
 }
