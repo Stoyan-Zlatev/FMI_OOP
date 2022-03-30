@@ -54,10 +54,13 @@ void getTagLength(const char* text, size_t& startIndex)
 		startIndex++;
 }
 
-void getContent(const char* text, char* content, size_t& startIndex, bool& isFinishedLine)
+void getContent(const char* text, char* content, size_t whiteSpaces, size_t& startIndex, bool& isFinishedLine)
 {
+	//check this!
 	size_t textLength = strlen(text) + startIndex;
 	getTagLength(text, startIndex);
+	//tab is 8 whitespaces
+	startIndex += whiteSpaces;
 	size_t contentIndex = 0;
 	for (startIndex; startIndex < textLength; startIndex++)
 	{
@@ -66,7 +69,7 @@ void getContent(const char* text, char* content, size_t& startIndex, bool& isFin
 		content[contentIndex++] = text[startIndex];
 	}
 	content[contentIndex] = '\0';
-	getTagLength(text, startIndex);
+	getTagLength(text + whiteSpaces, startIndex);
 	if (startIndex < textLength)
 		isFinishedLine = false;
 	else
@@ -100,49 +103,6 @@ size_t parseCharToInt(char element)
 	return element - '0';
 }
 
-double parseStringToDouble(const char* content)
-{
-	double grade = 0;
-	size_t index = 0;
-	while (content[index] != '.')
-	{
-		if (isDigit(content[index]))
-		{
-			grade *= 10;
-			grade += parseCharToInt(content[index]);
-			index++;
-		}
-	}
-	index++;
-	double divider = 10;
-	while (content[index] != '\0')
-	{
-		if (isDigit(content[index]))
-		{
-			grade += ((double)parseCharToInt(content[index])) / divider;
-			index++;
-		}
-	}
-	return grade;
-}
-
-size_t parseStringToInt(const char* content)
-{
-	double number = 0;
-	size_t index = 0;
-	while (content[index] != '\0')
-	{
-		if (isDigit(content[index]))
-		{
-			number *= 10;
-			number += parseCharToInt(content[index]);
-			index++;
-		}
-	}
-
-	return number;
-}
-
 enum class GenderType
 {
 	Male,
@@ -173,7 +133,7 @@ GenderType convertStringToGender(const char* str)
 class Student
 {
 	char name[25];
-	size_t fn;//unique
+	int fn;//unique
 	size_t age;//[15,65]
 	GenderType gender;
 	char email[25];//contains(@)
@@ -187,7 +147,7 @@ public:
 	bool setAvg(double avg);
 
 	const char* getName() const;
-	size_t getFn() const;
+	int getFn() const;
 	size_t getAge() const;
 	GenderType getGender() const;
 	const char* getEmail() const;
@@ -264,7 +224,7 @@ bool Student::setAvg(double avg)
 	return true;
 }
 
-size_t Student::getFn() const
+int Student::getFn() const
 {
 	return this->fn;
 }
@@ -583,11 +543,12 @@ int main()
 				}
 
 				size_t whiteSpaces = trimwhiteSpaces(line + lastLineIndex);
-				getContent(line + whiteSpaces, content, currentLineIndex, isFinishedLine);
+				getContent(line, content, whiteSpaces, currentLineIndex, isFinishedLine);
 
 				if (isPrefix(line + lastLineIndex + whiteSpaces, "<grade>"))
 				{
-					if (student.setAvg(parseStringToDouble(content)))
+					size_t startIndex = 0;
+					if (student.setAvg(getNumberValue(content, startIndex)))
 						fieldsCounter++;
 				}
 				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<name>"))
@@ -597,7 +558,8 @@ int main()
 				}
 				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<fn>"))
 				{
-					int fn = parseStringToInt(content);
+					size_t startIndex = 0;
+					int fn = getNumberValue(content, startIndex);
 					if (isUniqueFn(students, fn, studentsCounter))
 					{
 						student.setFn(fn);
@@ -606,7 +568,8 @@ int main()
 				}
 				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<age>"))
 				{
-					if (student.setAge(parseStringToInt(content)))
+					size_t startIndex = 0;
+					if (student.setAge(getNumberValue(content, startIndex)))
 						fieldsCounter++;
 				}
 				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<gender>"))
@@ -635,6 +598,10 @@ int main()
 	while (!isPrefix(line, "save"))
 	{
 		if (isPrefix(line, "edit"))
+		{
+			editNumber(line, students, studentsCounter);
+		}
+		if (isPrefix(line, "sort"))
 		{
 			editNumber(line, students, studentsCounter);
 		}
