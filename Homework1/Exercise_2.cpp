@@ -50,40 +50,43 @@ void getTagLength(const char* text, size_t& startIndex)
 		startIndex++;
 	}
 
-	if (text[startIndex != '\0'])
+	if (text[startIndex] != '\0')
 		startIndex++;
 }
 
-void getContent(const char* text, char* content, size_t whiteSpaces, size_t& startIndex, bool& isFinishedLine)
+void getContent(const char* text, char* content, size_t& startIndex, bool& isFinishedLine)
 {
 	//check this!
-	size_t textLength = strlen(text) + startIndex;
-	getTagLength(text, startIndex);
-	//tab is 8 whitespaces
-	startIndex += whiteSpaces;
-	size_t contentIndex = 0;
-	for (startIndex; startIndex < textLength; startIndex++)
+	size_t textLength = strlen(text);
+	if (textLength > 0)
 	{
-		if (isPrefix(text + startIndex, "<\\"))
-			break;
-		content[contentIndex++] = text[startIndex];
+		size_t contentStartIndex = 0;
+		getTagLength(text, contentStartIndex);
+		size_t index = 0;
+		for (contentStartIndex; contentStartIndex < textLength; contentStartIndex++)
+		{
+			if (isPrefix(text + contentStartIndex, "<\\"))
+				break;
+			content[index++] = text[contentStartIndex];
+		}
+		content[index] = '\0';
+		getTagLength(text, contentStartIndex);
+		startIndex += contentStartIndex;
+		if (startIndex < textLength)
+		{
+			isFinishedLine = false;
+			return;
+		}
 	}
-	content[contentIndex] = '\0';
-	getTagLength(text + whiteSpaces, startIndex);
-	if (startIndex < textLength)
-		isFinishedLine = false;
-	else
-		isFinishedLine = true;
+	isFinishedLine = true;
 }
 
-size_t trimwhiteSpaces(const char* text)
+void trimwhiteSpaces(const char* text, size_t& currentLineIndex)
 {
-	size_t index = 0;
-	while (text[index] == ' ' || text[index] == '\t')
+	while (text[currentLineIndex] == ' ' || text[currentLineIndex] == '\t')
 	{
-		index++;
+		currentLineIndex++;
 	}
-	return index;
 }
 
 bool isDigit(char element)
@@ -286,7 +289,7 @@ double getNumberValue(const char* command, size_t& startIndex)
 		size_t divider = 10;
 		while (isDigit(command[startIndex]))
 		{
-			value += (parseCharToInt(command[startIndex])) / divider;
+			value += (double)(parseCharToInt(command[startIndex])) / (double)divider;
 			startIndex++;
 			divider *= 10;
 		}
@@ -301,7 +304,7 @@ void selectionSort(Student* students, char** stringArray, size_t studentCount)
 		int minElementIndex = i;
 		for (size_t j = i + 1; j < studentCount; j++)
 		{
-			if (strcmp(stringArray[i],stringArray[minElementIndex]))
+			if (strcmp(stringArray[i], stringArray[minElementIndex]))
 				minElementIndex = j;
 		}
 		if (minElementIndex != i)
@@ -312,10 +315,10 @@ void selectionSort(Student* students, char** stringArray, size_t studentCount)
 	}
 }
 
-void getStringValue(const char* command, char* field, size_t startIndex)
+void getStringValue(const char* command, char* field, size_t& startIndex)
 {
 	size_t index = 0;
-	while (command[startIndex] != ' ' && command[startIndex] != '\t')
+	while (command[startIndex] != ' ' && command[startIndex] != '\t' && command[startIndex] != '\0')
 	{
 		field[index++] = command[startIndex++];
 	}
@@ -408,7 +411,7 @@ void editString(size_t searchedIndex, size_t startIndex, const char* field, cons
 void edit(Student* students, size_t startIndex, size_t searchedIndex, char* field, const char* command, const size_t spaceSize)
 {
 	startIndex += spaceSize;
-	startIndex += strlen(field);
+	//startIndex += strlen(field);
 	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
 		editNumber(searchedIndex, startIndex, field, command, students);
 	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
@@ -425,11 +428,13 @@ void sort(Student* students, const char* field, size_t studentsCount)
 
 void change(const char* command, Student* students, size_t studentsCount)
 {
-	const size_t commandMaxLength = 4;
+	const size_t commandMaxLength = 5;
 	char changeCommand[commandMaxLength];
 	size_t startIndex = 0;
 	getStringValue(command, changeCommand, startIndex);
+	changeCommand[commandMaxLength - 1] = '\0';
 	const size_t spaceSize = 1;
+	startIndex += spaceSize;
 	size_t fn = getNumberValue(command, startIndex);
 	startIndex += spaceSize;
 	size_t fnLength = getNumberLength(fn);
@@ -443,9 +448,9 @@ void change(const char* command, Student* students, size_t studentsCount)
 
 	char field[maxFieldLength];
 	getStringValue(command, field, startIndex);
-	if (strcmp(changeCommand, "edit"))
+	if (strcmp(changeCommand, "edit") == 0)
 		edit(students, startIndex, searchedIndex, field, command, spaceSize);
-	else if (strcmp(changeCommand, "sort"))
+	else if (strcmp(changeCommand, "sort") == 0)
 		sort(students, field, studentsCount);
 }
 
@@ -467,23 +472,23 @@ void saveFile(const Student* students, const char* filePath, size_t studentsCoun
 		resultFile << "<student>\n";
 		resultFile << "\t<name>";
 		resultFile << students[i].getName();
-		resultFile << "</name>\n";
+		resultFile << "<\\name>\n";
 		resultFile << "\t<fn>";
 		resultFile << students[i].getFn();
-		resultFile << "</fn>\n";
+		resultFile << "<\\fn>\n";
 		resultFile << "\t<age>";
 		resultFile << students[i].getAge();
-		resultFile << "</age>\n";
+		resultFile << "<\\age>\n";
 		resultFile << "\t<gender>";
 		resultFile << convertGenderToString(students[i].getGender());
-		resultFile << "</gender>\n";
+		resultFile << "<\\gender>\n";
 		resultFile << "\t<email>";
 		resultFile << students[i].getEmail();
-		resultFile << "</email>\n";
+		resultFile << "<\\email>\n";
 		resultFile << "\t<grade>";
 		resultFile << students[i].getAvg();
-		resultFile << "</grade>\n";
-		resultFile << "</student>\n\n";
+		resultFile << "<\\grade>\n";
+		resultFile << "<\\student>\n\n";
 	}
 	resultFile.close();
 }
@@ -532,21 +537,22 @@ int main()
 					sourceFile.getline(line, BUFF);
 				}
 
-				size_t whiteSpaces = trimwhiteSpaces(line + lastLineIndex);
-				getContent(line, content, whiteSpaces, currentLineIndex, isFinishedLine);
+				trimwhiteSpaces(line, currentLineIndex);
+				lastLineIndex = currentLineIndex;
+				getContent(line + currentLineIndex, content, currentLineIndex, isFinishedLine);
 
-				if (isPrefix(line + lastLineIndex + whiteSpaces, "<grade>"))
+				if (isPrefix(line + lastLineIndex, "<grade>"))
 				{
 					size_t startIndex = 0;
 					if (student.setAvg(getNumberValue(content, startIndex)))
 						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<name>"))
+				else if (isPrefix(line + lastLineIndex, "<name>"))
 				{
 					if (student.setName(content))
 						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<fn>"))
+				else if (isPrefix(line + lastLineIndex, "<fn>"))
 				{
 					size_t startIndex = 0;
 					int fn = getNumberValue(content, startIndex);
@@ -556,23 +562,22 @@ int main()
 						fieldsCounter++;
 					}
 				}
-				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<age>"))
+				else if (isPrefix(line + lastLineIndex, "<age>"))
 				{
 					size_t startIndex = 0;
 					if (student.setAge(getNumberValue(content, startIndex)))
 						fieldsCounter++;
 				}
-				else if (isPrefix(line + lastLineIndex + whiteSpaces, "<gender>"))
+				else if (isPrefix(line + lastLineIndex, "<gender>"))
 				{
 					if (student.setGender(convertStringToGender(content)))
 						fieldsCounter++;
 				}
-				else if (isPrefix(line + (lastLineIndex + whiteSpaces), "<email>"))
+				else if (isPrefix(line + lastLineIndex, "<email>"))
 				{
 					if (student.setEmail(content))
 						fieldsCounter++;
 				}
-				lastLineIndex = currentLineIndex;
 			}
 			if (fieldsCounter == FieldsCount)
 			{
