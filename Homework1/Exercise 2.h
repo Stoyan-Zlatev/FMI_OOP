@@ -336,8 +336,8 @@ void editString(size_t searchedIndex, size_t startIndex, const char* field, cons
 		isExecuted = students[searchedIndex].setEmail(value);
 	else if (strcmp(field, "gender") == 0)
 		isExecuted = students[searchedIndex].setGender(convertStringToGender(value));
-	if(isExecuted)
-	std::cout << "Operation successfully executed!" << std::endl;
+	if (isExecuted)
+		std::cout << "Operation successfully executed!" << std::endl;
 
 }
 
@@ -507,6 +507,7 @@ void printStudentsData(Student* students, size_t studentsCounter)
 {
 	for (unsigned i = 0; i < studentsCounter; i++)
 	{
+		std::cout << std::endl;
 		std::cout << "Fn: " << students[i].getFn() << std::endl;
 		std::cout << "Name: " << students[i].getName() << std::endl;
 		std::cout << "Age: " << students[i].getAge() << std::endl;
