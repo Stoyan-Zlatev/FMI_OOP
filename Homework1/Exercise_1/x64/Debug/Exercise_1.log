@@ -1,5 +1,0 @@
-﻿  Exercise_1.cpp
-C:\Users\User\FMI_OOP\Homework1\Exercise_1\Exercise_1.cpp(46,38): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-C:\Users\User\FMI_OOP\Homework1\Exercise_1\Exercise_1.cpp(48,38): warning C4267: '=': conversion from 'size_t' to 'char', possible loss of data
-C:\Users\User\FMI_OOP\Homework1\Exercise_1\Exercise_1.cpp(95,40): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  Exercise_1.vcxproj -> C:\Users\User\FMI_OOP\Homework1\x64\Debug\Exercise_1.exe
