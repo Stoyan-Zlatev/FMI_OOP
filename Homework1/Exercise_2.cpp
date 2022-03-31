@@ -4,7 +4,8 @@
 
 #pragma warning(disable:4996)
 
-const size_t maxFieldLength = 6;
+const size_t maxFieldLength = 7;
+const size_t BUFF = 1024;
 
 bool isPrefix(const char* text, const char* prefix)
 {
@@ -136,7 +137,7 @@ class Student
 	double avg;//[2,6]
 public:
 	bool setName(const char* name);
-	void setFn(size_t fn);
+	bool setFn(size_t fn);
 	bool setAge(size_t age);
 	bool setGender(GenderType gender);
 	bool setEmail(const char* email);
@@ -161,10 +162,10 @@ bool Student::setName(const char* name)
 	return true;
 }
 
-void Student::setFn(size_t fn)
+bool Student::setFn(size_t fn)
 {
-	//check if unique
 	this->fn = fn;
+	return true;
 }
 
 bool Student::setAge(size_t age)
@@ -267,6 +268,13 @@ void swap(char*& element1, char*& element2)
 	element2 = temp;
 }
 
+void swap(double*& element1, double*& element2)
+{
+	double* temp = element1;
+	element1 = element2;
+	element2 = temp;
+}
+
 void swap(Student& a, Student& b)
 {
 	Student temp = a;
@@ -304,12 +312,41 @@ void selectionSort(Student* students, char** stringArray, size_t studentCount)
 		int minElementIndex = i;
 		for (size_t j = i + 1; j < studentCount; j++)
 		{
-			if (strcmp(stringArray[i], stringArray[minElementIndex]))
+			if (strcmp(stringArray[j], stringArray[minElementIndex]) < 0)
 				minElementIndex = j;
 		}
 		if (minElementIndex != i)
 		{
 			swap(stringArray[i], stringArray[minElementIndex]);
+			swap(students[i], students[minElementIndex]);
+		}
+	}
+}
+
+bool isUniqueFn(Student* students, int fn, size_t studentsCount)
+{
+	for (size_t i = 0; i < studentsCount; i++)
+	{
+		if (fn == students[i].getFn())
+			return false;
+	}
+	return true;
+}
+
+
+void selectionSort(Student* students, double* numberArray, size_t studentCount)
+{
+	for (size_t i = 0; i < studentCount - 1; i++)
+	{
+		int minElementIndex = i;
+		for (size_t j = i + 1; j < studentCount; j++)
+		{
+			if (numberArray[j] < numberArray[minElementIndex])
+				minElementIndex = j;
+		}
+		if (minElementIndex != i)
+		{
+			swap(numberArray, numberArray);
 			swap(students[i], students[minElementIndex]);
 		}
 	}
@@ -349,6 +386,7 @@ void sortNumber(Student* students, size_t studentsCount, const char* field)
 			numberArray[i] = students[i].getAge();
 		}
 	}
+	selectionSort(students, numberArray, studentsCount);
 }
 
 void sortString(Student* students, size_t studentsCount, const char* field)
@@ -378,19 +416,25 @@ void sortString(Student* students, size_t studentsCount, const char* field)
 			strcpy(stringArray[i], convertGenderToString(students[i].getGender()));
 		}
 	}
+	selectionSort(students, stringArray, studentsCount);
 }
 
-void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
+void editNumber(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students, size_t studentsCount)
 {
 	double value = getNumberValue(command, startIndex);
 
-
+	bool isExecuted = false;
 	if (strcmp(field, "fn") == 0)
-		students[searchedIndex].setFn(value);
+		if (isUniqueFn(students, value, studentsCount))
+			isExecuted = students[searchedIndex].setFn(value);
+		else
+			std::cout << "There is already student with this fn" << std::endl;
 	else if (strcmp(field, "grade") == 0)
-		students[searchedIndex].setAvg(value);
+		isExecuted = students[searchedIndex].setAvg(value);
 	else if (strcmp(field, "age") == 0)
-		students[searchedIndex].setAge(value);
+		isExecuted = students[searchedIndex].setAge(value);
+	if (isExecuted)
+		std::cout << "Operation successfully executed!" << std::endl;
 }
 
 void editString(size_t searchedIndex, size_t startIndex, const char* field, const char* command, Student* students)
@@ -399,44 +443,49 @@ void editString(size_t searchedIndex, size_t startIndex, const char* field, cons
 	char value[maxStringFieldLength];
 	getStringValue(command, value, startIndex);
 
-
+	bool isExecuted = false;
 	if (strcmp(field, "name") == 0)
-		students[searchedIndex].setName(value);
+		isExecuted = students[searchedIndex].setName(value);
 	else if (strcmp(field, "email") == 0)
-		students[searchedIndex].setEmail(value);
+		isExecuted = students[searchedIndex].setEmail(value);
 	else if (strcmp(field, "gender") == 0)
-		students[searchedIndex].setGender(convertStringToGender(value));
+		isExecuted = students[searchedIndex].setGender(convertStringToGender(value));
+	std::cout << "Operation successfully executed!" << std::endl;
+
 }
 
-void edit(Student* students, size_t startIndex, size_t searchedIndex, char* field, const char* command, const size_t spaceSize)
-{
-	startIndex += spaceSize;
-	//startIndex += strlen(field);
-	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
-		editNumber(searchedIndex, startIndex, field, command, students);
-	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
-		editString(searchedIndex, startIndex, field, command, students);
-}
-
-void sort(Student* students, const char* field, size_t studentsCount)
-{
-	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
-		sortNumber(students, studentsCount, field);
-	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
-		sortNumber(students, studentsCount, field);
-}
-
-void change(const char* command, Student* students, size_t studentsCount)
+void sort(const char* command, Student* students, size_t studentsCount)
 {
 	const size_t commandMaxLength = 5;
-	char changeCommand[commandMaxLength];
-	size_t startIndex = 0;
-	getStringValue(command, changeCommand, startIndex);
-	changeCommand[commandMaxLength - 1] = '\0';
 	const size_t spaceSize = 1;
+	char commandField[commandMaxLength];
+	size_t startIndex = 0;
+	getStringValue(command, commandField, startIndex);
+	startIndex += spaceSize;
+	char field[maxFieldLength];
+	getStringValue(command, field, startIndex);
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		sortNumber(students, studentsCount, field);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		sortString(students, studentsCount, field);
+	else
+	{
+		std::cout << "Invalid field" << std::endl;
+		return;
+	}
+
+	std::cout << "Operation successfully executed!" << std::endl;
+}
+
+void edit(const char* command, Student* students, size_t studentsCount)
+{
+	const size_t commandMaxLength = 5;
+	const size_t spaceSize = 1;
+	char commandField[commandMaxLength];
+	size_t startIndex = 0;
+	getStringValue(command, commandField, startIndex);
 	startIndex += spaceSize;
 	size_t fn = getNumberValue(command, startIndex);
-	startIndex += spaceSize;
 	size_t fnLength = getNumberLength(fn);
 	size_t searchedIndex = findByFn(students, fn, studentsCount);
 
@@ -446,22 +495,19 @@ void change(const char* command, Student* students, size_t studentsCount)
 		return;
 	}
 
+	startIndex += spaceSize;
 	char field[maxFieldLength];
 	getStringValue(command, field, startIndex);
-	if (strcmp(changeCommand, "edit") == 0)
-		edit(students, startIndex, searchedIndex, field, command, spaceSize);
-	else if (strcmp(changeCommand, "sort") == 0)
-		sort(students, field, studentsCount);
-}
-
-bool isUniqueFn(Student* students, int fn, size_t studentsCount)
-{
-	for (size_t i = 0; i < studentsCount; i++)
+	startIndex += spaceSize;
+	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
+		editNumber(searchedIndex, startIndex, field, command, students, studentsCount);
+	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
+		editString(searchedIndex, startIndex, field, command, students);
+	else
 	{
-		if (fn == students[i].getFn())
-			return false;
+		std::cout << "Invalid field" << std::endl;
+		return;
 	}
-	return true;
 }
 
 void saveFile(const Student* students, const char* filePath, size_t studentsCounter)
@@ -493,28 +539,9 @@ void saveFile(const Student* students, const char* filePath, size_t studentsCoun
 	resultFile.close();
 }
 
-int main()
+void change(std::fstream& sourceFile, Student* students, char* line, size_t& studentsCounter)
 {
-	const size_t maxStudents = 20;
 	const size_t FieldsCount = 6;
-	Student students[maxStudents];
-	const size_t BUFF = 1024;
-	char filePath[BUFF];
-	std::cout << "Enter a file path:" << std::endl;
-	std::cout << ">";
-	std::cin.getline(filePath, BUFF);
-	std::fstream sourceFile(filePath, std::ios::out | std::ios::in | std::ios::app);
-
-	if (!sourceFile.is_open())
-	{
-		std::cout << "Error" << std::endl;
-		return -1;
-	}
-
-	std::cout << "File loaded successfully!" << std::endl;
-
-	char line[BUFF];
-	size_t studentsCounter = 0;
 	size_t fieldsCounter = 0;
 	size_t currentLineIndex = 0;
 	size_t lastLineIndex = 0;
@@ -586,20 +613,58 @@ int main()
 			}
 		}
 	}
-	//here?
 	sourceFile.close();
+}
+
+void printStudentsData(Student* students, size_t studentsCounter)
+{
+	for (unsigned i = 0; i < studentsCounter; i++)
+	{
+		std::cout << "Fn: " << students[i].getFn() << std::endl;
+		std::cout << "Name: " << students[i].getName() << std::endl;
+		std::cout << "Age: " << students[i].getAge() << std::endl;
+		std::cout << "Gender: " << convertGenderToString(students[i].getGender()) << std::endl;
+		std::cout << "Average grade: " << students[i].getAvg() << std::endl;
+		std::cout << "Email: " << students[i].getEmail() << std::endl;
+	}
+}
+
+int main()
+{
+	char filePath[BUFF];
+	std::cout << "Enter a file path:" << std::endl;
+	std::cout << ">";
+	std::cin.getline(filePath, BUFF);
+	std::fstream sourceFile(filePath, std::ios::out | std::ios::in | std::ios::app);
+
+	if (!sourceFile.is_open())
+	{
+		std::cout << "Error" << std::endl;
+		return -1;
+	}
+	std::cout << "File loaded successfully!" << std::endl;
+
+	size_t studentsCounter = 0;
+	char line[BUFF];
+	const size_t maxStudents = 20;
+	Student students[maxStudents];
+
+	change(sourceFile, students, line, studentsCounter);
 
 	std::cout << ">";
 	std::cin.getline(line, BUFF);
 	while (!isPrefix(line, "save"))
 	{
-		if (isPrefix(line, "edit") || isPrefix(line, "sort"))
-			change(line, students, studentsCounter);
+		if (isPrefix(line, "edit"))
+			edit(line, students, studentsCounter);
+		else if (isPrefix(line, "sort"))
+			sort(line, students, studentsCounter);
+		else if (isPrefix(line, "print"))
+			printStudentsData(students, studentsCounter);
 		else
 			std::cout << "Invalid command" << std::endl;
 		std::cout << ">";
 		std::cin.getline(line, BUFF);
 	}
-
 	saveFile(students, filePath, studentsCounter);
 }
