@@ -1,5 +1,5 @@
 #include "GenderType.h"
-#include "Exx 2.h"
+#include "Exercice_2.h"
 #include <cstring>
 
 #pragma warning(disable:4996)
