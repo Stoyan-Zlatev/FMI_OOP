@@ -2,64 +2,6 @@ const int BUFF = 1024;
 const int minFileSize = 1;
 const int hexByteLegth = 2;
 
-void operate(std::fstream& sourceFile, const char* filePath, char*& buffer, size_t fileSize)
-{
-	char command[BUFF] = "";
-	while (!isPrefix(command, "save"))
-	{
-		std::cout << ">";
-		std::cin.getline(command, BUFF);
-
-		if (isPrefix(command, "view"))
-		{
-			view(buffer, fileSize);
-		}
-		else if (isPrefix(command, "change"))
-		{
-			if (change(command, buffer, fileSize))
-				std::cout << "Operation successfully executed!" << std::endl;
-			else
-				std::cout << "Error, incorrect input!" << std::endl;
-		}
-		else if (isPrefix(command, "remove"))
-		{
-			if (fileSize >= minFileSize)
-			{
-				removeLastByte(buffer, fileSize);
-			}
-			else
-			{
-				std::cout << "File is already empty" << std::endl;
-			}
-		}
-		else if (isPrefix(command, "add"))
-		{
-			if (add(command, buffer, fileSize))
-			{
-				std::cout << "Byte added successfuly!" << std::endl;
-			}
-			else
-			{
-				std::cout << "Operation failed!" << std::endl;
-			}
-		}
-		else if (isPrefix(command, "save as"))
-		{
-			saveAs(sourceFile, command, buffer, filePath, fileSize);
-			std::cout << "File successfully saved!" << std::endl;
-		}
-		else if (isPrefix(command, "save"))
-		{
-			save(sourceFile, buffer, filePath, fileSize);
-			std::cout << "File successfully saved!" << std::endl;
-		}
-		else
-		{
-			std::cout << "Incorrect command" << std::endl;
-		}
-	}
-}
-
 size_t getFileSize(std::fstream& file)
 {
 	size_t currentPosition = file.tellg();
@@ -76,12 +18,14 @@ size_t getNumberLength(size_t number)
 	{
 		return 1;
 	}
+
 	size_t counter = 0;
 	while (number != 0)
 	{
 		number /= 10;
 		counter++;
 	}
+
 	return counter;
 }
 
@@ -171,6 +115,7 @@ void printHex(const char* buffer, size_t fileSize)
 		else
 			std::cout << hexNumber[0] << hexNumber[1] << " ";
 	}
+
 	std::cout << std::endl;
 }
 
@@ -183,6 +128,7 @@ bool isPrefix(const char* text, const char* prefix)
 			return false;
 		i++;
 	}
+
 	return true;
 }
 
@@ -192,7 +138,6 @@ bool isValidHexNumber(const char* command, const size_t currentCommandIndex)
 	if (parseCharToInt(command[currentCommandIndex]) > hexCapacity || parseCharToInt(command[currentCommandIndex + 1]) > hexCapacity)
 		return false;
 	return true;
-
 }
 
 void getHexNumber(const char* command, char* hexNumber, size_t numberLength)
@@ -212,6 +157,7 @@ size_t getNumber(const char* command, size_t numberLength)
 		number += parseCharToInt(command[currentIndex]);
 		currentIndex++;
 	}
+
 	return number;
 }
 
@@ -227,6 +173,7 @@ void view(const char* buffer, size_t fileSize)
 		else
 			std::cout << ".  ";
 	}
+
 	std::cout << std::endl;
 }
 
@@ -310,10 +257,9 @@ void loadBuffer(char*& buffer, std::fstream& sourceFile, size_t fileSize)
 	}
 }
 
-void saveAs(std::fstream& sourceFile, const char* command, const char* buffer, const char* filePath, size_t fileSize)
+void saveAs(const char* command, const char* buffer, const char* filePath, size_t fileSize)
 {
 	const size_t currentCommandLength = 8;
-	sourceFile.close();
 	size_t textLength = strlen(command);
 	char* newFileName = new char[(textLength - currentCommandLength) + 1];
 	substr(currentCommandLength, command, newFileName, textLength, currentCommandLength);
@@ -324,10 +270,67 @@ void saveAs(std::fstream& sourceFile, const char* command, const char* buffer, c
 	delete[] newFileName;
 }
 
-void save(std::fstream& sourceFile, const char* buffer, const char* filePath, size_t fileSize)
+void save(const char* buffer, const char* filePath, size_t fileSize)
 {
-	sourceFile.close();
 	std::fstream newFile(filePath, std::ios::trunc | std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
 	rewriteFile(newFile, buffer, fileSize);
 	newFile.close();
+}
+
+void operate(const char* filePath, char*& buffer, size_t fileSize)
+{
+	char command[BUFF] = "";
+	while (!isPrefix(command, "save"))
+	{
+		std::cout << ">";
+		std::cin.getline(command, BUFF);
+
+		if (isPrefix(command, "view"))
+		{
+			view(buffer, fileSize);
+		}
+		else if (isPrefix(command, "change"))
+		{
+			if (change(command, buffer, fileSize))
+				std::cout << "Operation successfully executed!" << std::endl;
+			else
+				std::cout << "Error, incorrect input!" << std::endl;
+		}
+		else if (isPrefix(command, "remove"))
+		{
+			if (fileSize >= minFileSize)
+			{
+				removeLastByte(buffer, fileSize);
+			}
+			else
+			{
+				std::cout << "File is already empty" << std::endl;
+			}
+		}
+		else if (isPrefix(command, "add"))
+		{
+			if (add(command, buffer, fileSize))
+			{
+				std::cout << "Byte added successfuly!" << std::endl;
+			}
+			else
+			{
+				std::cout << "Operation failed!" << std::endl;
+			}
+		}
+		else if (isPrefix(command, "save as"))
+		{
+			saveAs(command, buffer, filePath, fileSize);
+			std::cout << "File successfully saved!" << std::endl;
+		}
+		else if (isPrefix(command, "save"))
+		{
+			save(buffer, filePath, fileSize);
+			std::cout << "File successfully saved!" << std::endl;
+		}
+		else
+		{
+			std::cout << "Incorrect command" << std::endl;
+		}
+	}
 }
