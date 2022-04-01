@@ -68,7 +68,6 @@ void getTagLength(const char* text, size_t& startIndex)
 
 void getContent(const char* text, char* content, size_t& startIndex, bool& isFinishedLine)
 {
-	//check this!
 	size_t textLength = strlen(text);
 	if (textLength > 0)
 	{
@@ -81,6 +80,7 @@ void getContent(const char* text, char* content, size_t& startIndex, bool& isFin
 				break;
 			content[index++] = text[contentStartIndex];
 		}
+	
 		content[index] = '\0';
 		getTagLength(text, contentStartIndex);
 		startIndex += contentStartIndex;
@@ -90,6 +90,7 @@ void getContent(const char* text, char* content, size_t& startIndex, bool& isFin
 			return;
 		}
 	}
+
 	isFinishedLine = true;
 }
 
@@ -101,17 +102,17 @@ void trimwhiteSpaces(const char* text, size_t& currentLineIndex)
 	}
 }
 
-bool isDigit(char element)
+bool isDigit(const char element)
 {
 	return element >= '0' && element <= '9';
 }
 
-size_t parseCharToInt(char element)
+size_t parseCharToInt(const char element)
 {
 	return element - '0';
 }
 
-const char* convertGenderToString(GenderType genderType)
+const char* convertGenderToString(const GenderType genderType)
 {
 	if (GenderType::Male == genderType)
 		return "Male";
@@ -122,7 +123,7 @@ const char* convertGenderToString(GenderType genderType)
 }
 
 
-int findByFn(Student* students, size_t fn, size_t studentsCount)
+int findByFn(const Student* students, size_t fn, size_t studentsCount)
 {
 	for (size_t i = 0; i < studentsCount; i++)
 	{
@@ -162,6 +163,7 @@ double getNumberValue(const char* command, size_t& startIndex)
 		value += parseCharToInt(command[startIndex]);
 		startIndex++;
 	}
+
 	if (command[startIndex] == '.')
 	{
 		startIndex++;
@@ -173,7 +175,18 @@ double getNumberValue(const char* command, size_t& startIndex)
 			divider *= 10;
 		}
 	}
+
 	return value;
+}
+
+bool isUniqueFn(const Student* students, int fn, size_t studentsCount)
+{
+	for (size_t i = 0; i < studentsCount; i++)
+	{
+		if (fn == students[i].getFn())
+			return false;
+	}
+	return true;
 }
 
 void selectionSort(Student* students, char** stringArray, size_t studentCount)
@@ -193,17 +206,6 @@ void selectionSort(Student* students, char** stringArray, size_t studentCount)
 		}
 	}
 }
-
-bool isUniqueFn(Student* students, int fn, size_t studentsCount)
-{
-	for (size_t i = 0; i < studentsCount; i++)
-	{
-		if (fn == students[i].getFn())
-			return false;
-	}
-	return true;
-}
-
 
 void selectionSort(Student* students, double* numberArray, size_t studentCount)
 {
@@ -298,6 +300,7 @@ void sortString(Student* students, size_t studentsCount, const char* field)
 			strcpy(stringArray[i], convertGenderToString(students[i].getGender()));
 		}
 	}
+
 	selectionSort(students, stringArray, studentsCount);
 	for (size_t i = 0; i < studentsCount; i++)
 	{
@@ -386,15 +389,13 @@ void edit(const char* command, Student* students, size_t studentsCount)
 	char field[maxFieldLength];
 	getField(command, field, startIndex);
 	startIndex += spaceSize;
+
 	if (strcmp(field, "fn") == 0 || strcmp(field, "grade") == 0 || strcmp(field, "age") == 0)
 		editNumber(searchedIndex, startIndex, field, command, students, studentsCount);
 	else if (strcmp(field, "name") == 0 || strcmp(field, "email") == 0 || strcmp(field, "gender") == 0)
 		editString(searchedIndex, startIndex, field, command, students);
 	else
-	{
 		std::cout << "Invalid field" << std::endl;
-		return;
-	}
 }
 
 void saveFile(const Student* students, const char* filePath, size_t studentsCounter)
@@ -423,6 +424,7 @@ void saveFile(const Student* students, const char* filePath, size_t studentsCoun
 		resultFile << "<\\grade>\n";
 		resultFile << "<\\student>\n\n";
 	}
+
 	resultFile.close();
 }
 
@@ -515,6 +517,7 @@ void printStudentsData(Student* students, size_t studentsCounter)
 		std::cout << "Average grade: " << students[i].getAvg() << std::endl;
 		std::cout << "Email: " << students[i].getEmail() << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 void operate(Student* students, size_t studentsCounter, const char* filePath, char* line)
@@ -531,9 +534,11 @@ void operate(Student* students, size_t studentsCounter, const char* filePath, ch
 			printStudentsData(students, studentsCounter);
 		else
 			std::cout << "Invalid command" << std::endl;
+
 		std::cout << ">";
 		std::cin.getline(line, BUFF);
 	}
+
 	saveFile(students, filePath, studentsCounter);
 }
 
@@ -541,7 +546,7 @@ bool Student::setName(const char* name)
 {
 	if (strlen(name) > 25)
 	{
-		std::cout << "Entered name is too long";
+		std::cout << "Entered name is too long" << std::endl;
 		return false;
 	}
 	strcpy(this->name, name);
@@ -609,30 +614,30 @@ bool Student::setAvg(double avg)
 
 int Student::getFn() const
 {
-	return this->fn;
+	return fn;
 }
 
 size_t Student::getAge() const
 {
-	return this->age;
+	return age;
 }
 
 GenderType Student::getGender() const
 {
-	return this->gender;
+	return gender;
 }
 
 const char* Student::getName() const
 {
-	return this->name;
+	return name;
 }
 
 const char* Student::getEmail() const
 {
-	return this->email;
+	return email;
 }
 
 double Student::getAvg() const
 {
-	return this->avg;
+	return avg;
 }
