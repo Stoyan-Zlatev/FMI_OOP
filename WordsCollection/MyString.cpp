@@ -65,3 +65,18 @@ const char* MyString::c_str() const
 {
 	return str;
 }
+
+bool MyString::operator<(const MyString& other) const
+{
+	return strcmp(this->str, other.str) == -1 ? 1 : 0;
+}
+
+bool MyString::operator==(const MyString& other) const
+{
+	return strcmp(this->str, other.str) == 0 ? 1 : 0;
+}
+
+const char* MyString::getString() const
+{
+	return str;
+}
