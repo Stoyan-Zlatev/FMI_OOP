@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include "Label.h"
 #include "LabelsCollection.h"
 #pragma warning(disable:4996)
@@ -15,6 +16,11 @@ void Label::setName(const char* name)
 {
 	if (name == nullptr)
 		return;
+	if (strlen(name) > 64)
+	{
+		std::cout << "Name is too long" << std::endl;
+		return;
+	}
 
 	strcpy(this->name, name);
 }
