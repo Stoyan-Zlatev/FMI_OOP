@@ -1,6 +1,7 @@
 #pragma once
 #include "Page.h"
 #include "CommentsCollection.h"
+#include "Comment.h"
 #include "GlobalConstants.h"
 #include "PagesCollection.h"
 
@@ -10,7 +11,6 @@ class Book
 	char authorName[MaxNameLength];
 	size_t rating;
 	PagesCollection pages;
-	size_t currentPageNumber;
 	CommentsCollection comments;
 public:
 	Book();
@@ -19,13 +19,10 @@ public:
 	void setTitle(const char* title);
 	void setAuthorName(const char* authorName);
 	void setRating(size_t rating);
-	void setCurrentPageNumber(size_t currentPageNumber);
 	void addComment(const char* username, const char* comment);
 
 	const char* getTitle() const;
 	const char* getAuthorName() const;
 	size_t getRating() const;
-	size_t getCurrentPageNumber() const;
 	void printComments() const;
-
 };

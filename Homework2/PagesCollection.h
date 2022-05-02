@@ -1,5 +1,6 @@
 #pragma once
 #include "Page.h"
+
 class PagesCollection
 {
 	Page* pages;

@@ -8,7 +8,6 @@ Book::Book(const char* title, const char* authorName)
 {
 	setTitle(title);
 	setAuthorName(authorName);
-	this->currentPageNumber = 1;
 }
 
 void Book::setTitle(const char* title)
@@ -39,10 +38,6 @@ void Book::setRating(size_t rating)
 
 	this->rating = rating;
 }
-void Book::setCurrentPageNumber(size_t currentPageNumber)
-{
-	this->currentPageNumber = currentPageNumber;
-}
 
 const char* Book::getTitle() const
 {
@@ -55,11 +50,6 @@ const char* Book::getAuthorName() const
 size_t Book::getRating() const
 {
 	return rating;
-}
-
-size_t Book::getCurrentPageNumber() const
-{
-	return currentPageNumber;
 }
 
 void Book::printComments() const

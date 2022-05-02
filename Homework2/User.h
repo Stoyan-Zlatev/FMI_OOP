@@ -8,14 +8,14 @@ class User
 	char password[MaxNameLength];
 	BooksCollection readBooks;
 	BooksCollection writenBooks;
+	void setName(const char* name);
+	void setPassword(const char* password);
 public:
 	User();
 	User(const char* name, const char* password);
 
-	void setName(const char* name);
-	void setPassword(const char* password);
 	void readBook(const Book& book);
-	void readBookPage(const Book& book, size_t pageCount);
+	void readBookPage(const Book& book, size_t pageCount) const;
 	void readBookComments(const Book& book) const;
 	void writeBook(const Book& book);
 	void writeBookComment(Book& book, const char* comment);

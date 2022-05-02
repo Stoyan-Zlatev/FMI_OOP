@@ -1,4 +1,3 @@
-#pragma once
 #include "UsersCollection.h"
 
 void UsersCollection::copyFrom(const UsersCollection& other)
