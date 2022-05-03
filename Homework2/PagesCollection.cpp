@@ -18,8 +18,8 @@ void PagesCollection::resize()
 {
 	allocatedCellsCount *= 2;
 	Page* newData = new Page[allocatedCellsCount];
-
-	for (int i = 0; i < pagesCount; i++) {
+	for (int i = 0; i < pagesCount; i++) 
+	{
 		newData[i] = pages[i];
 	}
 
