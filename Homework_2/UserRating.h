@@ -1,0 +1,15 @@
+#pragma once
+#include "MyString.h"
+
+class UserRating
+{
+	MyString username;
+	size_t rating;
+public:
+	UserRating();
+	UserRating(const MyString& user, size_t rating);
+
+	void setRating(size_t rating);
+	size_t getRating() const;
+	const MyString getUserName() const;
+};
