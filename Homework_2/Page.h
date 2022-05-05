@@ -1,6 +1,7 @@
 #pragma once
 #include "GlobalConstants.h"
 #include "MyString.h"
+#include <fstream>
 
 class Page
 {
@@ -12,6 +13,7 @@ public:
 	Page(const MyString& pageContent, size_t pageNumber);
 
 	void setPageContent(const MyString& pageContent);
+	void saveToFile(std::fstream& file);
 
 	size_t getPageNumber() const;
 	const MyString getPageContent() const;

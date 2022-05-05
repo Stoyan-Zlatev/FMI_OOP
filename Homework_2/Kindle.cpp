@@ -1,13 +1,16 @@
 #include "Kindle.h"
 #include "User.h"
+#include "Book.h"
 #include <exception>
 #include <iostream>
 
 Kindle::Kindle()
 {
-	booksToRead.add(Book("Kniga", "Avtor 1"));
-	booksToRead.add(Book("Knigata", "Avtor 2"));
-	currentUser = User("", "");
+	///*booksToRead = Collection<Book>();
+	//users = Collection<User>();*/
+	//booksToRead.add(Book("Kniga", "Avtor 1"));
+	//booksToRead.add(Book("Knigata", "Avtor 2"));
+	//currentUser = User("", "");
 	isUsed = false;
 }
 
@@ -66,10 +69,9 @@ void Kindle::signup(const MyString& username, const MyString& password)
 	{
 		throw std::invalid_argument("User with this username already exists!");
 	}
-
-	User currentUser = User(username, password);
-	users.add(currentUser);
-	this->currentUser = currentUser;
+	User user(username,password);
+	users.add(user);
+	this->currentUser = user;
 	isUsed = true;
 }
 
@@ -99,9 +101,17 @@ void Kindle::load(std::fstream& sourceFile)
 
 void Kindle::saveToFile(std::fstream& file)
 {
-	file << booksToRead.count << users.count;
-	file.write((const char*)&booksToRead, booksToRead.count * sizeof(Collection<Book>));
-	file.write((const char*)&users, users.count * sizeof(Collection<User>));
+	file.write((const char*)&booksToRead.count, sizeof(size_t));
+	for (size_t i = 0; i < booksToRead.count; i++)
+	{
+		booksToRead.collection[i].saveToFile(file);
+	}
+
+	file.write((const char*)&users.count, sizeof(size_t));
+	for (size_t i = 0; i < users.count; i++)
+	{
+		users.collection[i].saveToFile(file);
+	}
 }
 
 void Kindle::printFirstUser() const

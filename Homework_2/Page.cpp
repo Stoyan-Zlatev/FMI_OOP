@@ -40,3 +40,14 @@ const MyString Page::getPageContent() const
 {
 	return content;
 }
+
+void Page::saveToFile(std::fstream& file)
+{
+	/*size_t pageNumber;
+	MyString content;*/
+	file.write((const char*)&pageNumber, sizeof(size_t));
+
+	size_t contentSize = content.getSize();
+	file.write((const char*)&contentSize, sizeof(size_t));
+	file.write((const char*)content.c_str(),content.getSize());
+}

@@ -3,6 +3,7 @@
 #include "Collection.hpp"
 #include "GlobalConstants.h"
 #include "MyString.h"
+#include <fstream>
 
 class User
 {
@@ -15,6 +16,8 @@ class User
 public:
 	User();
 	User(const MyString& name, const MyString& password);
+
+	void saveToFile(std::fstream& file);
 
 	void readBook(const Book& book);
 	void readBookPage(const Book& book, size_t pageCount) const;

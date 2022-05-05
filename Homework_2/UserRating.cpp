@@ -9,6 +9,17 @@ UserRating::UserRating(const MyString& username, size_t rating)
 	setRating(rating);
 }
 
+void UserRating::saveToFile(std::fstream& file)
+{
+	/*	MyString username;
+	size_t rating;*/
+	size_t usernameSize = username.getSize();
+	file.write((const char*)&usernameSize, sizeof(size_t));
+	file.write((const char*)username.c_str(), sizeof(size_t));
+
+	file.write((const char*)&rating, sizeof(size_t));
+}
+
 void UserRating::setRating(size_t rating)
 {
 	if (rating < 0 || rating>5)

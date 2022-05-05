@@ -40,3 +40,16 @@ const MyString Comment::getContent() const
 {
 	return content;
 }
+
+void Comment::saveToFile(std::fstream& file)
+{
+	/*MyString username;
+	MyString content;*/
+	size_t usernameSize = username.getSize();
+	file.write((const char*)&usernameSize, sizeof(size_t));
+	file.write((const char*)username.c_str(), sizeof(size_t));
+
+	size_t contentSize = content.getSize();
+	file.write((const char*)&contentSize, sizeof(size_t));
+	file.write((const char*)content.c_str(), content.getSize());
+}

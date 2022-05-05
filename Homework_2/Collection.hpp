@@ -22,6 +22,7 @@ public:
 	size_t getCount() const;
 	friend class Kindle;
 	friend class Book;
+	friend class User;
 
 	~Collection();
 };
@@ -29,7 +30,7 @@ public:
 template <typename T>
 Collection<T>::Collection()
 {
-	collection = new T[DEFAULT_ALLOCATED_CELLS];
+	collection = new T[DEFAULT_ALLOCATED_CELLS]();
 	count = 0;
 	allocatedCellsCount = DEFAULT_ALLOCATED_CELLS;
 }
@@ -61,10 +62,11 @@ Collection<T>::~Collection()
 template <typename T>
 void Collection<T>::copyFrom(const Collection& other)
 {
-	collection = new  T[other.count];
+	collection = new  T[other.allocatedCellsCount];
 	for (size_t i = 0; i < other.count; i++)
 		collection[i] = other.collection[i];
 	count = other.count;
+	allocatedCellsCount = other.allocatedCellsCount;
 }
 
 template <typename T>

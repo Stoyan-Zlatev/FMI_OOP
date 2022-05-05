@@ -90,7 +90,7 @@ int parseStringToInt(const char* data)
 
 int main()
 {
-	std::fstream sourceFile("FMIKindle.dat", std::ios::app, std::ios::binary);
+	std::fstream sourceFile("FMIKindle.dat",std::ios::out| std::ios::binary);
 
 	if (!sourceFile.is_open())
 	{

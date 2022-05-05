@@ -12,6 +12,7 @@ public:
 	Comment(const MyString username, const MyString content);
 
 	void setContent(const MyString content);
+	void saveToFile(std::fstream& file);
 
 	const MyString getUserName() const;
 	const MyString getContent() const;

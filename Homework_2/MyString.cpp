@@ -145,13 +145,10 @@ MyString::MyString(MyString&& otherString)
 	str = otherString.str;
 	size = otherString.size;
 	otherString.str = nullptr;
-	//std::cout << "move constr" << std::endl;
 }
 
 MyString& MyString::operator=(MyString&& otherString)
 {
-	//std::cout << "move op=" << std::endl;
-
 	if (this != &otherString)
 	{
 		free();
@@ -161,16 +158,3 @@ MyString& MyString::operator=(MyString&& otherString)
 	}
 	return *this;
 }
-
-//MyString& MyString::substring(size_t startIndex, size_t endIndex)
-//{
-//	MyString tempString = "";
-//	for (size_t i = startIndex; i <= endIndex; i++)
-//	{
-//		std::cout << str[i];
-//		tempString+=(str[i]);
-//	}
-//	tempString.concat("\0");
-//
-//	return tempString;
-//}

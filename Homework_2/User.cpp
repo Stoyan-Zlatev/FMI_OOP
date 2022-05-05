@@ -1,4 +1,6 @@
 #include "User.h"
+#include "Collection.hpp"
+#include "Book.h"
 #include <cstring>
 #pragma warning(disable:4996)
 
@@ -6,8 +8,38 @@ User::User() : User("", "") {}
 
 User::User(const MyString& name, const MyString& password)
 {
+	//readBooks = Collection<Book>();
+	//writtenBooks = Collection<Book>();
 	setName(name);
 	setPassword(password);
+}
+
+void User::saveToFile(std::fstream& file)
+{
+	/*MyString name;
+	MyString password;
+	Collection<Book> readBooks;
+	Collection<Book> writtenBooks;*/
+
+	size_t nameSize = name.getSize();
+	file.write((const char*)&nameSize, sizeof(size_t));
+	file.write((const char*)name.c_str(), name.getSize());
+
+	size_t passwordSize = password.getSize();
+	file.write((const char*)&passwordSize, sizeof(size_t));
+	file.write((const char*)password.c_str(), password.getSize());
+
+	file.write((const char*)&readBooks.count, sizeof(size_t));
+	for (size_t i = 0; i < readBooks.count; i++)
+	{
+		readBooks.collection[i].saveToFile(file);
+	}
+
+	file.write((const char*)&writtenBooks.count, sizeof(size_t));
+	for (size_t i = 0; i < writtenBooks.count; i++)
+	{
+		writtenBooks.collection[i].saveToFile(file);
+	}
 }
 
 void User::setName(const MyString& name)
