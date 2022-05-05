@@ -90,7 +90,8 @@ int parseStringToInt(const char* data)
 
 int main()
 {
-	std::fstream sourceFile("FMIKindle.dat",std::ios::out| std::ios::binary);
+	//books should be added to users not only to currentUser
+	std::fstream sourceFile("FMIKindle.dat", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
 
 	if (!sourceFile.is_open())
 	{
@@ -100,8 +101,8 @@ int main()
 
 	char command[MaxContentLength];
 	Kindle fmiKindle;
-	//fmiKindle.load(sourceFile);
-	//fmiKindle.printFirstUser();
+	fmiKindle.load(sourceFile);
+	sourceFile.close();
 	std::cout << ">";
 	std::cin.getline(command, MaxContentLength);
 	while (!isPrefix(command, "exit"))
@@ -140,25 +141,26 @@ int main()
 			}
 			else if (isPrefix(command, "read"))
 			{
-				char readCommand = '\0';
 				size_t startIndex = 5;
-				size_t currentPageNumber;
+				int currentPageNumber;
 				char title[MaxContentLength];
 				char data[MaxContentLength];
 				getCommandData(startIndex, command, title, data);
 				fmiKindle.readBook(title);
 				if (data[0] == '\0')
 				{
-					currentPageNumber = 1;
+					currentPageNumber = 0;
 				}
 				else
 				{
 					currentPageNumber = parseStringToInt(data);
 				}
 
+				char readCommand = '\0';
 				while (readCommand != 'q')
 				{
 					fmiKindle.printBookPage(title, currentPageNumber);
+					std::cin >> readCommand;
 					if (readCommand == 'n')
 					{
 						currentPageNumber++;
@@ -167,8 +169,14 @@ int main()
 					{
 						currentPageNumber--;
 					}
-					std::cin >> readCommand;
 				}
+			}
+			else if (isPrefix(command, "rates"))
+			{
+				size_t startIndex = 6;
+				char title[MaxContentLength];
+				getCommandData(startIndex, command, title);
+				fmiKindle.printBookRating(title);
 			}
 			else if (isPrefix(command, "rate"))
 			{
@@ -178,23 +186,20 @@ int main()
 				getCommandData(startIndex, command, title, data);
 				fmiKindle.rateBookByName(title, fmiKindle.getCurrentUserName(), parseStringToInt(data));
 			}
-			else if (isPrefix(command, "rates"))
-			{
-				size_t startIndex = 6;
-				char title[MaxContentLength];
-				getCommandData(startIndex, command, title);
-				fmiKindle.printBookRating(title);
-			}
 			else if (isPrefix(command, "write"))
 			{
 				std::cout << "Enter title: ";
+				
 				char title[MaxContentLength];
 				std::cin.getline(title, MaxContentLength);
+				
 				size_t pagesCount;
 				std::cout << "Pages count: ";
 				std::cin.getline(command, MaxContentLength);
+				
 				pagesCount = parseStringToInt(command);
 				Book currentBook(title, fmiKindle.getCurrentUserName());
+				
 				for (size_t i = 0; i < pagesCount; i++)
 				{
 					std::cout << "Page " << i + 1 << ": ";
@@ -202,13 +207,6 @@ int main()
 					currentBook.addPage(command, i);
 				}
 				fmiKindle.addBook(currentBook);
-			}
-			else if (isPrefix(command, "comments"))
-			{
-				size_t startIndex = 9;
-				char title[MaxContentLength];
-				getCommandData(startIndex, command, title);
-				fmiKindle.printBookComments(title);
 			}
 			else if (isPrefix(command, "comments"))
 			{
@@ -249,4 +247,15 @@ int main()
 		std::cout << ">";
 		std::cin.getline(command, MaxContentLength);
 	}
+	
+	std::fstream newFile("FMIKindle.dat", std::ios::trunc | std::ios::binary | std::ios::out | std::ios::ate);
+	if (!newFile.is_open())
+	{
+		std::cout << "Error while opening the file!" << std::endl;
+		return -1;
+	}
+	newFile.seekp(0, std::ios::beg);
+	fmiKindle.saveToFile(newFile);
+	newFile.seekp(0, std::ios::beg);
+	newFile.close();
 }

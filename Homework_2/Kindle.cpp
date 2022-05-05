@@ -57,27 +57,31 @@ void Kindle::login(const MyString& username, const MyString& password)
 		throw std::invalid_argument("User with this username and password does not exist!");
 	}
 
-	User currentUser = User(username, password);
-	users.add(currentUser);
-	this->currentUser = currentUser;
+	size_t userIndex = getUserIndexByName(username);
+	this->currentUser = users.getElementByIndex(userIndex);
 	isUsed = true;
 }
 
 void Kindle::signup(const MyString& username, const MyString& password)
 {
-	if (containsUser(username))
+	if (isUsed)
+	{
+		throw std::invalid_argument("There is already logged user!");
+	}
+	else if (containsUser(username))
 	{
 		throw std::invalid_argument("User with this username already exists!");
 	}
-	User user(username,password);
-	users.add(user);
+
+	User user(username, password);
+	//users.add(user);
 	this->currentUser = user;
 	isUsed = true;
 }
 
 void Kindle::logout(std::fstream& file)
 {
-	saveToFile(file);
+	users.add(currentUser);
 	isUsed = false;
 }
 
@@ -93,10 +97,17 @@ size_t getFileSize(std::fstream& file)
 
 void Kindle::load(std::fstream& sourceFile)
 {
-	size_t booksCount, usersCount;
-	sourceFile >> booksCount >> usersCount;
-	sourceFile.read((char*)&booksToRead, booksCount * sizeof(Collection<Book>));
-	sourceFile.read((char*)&users, usersCount * sizeof(Collection<User>));
+	sourceFile.read((char*)&booksToRead.count, sizeof(size_t));
+	for (size_t i = 0; i < booksToRead.count; i++)
+	{
+		booksToRead.collection[i].readFromFile(sourceFile);
+	}
+
+	sourceFile.read((char*)&users.count, sizeof(size_t));
+	for (size_t i = 0; i < users.count; i++)
+	{
+		users.collection[i].readFromFile(sourceFile);
+	}
 }
 
 void Kindle::saveToFile(std::fstream& file)
@@ -112,12 +123,6 @@ void Kindle::saveToFile(std::fstream& file)
 	{
 		users.collection[i].saveToFile(file);
 	}
-}
-
-void Kindle::printFirstUser() const
-{
-	std::cout << users.getElementByIndex(0).getName() << std::endl;
-	std::cout << users.getElementByIndex(0).getPassword() << std::endl;
 }
 
 const MyString Kindle::getCurrentUserName() const
@@ -173,7 +178,7 @@ void Kindle::addBookComment(const MyString& bookTitle, const MyString& comment)
 	booksToRead.collection[bookIndex].addComment(currentUser.getName(), comment);
 }
 
-void Kindle::printBookPage(const MyString& bookTitle, size_t pageNumber) const
+void Kindle::printBookPage(const MyString& bookTitle, int pageNumber) const
 {
 	size_t bookIndex = getBookIndexByName(bookTitle);
 	booksToRead.collection[bookIndex].printPageByIndex(pageNumber);
@@ -224,5 +229,18 @@ size_t Kindle::getBookIndexByName(const MyString& name) const
 	}
 
 	throw std::invalid_argument("Book with this name does not exist!");
+}
+
+size_t Kindle::getUserIndexByName(const MyString& name) const
+{
+	for (size_t i = 0; i < users.count; i++)
+	{
+		if (name == users.collection[i].getName())
+		{
+			return i;
+		}
+	}
+
+	throw std::invalid_argument("User with this name does not exist!");
 }
 

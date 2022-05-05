@@ -114,6 +114,48 @@ void Book::removeLastPage()
 	pages.remove();
 }
 
+void Book::readFromFile(std::fstream& file)
+{
+	//Title 
+	size_t size;
+	file.read((char*)&size, sizeof(size_t));
+	char* data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	title = MyString(data);
+
+	//Author 
+	file.read((char*)&size, sizeof(size_t));
+	delete[] data;
+	data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	authorName = MyString(data);
+
+	delete[] data;
+
+	//Pages 
+	file.read((char*)&pages.count, sizeof(size_t));
+	for (size_t i = 0; i < pages.count; i++)
+	{
+		pages.collection[i].readFromFile(file);
+	}
+
+	//Comments 
+	file.read((char*)&comments.count, sizeof(size_t));
+	for (size_t i = 0; i < comments.count; i++)
+	{
+		comments.collection[i].readFromFile(file);
+	}
+
+	//Ratings saved
+	file.read((char*)&ratings.count, sizeof(size_t));
+	for (size_t i = 0; i < ratings.count; i++)
+	{
+		ratings.collection[i].readFromFile(file);
+	}
+}
+
 void Book::saveToFile(std::fstream& file)
 {
 	//Title saved
@@ -146,8 +188,6 @@ void Book::saveToFile(std::fstream& file)
 	{
 		ratings.collection[i].saveToFile(file);
 	}
-
-
 }
 
 void Book::printPageByIndex(int index) const
@@ -161,6 +201,6 @@ void Book::printPageByIndex(int index) const
 	{
 		throw std::invalid_argument("This is the last page of the book!");
 	}
-	std::cout << pages.getElementByIndex(index).getPageContent();
+	std::cout << pages.getElementByIndex(index).getPageContent()<<std::endl;
 }
 

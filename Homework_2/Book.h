@@ -28,6 +28,8 @@ public:
 	void addPage(const MyString& content, size_t pageNumber);
 	void removeLastPage();
 	void saveToFile(std::fstream& file);
+	void readFromFile(std::fstream& file);
+
 
 	const MyString getTitle() const;
 	const MyString getAuthorName() const;

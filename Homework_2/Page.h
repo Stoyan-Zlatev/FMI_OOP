@@ -14,6 +14,7 @@ public:
 
 	void setPageContent(const MyString& pageContent);
 	void saveToFile(std::fstream& file);
+	void readFromFile(std::fstream& file);
 
 	size_t getPageNumber() const;
 	const MyString getPageContent() const;

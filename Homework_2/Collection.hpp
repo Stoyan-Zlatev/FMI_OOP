@@ -106,6 +106,11 @@ void Collection<T>::add(const T& element)
 template <typename T>
 void Collection<T>::remove()
 {
+	if (count == 0)
+	{
+		throw std::invalid_argument("It is already empty!");
+	}
+
 	count--;
 }
 

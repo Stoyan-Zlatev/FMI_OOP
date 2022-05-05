@@ -16,11 +16,6 @@ User::User(const MyString& name, const MyString& password)
 
 void User::saveToFile(std::fstream& file)
 {
-	/*MyString name;
-	MyString password;
-	Collection<Book> readBooks;
-	Collection<Book> writtenBooks;*/
-
 	size_t nameSize = name.getSize();
 	file.write((const char*)&nameSize, sizeof(size_t));
 	file.write((const char*)name.c_str(), name.getSize());
@@ -39,6 +34,36 @@ void User::saveToFile(std::fstream& file)
 	for (size_t i = 0; i < writtenBooks.count; i++)
 	{
 		writtenBooks.collection[i].saveToFile(file);
+	}
+}
+
+void User::readFromFile(std::fstream& file)
+{
+	size_t size;
+	file.read((char*)&size, sizeof(size_t));
+	char* data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	name = MyString(data);
+
+	file.read((char*)&size, sizeof(size_t));
+	delete[] data;
+	data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	password = MyString(data);
+	delete[] data;
+
+	file.read((char*)&readBooks.count, sizeof(size_t));
+	for (size_t i = 0; i < readBooks.count; i++)
+	{
+		readBooks.collection[i].readFromFile(file);
+	}
+
+	file.read((char*)&writtenBooks.count, sizeof(size_t));
+	for (size_t i = 0; i < writtenBooks.count; i++)
+	{
+		writtenBooks.collection[i].readFromFile(file);
 	}
 }
 

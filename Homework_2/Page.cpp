@@ -43,11 +43,22 @@ const MyString Page::getPageContent() const
 
 void Page::saveToFile(std::fstream& file)
 {
-	/*size_t pageNumber;
-	MyString content;*/
 	file.write((const char*)&pageNumber, sizeof(size_t));
 
 	size_t contentSize = content.getSize();
 	file.write((const char*)&contentSize, sizeof(size_t));
 	file.write((const char*)content.c_str(),content.getSize());
+}
+
+void Page::readFromFile(std::fstream& file) 
+{
+	file.read((char*)&pageNumber, sizeof(size_t));
+
+	size_t contentSize;
+	file.read((char*)&contentSize, sizeof(size_t));
+	char* data = new char[contentSize + 1];
+	file.read((char*)data, contentSize);
+	data[contentSize] = '\0';
+	content = MyString(data);
+	delete[] data;
 }

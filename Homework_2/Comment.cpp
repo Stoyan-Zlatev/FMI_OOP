@@ -43,13 +43,30 @@ const MyString Comment::getContent() const
 
 void Comment::saveToFile(std::fstream& file)
 {
-	/*MyString username;
-	MyString content;*/
 	size_t usernameSize = username.getSize();
 	file.write((const char*)&usernameSize, sizeof(size_t));
-	file.write((const char*)username.c_str(), sizeof(size_t));
+	file.write((const char*)username.c_str(), username.getSize());
 
 	size_t contentSize = content.getSize();
 	file.write((const char*)&contentSize, sizeof(size_t));
 	file.write((const char*)content.c_str(), content.getSize());
+}
+
+void Comment::readFromFile(std::fstream& file)
+{
+	size_t size;
+	file.read((char*)&size, sizeof(size_t));
+	char* data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	username = MyString(data);
+
+	file.read((char*)&size, sizeof(size_t));
+	delete[] data;
+	data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	content = MyString(data);
+
+	delete[] data;
 }

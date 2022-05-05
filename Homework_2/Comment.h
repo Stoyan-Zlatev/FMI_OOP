@@ -13,6 +13,7 @@ public:
 
 	void setContent(const MyString content);
 	void saveToFile(std::fstream& file);
+	void readFromFile(std::fstream& file);
 
 	const MyString getUserName() const;
 	const MyString getContent() const;
