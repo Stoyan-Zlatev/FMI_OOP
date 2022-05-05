@@ -5,8 +5,8 @@
 
 Kindle::Kindle()
 {
-	booksToRead.add(Book("Kniga 1", "Avtor 1"));
-	booksToRead.add(Book("Kniga 2", "Avtor 2"));
+	booksToRead.add(Book("Kniga", "Avtor 1"));
+	booksToRead.add(Book("Knigata", "Avtor 2"));
 	currentUser = User("", "");
 	isUsed = false;
 }
@@ -91,16 +91,17 @@ size_t getFileSize(std::fstream& file)
 
 void Kindle::load(std::fstream& sourceFile)
 {
-	size_t sizeOfFile = getFileSize(sourceFile);
-	sourceFile.read((char*)this, sizeOfFile);
+	size_t booksCount, usersCount;
+	sourceFile >> booksCount >> usersCount;
+	sourceFile.read((char*)&booksToRead, booksCount * sizeof(Collection<Book>));
+	sourceFile.read((char*)&users, usersCount * sizeof(Collection<User>));
 }
 
 void Kindle::saveToFile(std::fstream& file)
 {
-	//not working
-	size_t totalFileSize = users.getCount() * sizeof(Collection<User>);
-	totalFileSize += booksToRead.getCount() * sizeof(Collection<Book>) + sizeof(User) + sizeof(bool);
-	file.write((const char*)this, sizeof(totalFileSize));
+	file << booksToRead.count << users.count;
+	file.write((const char*)&booksToRead, booksToRead.count * sizeof(Collection<Book>));
+	file.write((const char*)&users, users.count * sizeof(Collection<User>));
 }
 
 void Kindle::printFirstUser() const
@@ -120,23 +121,98 @@ void Kindle::view() const
 	{
 		throw std::invalid_argument("You do not have access!");
 	}
+
 	for (size_t i = 0; i < booksToRead.getCount(); i++)
 	{
 		Book currentBook = booksToRead.getElementByIndex(i);
-		std::cout << i + 1 << ". " << currentBook.getTitle() << "by " << currentBook.getAuthorName() << std::endl;
+		std::cout << i + 1 << ". " << currentBook.getTitle() << " by " << currentBook.getAuthorName() << std::endl;
 	}
 }
 
-Book& Kindle::getBookByName(const MyString& name) const
+void Kindle::rateBookByName(const MyString& bookTitle, const MyString& username, int rating)
 {
-	for (size_t i = 0; i < booksToRead.getCount(); i++)
+	if (!(isUsed && currentUser.hasUserRead(bookTitle)))
 	{
-		if (booksToRead.getElementByIndex(i).getTitle() == name)
+		throw std::invalid_argument("You do not have access!");
+	}
+
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].rate(username, rating);
+}
+
+void Kindle::addBook(const Book& book)
+{
+	booksToRead.add(book);
+	currentUser.writeBook(book);
+}
+
+void Kindle::printBookComments(const MyString& bookTitle) const
+{
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].printComments();
+}
+
+void Kindle::addBookComment(const MyString& bookTitle, const MyString& comment)
+{
+	if (!currentUser.hasUserRead(bookTitle))
+	{
+		throw std::invalid_argument("You can comment only books you have read!");
+	}
+
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].addComment(currentUser.getName(), comment);
+}
+
+void Kindle::printBookPage(const MyString& bookTitle, size_t pageNumber) const
+{
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].printPageByIndex(pageNumber);
+}
+
+void Kindle::printBookRating(const MyString& bookTitle) const
+{
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].printRatings();
+}
+
+void Kindle::addBookPage(const MyString& bookTitle, const MyString& pageContent)
+{
+	if (!currentUser.isUsersBook(bookTitle))
+	{
+		throw std::invalid_argument("You can edit only your books!");
+	}
+
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].addPage(pageContent, booksToRead.collection[bookIndex].getPagesCount());
+}
+
+void Kindle::removeBookLastPage(const MyString& bookTitle)
+{
+	if (!currentUser.isUsersBook(bookTitle))
+	{
+		throw std::invalid_argument("You can edit only your books!");
+	}
+
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	booksToRead.collection[bookIndex].removeLastPage();
+}
+
+void Kindle::readBook(const MyString& bookTitle)
+{
+	size_t bookIndex = getBookIndexByName(bookTitle);
+	currentUser.readBook(booksToRead.collection[bookIndex]);
+}
+
+size_t Kindle::getBookIndexByName(const MyString& name) const
+{
+	for (size_t i = 0; i < booksToRead.count; i++)
+	{
+		if (name == booksToRead.collection[i].getTitle())
 		{
-			return booksToRead.getElementByIndex(i);
+			return i;
 		}
 	}
+
 	throw std::invalid_argument("Book with this name does not exist!");
 }
-
 

@@ -6,13 +6,15 @@
 class Kindle
 {
 	Collection<User> users;
+	Collection<Book> booksToRead;
 	User currentUser;
 	bool isUsed;
-	Collection<Book> booksToRead;
+	
 	bool containsUser(const MyString& username, const MyString& password) const;
 	bool containsUser(const MyString& username) const;
 	bool conatinsBook(const MyString& bookTitle) const;
 	void saveToFile(std::fstream& file);
+	size_t getBookIndexByName(const MyString& name) const;
 public:
 	Kindle();
 	void load(std::fstream& sourceFile);
@@ -21,7 +23,15 @@ public:
 	void logout(std::fstream& file);
 	void view() const;
 	void printFirstUser() const;
-	const MyString getCurrentUserName() const;
+	void rateBookByName(const MyString& title, const MyString& username, int rating);
+	void addBook(const Book& book);
+	void printBookComments(const MyString& bookTitle) const;
+	void addBookComment(const MyString& bookTitle, const MyString& comment);
+	void printBookPage(const MyString& bookTitle, size_t pageNumber) const;
+	void printBookRating(const MyString& bookTitle) const;
+	void addBookPage(const MyString& bookTitle, const MyString& pageContent);
+	void removeBookLastPage(const MyString& bookTitle);
+	void readBook(const MyString& bookTitle);
 
-	Book& getBookByName(const MyString& name) const;
+	const MyString getCurrentUserName() const;
 };

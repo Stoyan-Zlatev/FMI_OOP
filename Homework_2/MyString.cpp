@@ -162,15 +162,15 @@ MyString& MyString::operator=(MyString&& otherString)
 	return *this;
 }
 
-MyString& MyString::substring(size_t startIndex, size_t endIndex)
-{
-	MyString tempString = "";
-	for (size_t i = startIndex; i <= endIndex; i++)
-	{
-		std::cout << str[i];
-		tempString+=(str[i]);
-	}
-	tempString.concat("\0");
-
-	return tempString;
-}
+//MyString& MyString::substring(size_t startIndex, size_t endIndex)
+//{
+//	MyString tempString = "";
+//	for (size_t i = startIndex; i <= endIndex; i++)
+//	{
+//		std::cout << str[i];
+//		tempString+=(str[i]);
+//	}
+//	tempString.concat("\0");
+//
+//	return tempString;
+//}

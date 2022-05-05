@@ -29,7 +29,7 @@ public:
 	const char* c_str() const;
 
 	MyString& operator+=(const MyString& other);
-	MyString& substring(size_t startIndex, size_t endIndex);
+	//MyString& substring(size_t startIndex, size_t endIndex);
 
 	friend std::ostream& operator<<(std::ostream& stream, const MyString& str);
 	friend std::istream& operator>>(std::istream& stream, MyString& str);

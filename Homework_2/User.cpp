@@ -43,7 +43,7 @@ void User::writeBook(const Book& book)
 
 void User::readBookPage(const Book& book, size_t pageCount) const
 {
-	//book.pages[pageCount].getContent();
+	book.printPageByIndex(pageCount);
 }
 
 void User::readBookComments(const Book& book) const
@@ -58,8 +58,7 @@ void User::writeBookComment(Book& book, const MyString comment)
 
 void User::editWrittenBook(Book& book)
 {
-
-	if (isUsersBook(book))
+	if (isUsersBook(book.getTitle()))
 	{
 		writeBook(book);
 	}
@@ -85,11 +84,24 @@ const MyString User::getPassword() const
 	return password;
 }
 
-bool User::isUsersBook(const Book& book) const
+bool User::isUsersBook(const MyString& bookTitle) const
 {
 	for (size_t i = 0; i < writtenBooks.getCount(); i++)
 	{
-		if (writtenBooks.getElementByIndex(i).getTitle() == book.getTitle())
+		if (writtenBooks.getElementByIndex(i).getTitle() == bookTitle)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool User::hasUserRead(const MyString& bookTitle) const
+{
+	for (size_t i = 0; i < readBooks.getCount(); i++)
+	{
+		if (readBooks.getElementByIndex(i).getTitle() == bookTitle)
 		{
 			return true;
 		}

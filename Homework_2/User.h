@@ -10,7 +10,6 @@ class User
 	MyString password;
 	Collection<Book> readBooks;
 	Collection<Book> writtenBooks;
-	bool isUsersBook(const Book& book) const;
 	void setName(const MyString& name);
 	void setPassword(const MyString& password);
 public:
@@ -25,6 +24,8 @@ public:
 	void editWrittenBook(Book& book);
 	void rateBook(Book& book, size_t rating);
 	void editBookRating(Book& book, size_t newRating);
+	bool isUsersBook(const MyString& bookTitle) const;
+	bool hasUserRead(const MyString& bookTitle) const;
 
 	const MyString getName() const;
 	const MyString getPassword() const;
