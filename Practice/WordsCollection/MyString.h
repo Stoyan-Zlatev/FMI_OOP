@@ -1,4 +1,6 @@
 #pragma once
+
+#include <fstream>
 class MyString
 {
 	char* str;
@@ -6,20 +8,37 @@ class MyString
 
 	void copyFrom(const MyString& other);
 	void free();
+
 public:
 	MyString();
 	MyString(const char*);
 
 	MyString(const MyString&);
+	
+	MyString(MyString&&); //move constructor that accepts rvalue;
+
 	MyString& operator=(const MyString& other);
+	MyString& operator=(MyString&& other);  //move op= that accepts rvalue;
+
 	~MyString();
 
 	size_t getSize() const;
-	const char* getString() const;
 	void concat(const MyString& other);
 
-	bool operator<(const MyString& other) const;
-	bool operator==(const MyString& other) const;
-
 	const char* c_str() const;
+
+	MyString& operator+=(const MyString& other);
+
+	friend std::ostream& operator<<(std::ostream& stream, const MyString& str);
+	friend std::istream& operator>>(std::istream& stream, MyString& str);
+
 };
+
+MyString operator+(const MyString& lhs, const MyString& rhs);
+
+bool operator==(const MyString& lhs, const MyString& rhs);
+bool operator<=(const MyString& lhs, const MyString& rhs);
+bool operator<(const MyString& lhs, const MyString& rhs);
+
+
+//MyString name = "sdfsdf"
