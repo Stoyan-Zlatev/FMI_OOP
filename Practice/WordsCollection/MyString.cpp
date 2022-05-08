@@ -1,6 +1,6 @@
 #include "MyString.h"
 #include <cstring>
-#pragma warning(disable:4996)
+#include <iostream>
 
 void MyString::copyFrom(const MyString& other)
 {
@@ -22,9 +22,18 @@ MyString::MyString()
 
 MyString::MyString(const char* data)
 {
-	size = strlen(data);
-	str = new char[size + 1];
-	strcpy(str, data);
+	if(data == nullptr)
+	{
+		str = new char[1];
+		str[0] = '\0';
+		size = 0;
+	}
+	else
+	{
+		size = strlen(data);
+		str = new char[size + 1];
+		strcpy(str, data);
+	}
 }
 
 MyString::MyString(const MyString& other)
@@ -66,17 +75,69 @@ const char* MyString::c_str() const
 	return str;
 }
 
-bool MyString::operator<(const MyString& other) const
+MyString& MyString::operator+=(const MyString& other)
 {
-	return strcmp(this->str, other.str) == -1 ? 1 : 0;
+	concat(other);
+	return *this;
 }
 
-bool MyString::operator==(const MyString& other) const
+MyString operator+(const MyString& lhs, const MyString& rhs)
 {
-	return strcmp(this->str, other.str) == 0 ? 1 : 0;
+	MyString copyOfLeft(lhs);
+	copyOfLeft += rhs;
+	return copyOfLeft;
 }
 
-const char* MyString::getString() const
+std::ostream& operator<<(std::ostream& stream, const MyString& str)
 {
-	return str;
+	stream << str.str;
+	return stream;
+}
+
+std::istream& operator>>(std::istream& stream, MyString& str)
+{
+	delete[] str.str;
+	char buff[1024];
+	stream >> buff;
+
+	str.size = strlen(buff);
+	str.str = new char[str.size + 1];
+	strcpy(str.str, buff);
+
+	return stream;
+}
+
+bool operator==(const MyString& lhs, const MyString& rhs)
+{
+	return strcmp(lhs.c_str(), rhs.c_str()) == 0;
+}
+bool operator<=(const MyString& lhs, const MyString& rhs)
+{
+	return strcmp(lhs.c_str(), rhs.c_str()) <= 0;
+
+}
+bool operator<(const MyString& lhs, const MyString& rhs)
+{
+	return strcmp(lhs.c_str(), rhs.c_str()) < 0;
+
+}
+
+MyString::MyString(MyString&& otherString)
+{
+	str = otherString.str;
+	size = otherString.size;
+	otherString.str = nullptr;
+	std::cout << "move constr" << std::endl;
+}
+
+MyString& MyString::operator=(MyString&& otherString)
+{
+	if (this != &otherString)
+	{
+		free();
+		str = otherString.str;
+		otherString.str = nullptr;
+		size = otherString.size;
+	}
+	return *this;
 }
