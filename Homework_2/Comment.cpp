@@ -31,6 +31,36 @@ void Comment::setContent(const MyString content)
 	this->content = content;
 }
 
+void Comment::saveToFile(std::fstream& file)
+{
+	size_t size = username.getSize();
+	file.write((const char*)&size, sizeof(size));
+	file.write((const char*)username.c_str(), username.getSize());
+
+	size = content.getSize();
+	file.write((const char*)&size, sizeof(size));
+	file.write((const char*)content.c_str(), content.getSize());
+}
+
+void Comment::readFromFile(std::fstream& file)
+{
+	size_t size;
+	file.read((char*)&size, sizeof(size));
+	char* data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	username = MyString(data);
+
+	file.read((char*)&size, sizeof(size));
+	delete[] data;
+	data = new char[size + 1];
+	file.read((char*)data, size);
+	data[size] = '\0';
+	content = MyString(data);
+
+	delete[] data;
+}
+
 const MyString Comment::getUserName() const
 {
 	return username;
@@ -39,34 +69,4 @@ const MyString Comment::getUserName() const
 const MyString Comment::getContent() const
 {
 	return content;
-}
-
-void Comment::saveToFile(std::fstream& file)
-{
-	size_t usernameSize = username.getSize();
-	file.write((const char*)&usernameSize, sizeof(size_t));
-	file.write((const char*)username.c_str(), username.getSize());
-
-	size_t contentSize = content.getSize();
-	file.write((const char*)&contentSize, sizeof(size_t));
-	file.write((const char*)content.c_str(), content.getSize());
-}
-
-void Comment::readFromFile(std::fstream& file)
-{
-	size_t size;
-	file.read((char*)&size, sizeof(size_t));
-	char* data = new char[size + 1];
-	file.read((char*)data, size);
-	data[size] = '\0';
-	username = MyString(data);
-
-	file.read((char*)&size, sizeof(size_t));
-	delete[] data;
-	data = new char[size + 1];
-	file.read((char*)data, size);
-	data[size] = '\0';
-	content = MyString(data);
-
-	delete[] data;
 }

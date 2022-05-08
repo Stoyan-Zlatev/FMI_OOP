@@ -9,29 +9,6 @@ UserRating::UserRating(const MyString& username, size_t rating)
 	setRating(rating);
 }
 
-void UserRating::saveToFile(std::fstream& file)
-{
-	size_t usernameSize = username.getSize();
-	file.write((const char*)&usernameSize, sizeof(size_t));
-	file.write((const char*)username.c_str(), username.getSize());
-
-	size_t tempRating = rating;
-	file.write((const char*)&tempRating, sizeof(size_t));
-}
-
-void UserRating::readFromFile(std::fstream& file)
-{
-	size_t usernameSize;
-	file.read((char*)&usernameSize, sizeof(size_t));
-	char* data = new char[usernameSize + 1];
-	file.read((char*)data, usernameSize);
-	data[usernameSize] = '\0';
-	username = MyString(data);
-	delete[] data;
-
-	file.read((char*)&rating, sizeof(size_t));
-}
-
 void UserRating::setRating(size_t rating)
 {
 	if (rating < 0 || rating>5)
@@ -40,6 +17,29 @@ void UserRating::setRating(size_t rating)
 	}
 
 	this->rating = rating;
+}
+
+void UserRating::saveToFile(std::fstream& file)
+{
+	size_t usernameSize = username.getSize();
+	file.write((const char*)&usernameSize, sizeof(usernameSize));
+	file.write((const char*)username.c_str(), username.getSize());
+
+	size_t tempRating = rating;
+	file.write((const char*)&tempRating, sizeof(tempRating));
+}
+
+void UserRating::readFromFile(std::fstream& file)
+{
+	size_t usernameSize;
+	file.read((char*)&usernameSize, sizeof(usernameSize));
+	char* data = new char[usernameSize + 1];
+	file.read((char*)data, usernameSize);
+	data[usernameSize] = '\0';
+	username = MyString(data);
+	delete[] data;
+
+	file.read((char*)&rating, sizeof(rating));
 }
 
 size_t UserRating::getRating() const
