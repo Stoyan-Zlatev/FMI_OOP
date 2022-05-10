@@ -1,6 +1,7 @@
 #include <iostream>
 #include <exception>
 
+//Better way:Make circular queue for each prioriry, so the main queue contains arrays of queues
 template <typename T>
 struct Item
 {
