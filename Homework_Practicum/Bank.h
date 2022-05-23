@@ -1,15 +1,17 @@
 ﻿#pragma once
 #include "MyString.h"
+#include "Collection.hpp"
+#include "Customer.h"
+#include "Account.h"
+#include "Transaction.h"
 
 class Bank
 {
 	MyString name;
 	MyString address;
-	/* customers – списък от потребители. (изберете подходящ начин за представяне)
- accounts – списък от банкови сметки. (изберете подходящ начин за представяне)
- log – списък от всички извършени транзакции на банката(под транзакция
-разбираме създаване на потребител, създаване на сметка, изтриване на
-потребител, изтриване на сметка, deposit , withdraw etc)*/
+	Collection<Customer> customers;
+	Collection<Account> accounts;
+	Collection<Transaction> log;
 public:
 	void addCustomer();
 	void deleteCustomer();
