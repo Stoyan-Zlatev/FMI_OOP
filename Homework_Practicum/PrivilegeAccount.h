@@ -14,7 +14,10 @@ class PriviligeAccount : public Account
  display – за извеждане на информация за сметката.*/
 	double overdraft;
 public:
-	void deposit();
-	bool withdraw();
-	void display() const;
+	PriviligeAccount();
+	PriviligeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+					 double overdraft = 0, double amount = 0, time_t dateOfCreation = std::time(0));
+	bool withdraw(double amount) override;
+	void printAccountType() const override;
+	virtual Account* clone()  const override;
 };
