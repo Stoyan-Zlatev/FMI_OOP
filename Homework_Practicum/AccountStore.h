@@ -16,7 +16,7 @@ private:
 	void copyFrom(const AccountStore& other);
 	void free();
 	void resize();
-
+	void resizeDown(size_t index);
 public:
 	AccountStore();
 	AccountStore(const AccountStore& other);
@@ -29,6 +29,9 @@ public:
 		double overdraft = 0, double amount = 0, time_t dateOfCreation = std::time(0));
 	void addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 		double interestRate = 0, double amount = 0, time_t dateOfCreation = std::time(0));
+
+	void remove(const Account& element);
+	void removeAt(size_t index);
 
 	void printAllAccounts() const;
 	friend class Bank;

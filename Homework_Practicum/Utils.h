@@ -14,3 +14,5 @@ void printAccountMenu();
 void printListMenu();
 
 void printActionMenu();
+
+void printAccountTypes();

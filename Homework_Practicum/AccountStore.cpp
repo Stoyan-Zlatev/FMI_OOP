@@ -59,6 +59,31 @@ void AccountStore::resize()
 	data = newCollection;
 }
 
+void AccountStore::resizeDown(size_t index)
+{
+	capacity /= ResizeFactor;
+	Account** newData = new Account * [capacity];
+
+	for (size_t i = 0; i < index; i++)
+	{
+		newData[i] = data[i];
+	}
+
+	for (size_t i = index; i < count; i++)
+	{
+		newData[i] = data[i + 1];
+	}
+
+	for (size_t i = 0; i < capacity; i++)
+	{
+		delete data[i];
+	}
+
+	delete[] data;
+	data = newData;
+	return;
+}
+
 void AccountStore::addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 	double amount, time_t dateOfCreation)
 {
@@ -75,6 +100,44 @@ void AccountStore::addSavingsAccount(const MyString& username, const MyString& p
 	double interestRate, double amount, time_t dateOfCreation)
 {
 	data[count++] = new SavingsAccount(username, password, iban, id, interestRate, amount, dateOfCreation);
+}
+
+void AccountStore::remove(const Account& element)
+{
+	if (count == 0)
+	{
+		throw std::invalid_argument("It is already empty!");
+	}
+
+	for (size_t i = 0; i < count; i++)
+	{
+		if (data[i]->getIban() == element.getIban()) {
+			removeAt(i);
+			return;
+		}
+	}
+}
+
+void AccountStore::removeAt(size_t index)
+{
+	if (index >= count)
+	{
+		throw std::invalid_argument("Index out of range!");
+	}
+
+	--count;
+
+	if (count * ResizeFactor * ResizeFactor <= capacity)
+	{
+		resizeDown(index);
+	}
+
+	for (size_t i = index; i < count; i++)
+	{
+		data[index] = data[index + 1];
+	}
+
+	delete data[count - 1];
 }
 
 void AccountStore::printAllAccounts() const

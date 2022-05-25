@@ -8,8 +8,7 @@ void NormalAccount::printAccountType() const
 
 Account* NormalAccount::clone() const
 {
-	Account* newAcc = new NormalAccount(*this);
-	return newAcc;
+	return new NormalAccount(*this);
 }
 
 NormalAccount::NormalAccount() : NormalAccount("", "", "", -1, 0, std::time(0)) {}

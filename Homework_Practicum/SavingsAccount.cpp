@@ -21,6 +21,5 @@ void SavingsAccount::printAccountType() const
 
 Account* SavingsAccount::clone() const
 {
-	Account* newAcc = new SavingsAccount(*this);
-	return newAcc;
+	return new SavingsAccount(*this);
 }

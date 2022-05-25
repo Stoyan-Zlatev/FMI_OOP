@@ -25,6 +25,5 @@ void PriviligeAccount::printAccountType() const
 
 Account* PriviligeAccount::clone() const
 {
-	Account* newAcc = new PriviligeAccount(*this);
-	return newAcc;
+	return new PriviligeAccount(*this);
 }

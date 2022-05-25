@@ -12,9 +12,9 @@ void Customer::setName(const MyString& name)
 	this->name = name;
 }
 
-void Customer::setAdress(const MyString& adress)
+void Customer::setAdress(const MyString& address)
 {
-	if(adress.getSize()>MaxContentLength)
+	if(address.getSize()>MaxContentLength)
 	{
 		throw std::invalid_argument("Entered adress is too long.");
 	}
@@ -51,10 +51,10 @@ Customer::Customer(size_t id, const MyString& name, const MyString& address)
 	setAdress(address);
 }
 
-void Customer::saveToFile(std::fstream& file)
+void Customer::saveToFile(std::ofstream& file)
 {
 }
 
-void Customer::readFromFile(std::fstream& file)
+void Customer::readFromFile(std::ifstream& file)
 {
 }

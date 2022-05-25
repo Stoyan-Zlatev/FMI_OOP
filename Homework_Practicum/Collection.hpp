@@ -5,8 +5,8 @@ template <typename T>
 class Collection
 {
 	size_t count;
-	size_t allocatedCellsCount;
-	T* collection;
+	size_t capacity;
+	T** data;
 	void copyFrom(const Collection& other);
 	void free();
 	void resize();
@@ -32,9 +32,9 @@ public:
 template <typename T>
 Collection<T>::Collection()
 {
-	collection = new T[DEFAULT_ALLOCATED_CELLS]();
+	data = new T*[DEFAULT_ALLOCATED_CELLS]();
 	count = 0;
-	allocatedCellsCount = DEFAULT_ALLOCATED_CELLS;
+	capacity = DEFAULT_ALLOCATED_CELLS;
 }
 
 template <typename T>
@@ -64,45 +64,50 @@ Collection<T>::~Collection()
 template <typename T>
 void Collection<T>::copyFrom(const Collection& other)
 {
-	collection = new  T[other.allocatedCellsCount];
+	data = new  T*[other.capacity];
 	for (size_t i = 0; i < other.count; i++)
 	{
-		collection[i] = other.collection[i];
+		data[i] = new T(*other.data[i]);
 	}
 	
 	count = other.count;
-	allocatedCellsCount = other.allocatedCellsCount;
+	capacity = other.capacity;
 }
 
 template <typename T>
 void Collection<T>::free()
 {
-	delete[] collection;
+	for (size_t i = 0; i < capacity; i++)
+	{
+		delete data[i];
+	}
+
+	delete[] data;
 }
 
 template <typename T>
 void Collection<T>::resize()
 {
-	allocatedCellsCount *= 2;
-	T* newData = new T[allocatedCellsCount];
+	capacity *= 2;
+	T** newData = new T*[capacity];
 
 	for (int i = 0; i < count; i++) {
-		newData[i] = collection[i];
+		newData[i] = data[i];
 	}
 
-	delete[] collection;
-	collection = newData;
+	delete[] data;
+	data = newData;
 }
 
 template <typename T>
 void Collection<T>::add(const T& element)
 {
-	if (count >= allocatedCellsCount)
+	if (count >= capacity)
 	{
 		resize();
 	}
 
-	collection[count++] = element;
+	data[count++] = new T(element);
 }
 
 template <typename T>
@@ -113,7 +118,7 @@ void Collection<T>::edit(const T& element, int index)
 		throw std::invalid_argument("This element does not exist!");
 	}
 
-	collection[index] = element;
+	(*data)[index] = element;
 }
 
 template <typename T>
@@ -126,7 +131,7 @@ void Collection<T>::remove(const T& element)
 
 	for (size_t i = 0; i < count; i++)
 	{
-		if (collection[i] == element) {
+		if (data[i] == element) {
 			removeAt(i);
 			return;
 		}
@@ -136,21 +141,26 @@ void Collection<T>::remove(const T& element)
 template <typename T>
 void Collection<T>::resizeDown(size_t index)
 {
-	allocatedCellsCount /= ResizeFactor;
-	T* newData = new T[allocatedCellsCount];
+	capacity /= ResizeFactor;
+	T** newData = new T*[capacity];
 
 	for (size_t i = 0; i < index; i++)
 	{
-		newData[i] = allocatedCellsCount[i];
+		newData[i] = data[i];
 	}
 
 	for (size_t i = index; i < count; i++)
 	{
-		newData[i] = allocatedCellsCount[i + 1];
+		newData[i] = data[i + 1];
 	}
 
-	delete[] allocatedCellsCount;
-	allocatedCellsCount = newData;
+	for (size_t i = 0; i < capacity; i++)
+	{
+		delete data[i];
+	}
+
+	delete[] data;
+	data = newData;
 	return;
 }
 
@@ -163,15 +173,17 @@ void Collection<T>::removeAt(size_t index) {
 
 	--count;
 
-	if (count * ResizeFactor * ResizeFactor <= allocatedCellsCount) 
+	if (count * ResizeFactor * ResizeFactor <= capacity) 
 	{
 		resizeDown(index);
 	}
 
 	for (size_t i = index; i < count; i++)
 	{
-		collection[index] = collection[index + 1];
+		data[index] = data[index + 1];
 	}
+
+	delete data[count - 1];
 }
 
 template <typename T>
@@ -182,19 +194,24 @@ size_t Collection<T>::getCount() const
 
 template <typename T>
 Collection<T>::Collection(const Collection&& other) {
-	collection = other.collection;
+	data = other.data;
 	count = other.count;
-	allocatedCellsCount = other.allocatedCellsCount;
-	other.collection = nullptr;
+	capacity = other.capacity;
+	other.data = nullptr;
 }
  
 template <typename T>
 Collection<T>& Collection<T>::operator= (Collection&& other) {
-	delete[] collection;
-	collection = other.collection;
+	for (size_t i = 0; i < capacity; i++)
+	{
+		delete data[i];
+	}
+
+	delete[] data;
+	data = other.data;
 	count = other.count;
-	allocatedCellsCount = other.allocatedCellsCount;
-	other.collection = nullptr;
+	capacity = other.capacity;
+	other.data = nullptr;
  
-	return *this;
+	return (* this);
 }

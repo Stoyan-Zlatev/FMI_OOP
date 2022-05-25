@@ -24,7 +24,7 @@ void printMenu()
 	std::cout << "2. List" << std::endl;
 	printListMenu();
 	std::cout << "3. Action" << std::endl;
-	printAccountMenu();
+	printActionMenu();
 	std::cout << "4. Display info for the bank" << std::endl;
 	std::cout << "5. Quit" << std::endl;
 }
@@ -60,4 +60,11 @@ void printActionMenu()
 	std::cout << "  a. Withdraw from account" << std::endl;
 	std::cout << "  b. Deposit to account" << std::endl;
 	std::cout << "  c. Transfer" << std::endl;
+}
+
+void printAccountTypes()
+{
+	std::cout << "1. Normal account" << std::endl;
+	std::cout << "2. Privilege account" << std::endl;
+	std::cout << "3. Savings account" << std::endl;
 }

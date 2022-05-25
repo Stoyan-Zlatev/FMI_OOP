@@ -9,8 +9,8 @@ class Customer
 public:
 	Customer();
 	Customer(size_t id, const MyString& name, const MyString& address);
-	void saveToFile(std::fstream& file);
-	void readFromFile(std::fstream& file);
+	void saveToFile(std::ofstream& file);
+	void readFromFile(std::ifstream& file);
 
 	void setName(const MyString& name);
 	void setAdress(const MyString& adress);
