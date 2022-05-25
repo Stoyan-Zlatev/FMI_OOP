@@ -34,5 +34,8 @@ public:
 	double getAmount() const;
 	time_t getDateOfCreation() const;
 
+	void saveToFile(std::ofstream& file);
+	void readFromFile(std::ifstream& file);
+
 	virtual ~Account();
 };

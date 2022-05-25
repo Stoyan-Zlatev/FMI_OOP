@@ -1,5 +1,6 @@
 #include "Account.h"
 #include "GlobalConstants.h"
+#include "Serialize.h"
 #include <iostream>
 #include <ctime>
 
@@ -109,6 +110,24 @@ double Account::getAmount() const
 time_t Account::getDateOfCreation() const
 {
 	return dateOfCreation;
+}
+
+void Account::saveToFile(std::ofstream& sourceFile)
+{
+	writeString(sourceFile, username);
+	writeString(sourceFile, password);
+	sourceFile.write((const char*)&id, sizeof(id));
+	sourceFile.write((const char*)&amount, sizeof(amount));
+	sourceFile.write((const char*)&dateOfCreation, sizeof(dateOfCreation));
+}
+
+void Account::readFromFile(std::ifstream& file)
+{
+	readString(file, username);
+	readString(file, password);
+	file.read((char*)&id, sizeof(id));
+	file.read((char*)&amount, sizeof(amount));
+	file.read((char*)&dateOfCreation, sizeof(dateOfCreation));
 }
 
 Account::~Account(){}

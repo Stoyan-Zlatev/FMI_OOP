@@ -1,6 +1,7 @@
 #include "Customer.h"
 #include "GlobalConstants.h"
 #include <exception>
+#include "Serialize.h"
 
 void Customer::setName(const MyString& name)
 {
@@ -51,10 +52,16 @@ Customer::Customer(size_t id, const MyString& name, const MyString& address)
 	setAdress(address);
 }
 
-void Customer::saveToFile(std::ofstream& file)
+void Customer::saveToFile(std::ofstream& sourceFile)
 {
+	sourceFile.write((const char*)&id, sizeof(id));
+	writeString(sourceFile, name);
+	writeString(sourceFile, address);
 }
 
 void Customer::readFromFile(std::ifstream& file)
 {
+	file.read((char*)&id, sizeof(id));
+	readString(file, name);
+	readString(file, address);
 }

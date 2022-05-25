@@ -127,6 +127,15 @@ void Bank::listLog() const
 	}
 }
 
+void Bank::exportLog(std::ofstream& sourceFile)
+{
+	sourceFile.write((const char*)&log.count, sizeof(log.count));
+	for (size_t i = 0; i < log.count; i++)
+	{
+		writeString(sourceFile, *(log.data[i]));
+	}
+}
+
 void Bank::listCustomerAccounts(const MyString& username) const
 {
 	if (getUserIndex(username) == -1)
@@ -189,6 +198,25 @@ void Bank::withdraw(const MyString& iban, double amount)
 
 void Bank::load(std::ifstream& sourceFile)
 {
+	readString(sourceFile, name);
+	readString(sourceFile, address);
+	sourceFile.read((char*)&customers.count, sizeof(customers.count));
+	for (size_t i = 0; i < customers.count; i++)
+	{
+		customers.data[i]->readFromFile(sourceFile);
+	}
+
+	sourceFile.read((char*)&log.count, sizeof(log.count));
+	for (size_t i = 0; i < log.count; i++)
+	{
+		readString(sourceFile, *(log.data[i]));
+	}
+
+	sourceFile.read((char*)&accounts.count, sizeof(accounts.count));
+	for (size_t i = 0; i < accounts.count; i++)
+	{
+		accounts.data[i]->readFromFile(sourceFile);
+	}
 }
 
 void Bank::saveToFile(std::ofstream& sourceFile)
@@ -201,16 +229,11 @@ void Bank::saveToFile(std::ofstream& sourceFile)
 		customers.data[i]->saveToFile(sourceFile);
 	}
 
-	sourceFile.write((const char*)&log.count, sizeof(log.count));
-	for (size_t i = 0; i < log.count; i++)
-	{
-		writeString(sourceFile, *(log.data[i]));
-	}
+	exportLog(sourceFile);
 
 	sourceFile.write((const char*)&accounts.count, sizeof(accounts.count));
 	for (size_t i = 0; i < accounts.count; i++)
 	{
-		//TODO
-		//accounts.data[i]->saveToFile(sourceFile);
+		accounts.data[i]->saveToFile(sourceFile);
 	}
 }

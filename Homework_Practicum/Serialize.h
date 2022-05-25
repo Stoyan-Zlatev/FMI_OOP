@@ -4,4 +4,4 @@
 
 void writeString(std::ofstream& outFile, const MyString& str);
 
-MyString readString(std::ifstream& inFile);
+void readString(std::ifstream& inFile, MyString& str);

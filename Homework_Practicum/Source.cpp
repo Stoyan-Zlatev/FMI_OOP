@@ -5,7 +5,7 @@
 
 void main()
 {
-	std::ifstream sourceFile("FMIKindle.dat", std::ios::in | std::ios::binary);
+	std::ifstream sourceFile("Bank.dat", std::ios::in | std::ios::binary);
 
 	if (!sourceFile.is_open())
 	{
@@ -45,7 +45,7 @@ void main()
 						std::cout << "Enter username:";
 						MyString username;
 						username.getline(std::cin);
-						
+
 						std::cout << "Enter customer address:";
 						MyString address;
 						address.getline(std::cin);
@@ -56,8 +56,8 @@ void main()
 					{
 						std::cout << "Enter username:";
 						MyString username;
-						username.getline(std::cin); 
-						
+						username.getline(std::cin);
+
 						bank.deleteCustomer(username);
 					}
 				}
@@ -176,7 +176,9 @@ void main()
 			}
 			else if (isPrefix(command, "5"))
 			{
-
+				std::ofstream file("Bank.dat");
+				bank.saveToFile(file);
+				return;
 			}
 			else
 			{
