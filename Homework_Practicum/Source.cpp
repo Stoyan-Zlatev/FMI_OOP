@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 #include "MyString.h"
 #include "Bank.h"
 #include "Utils.h"
@@ -182,7 +183,7 @@ void main()
 			}
 			else
 			{
-
+				throw std::invalid_argument("Invalid command");
 			}
 
 		}
