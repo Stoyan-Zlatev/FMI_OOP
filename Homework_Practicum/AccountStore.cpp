@@ -3,7 +3,10 @@
 void AccountStore::free()
 {
 	for (size_t i = 0; i < count; i++)
+	{
 		delete data[i];
+	}
+	
 	delete[] data;
 }
 

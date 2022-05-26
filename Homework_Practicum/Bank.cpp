@@ -1,4 +1,5 @@
 #include "Bank.h"
+#include "Account.h"
 #include "Serialize.h"
 #include <exception>
 #include <iostream>
@@ -200,22 +201,30 @@ void Bank::load(std::ifstream& sourceFile)
 {
 	readString(sourceFile, name);
 	readString(sourceFile, address);
-	sourceFile.read((char*)&customers.count, sizeof(customers.count));
-	for (size_t i = 0; i < customers.count; i++)
+	size_t count;
+	sourceFile.read((char*)&count, sizeof(count));
+	for (size_t i = 0; i < count; i++)
 	{
-		customers.data[i]->readFromFile(sourceFile);
+		Customer customer;
+
+		customer.readFromFile(sourceFile);
+		customers.add(customer);
 	}
 
-	sourceFile.read((char*)&log.count, sizeof(log.count));
-	for (size_t i = 0; i < log.count; i++)
+	sourceFile.read((char*)&count, sizeof(count));
+	for (size_t i = 0; i < count; i++)
 	{
-		readString(sourceFile, *(log.data[i]));
+		MyString str;
+		readString(sourceFile, str);
+		log.add(str);
 	}
 
 	sourceFile.read((char*)&accounts.count, sizeof(accounts.count));
 	for (size_t i = 0; i < accounts.count; i++)
 	{
-		accounts.data[i]->readFromFile(sourceFile);
+		Account* account;
+		account->readFromFile(sourceFile);
+		//get type and if else
 	}
 }
 

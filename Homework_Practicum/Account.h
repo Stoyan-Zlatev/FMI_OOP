@@ -8,6 +8,7 @@ protected:
 	MyString username;
 	MyString password;
 	MyString iban;
+	MyString accountType;//write save and int
 	size_t id;
 	double amount;
 	time_t dateOfCreation;
@@ -21,6 +22,7 @@ public:
 	virtual void printAccountType() const = 0;
 	virtual Account* clone()  const = 0;
 
+	void setAccountType(const MyString& accType);
 	void setIban(const MyString& iban);
 	void setUsername(const MyString& username);
 	void setId(size_t id);
@@ -28,6 +30,7 @@ public:
 	void setDateOfCreation(const time_t& date);
 	void setPassword(const MyString& password);
 
+	MyString getAccountType() const;
 	MyString getIban() const;
 	MyString getUsername() const;
 	size_t getId() const;
