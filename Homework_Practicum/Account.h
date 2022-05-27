@@ -38,8 +38,8 @@ public:
 	double getAmount() const;
 	time_t getDateOfCreation() const;
 
-	virtual void saveToFile(std::ofstream& file) = 0;
-	virtual void readFromFile(std::ifstream& file) = 0;
+	virtual void saveToFile(std::ofstream& file);
+	virtual void readFromFile(std::ifstream& file);
 
 	friend class Bank;
 

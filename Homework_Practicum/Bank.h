@@ -26,7 +26,8 @@ public:
 	void listAllAccounts() const;
 	void listCustomerAccounts(const MyString& username) const;;
 	void listLog() const;
-	void exportLog(std::ofstream& sourceFile);
+	void exportLog();
+	void importLog();
 	void transfer(const MyString& senderIban, const MyString& receiverIban, double amount);
 	void display() const;
 	void deposit(const MyString& iban, double amount);

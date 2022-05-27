@@ -118,4 +118,25 @@ time_t Account::getDateOfCreation() const
 	return dateOfCreation;
 }
 
+void Account::saveToFile(std::ofstream& file)
+{
+	file.write((const char*)&accountType, sizeof(accountType));
+	writeString(file, username);
+	writeString(file, password);
+	writeString(file, iban);
+	file.write((const char*)&id, sizeof(id));
+	file.write((const char*)&amount, sizeof(amount));
+	file.write((const char*)&dateOfCreation, sizeof(dateOfCreation));
+}
+
+void Account::readFromFile(std::ifstream& file)
+{
+	readString(file, username);
+	readString(file, password);
+	readString(file, iban);
+	file.read((char*)&id, sizeof(id));
+	file.read((char*)&amount, sizeof(amount));
+	file.read((char*)&dateOfCreation, sizeof(dateOfCreation));
+}
+
 Account::~Account() {}

@@ -58,8 +58,6 @@ MyString::MyString(const MyString& other)
 }
 MyString& MyString::operator=(const MyString& other)
 {
-	//std::cout << "op=" << std::endl;
-
 	if (this != &other)
 	{
 		free();
@@ -111,6 +109,19 @@ MyString operator+(const MyString& lhs, const MyString& rhs)
 std::ostream& operator<<(std::ostream& stream, const MyString& str)
 {
 	stream << str.str;
+	return stream;
+}
+
+std::istream& MyString::readLine(std::istream& stream)
+{
+	delete[] str;
+	char buff[MaxContentLength];
+	stream.getline(buff, MaxContentLength);
+
+	size = strlen(buff);
+	str = new char[size + 1];
+	strcpy(str, buff);
+
 	return stream;
 }
 

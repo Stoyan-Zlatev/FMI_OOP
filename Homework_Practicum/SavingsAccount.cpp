@@ -13,6 +13,7 @@ SavingsAccount::SavingsAccount() : SavingsAccount("", "", "", -1, 0, 0, std::tim
 SavingsAccount::SavingsAccount(const MyString& username, const MyString& password, const MyString& iban,
 	size_t id, double interestRate, double amount, time_t dateOfCreation) : Account(username, password, iban, id, amount, dateOfCreation)
 {
+	setAccountType();
 	this->interestRate = interestRate;
 }
 
@@ -33,22 +34,13 @@ Account* SavingsAccount::clone() const
 
 void SavingsAccount::saveToFile(std::ofstream& file)
 {
-	file.write((const char*)&accountType, sizeof(accountType));
-	writeString(file, username);
-	writeString(file, password);
-	file.write((const char*)&id, sizeof(id));
-	file.write((const char*)&amount, sizeof(amount));
-	file.write((const char*)&dateOfCreation, sizeof(dateOfCreation));
+	Account::saveToFile(file);
 	file.write((const char*)&interestRate, sizeof(interestRate));
 }
 
 void SavingsAccount::readFromFile(std::ifstream& file)
 {
-	file.read((char*)&accountType, sizeof(accountType));
-	readString(file, username);
-	readString(file, password);
-	file.read((char*)&id, sizeof(id));
-	file.read((char*)&amount, sizeof(amount));
-	file.read((char*)&dateOfCreation, sizeof(dateOfCreation));
+	accountType = AccountType::Savings;
+	Account::readFromFile(file);
 	file.read((char*)&interestRate, sizeof(interestRate));
 }

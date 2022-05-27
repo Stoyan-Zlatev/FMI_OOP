@@ -141,13 +141,44 @@ void Bank::listLog() const
 	}
 }
 
-void Bank::exportLog(std::ofstream& sourceFile)
+void Bank::exportLog()
 {
-	sourceFile.write((const char*)&log.count, sizeof(log.count));
+	std::ofstream logFile("log.txt");
+
+	if (!logFile.is_open())
+	{
+		std::cout << "Error while opening the file!" << std::endl;
+	}
+
+	logFile << log.count << '\n';
 	for (size_t i = 0; i < log.count; i++)
 	{
-		writeString(sourceFile, *(log.data[i]));
+		logFile << *(log.data[i]) << '\n';
 	}
+
+	logFile.close();
+}
+
+void Bank::importLog()
+{
+	size_t count;
+	std::ifstream logFile("log.txt");
+
+	if (!logFile.is_open())
+	{
+		std::cout << "Error while opening the file!" << std::endl;
+	}
+
+	logFile >> count;
+
+	for (size_t i = 0; i < count; i++)
+	{
+		MyString str;
+		str.readLine(logFile);
+		log.add(str);
+	}
+
+	logFile.close();
 }
 
 void Bank::listCustomerAccounts(const MyString& username) const
@@ -168,6 +199,8 @@ void Bank::listCustomerAccounts(const MyString& username) const
 		{
 			accounts.data[i]->display();
 		}
+
+		std::cout << std::endl;
 	}
 }
 
@@ -267,32 +300,30 @@ void Bank::load(std::ifstream& sourceFile)
 	}
 
 	sourceFile.read((char*)&count, sizeof(count));
+	AccountType accountType;
+	Account* account = nullptr;
 	for (size_t i = 0; i < count; i++)
 	{
-		MyString str;
-		readString(sourceFile, str);
-		log.add(str);
+		sourceFile.read((char*)&accountType, sizeof(accountType));
+		if (accountType == AccountType::Normal)
+		{
+			account = new NormalAccount();
+		}
+		else if (accountType == AccountType::Privilige)
+		{
+			account = new PrivilegeAccount();
+		}
+		else if (accountType == AccountType::Savings)
+		{
+			account = new SavingsAccount();
+		}
+		double additional = 0;
+		account->readFromFile(sourceFile);
+
+		accounts.addAccount(account);
 	}
 
-	sourceFile.read((char*)&accounts.count, sizeof(accounts.count));
-	for (size_t i = 0; i < accounts.count; i++)
-	{
-		Account* account;
-		double additional = 0;
-		/*account->readFromFile(sourceFile);
-		if (account->getAccountType() == NormalAccountType)
-		{
-			accounts.addNormalAccount(account->username,account->password, account->iban, account->id, account->amount, account->dateOfCreation);
-		}
-		else if (account->getAccountType() == PrivilegeAccountType)
-		{
-			accounts.addPrivilegeAccount(account->username, account->password, account->iban, account->id, additional, account->amount, account->dateOfCreation);
-		}
-		else if (account->getAccountType() == SavingsAccountType)
-		{
-			accounts.addSavingsAccount(account->username, account->password, account->iban, account->id, additional, account->amount, account->dateOfCreation);
-		}*/
-	}
+	importLog();
 }
 
 void Bank::saveToFile(std::ofstream& sourceFile)
@@ -305,11 +336,11 @@ void Bank::saveToFile(std::ofstream& sourceFile)
 		customers.data[i]->saveToFile(sourceFile);
 	}
 
-	exportLog(sourceFile);
-
 	sourceFile.write((const char*)&accounts.count, sizeof(accounts.count));
 	for (size_t i = 0; i < accounts.count; i++)
 	{
 		accounts.data[i]->saveToFile(sourceFile);
 	}
+
+	exportLog();
 }

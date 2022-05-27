@@ -40,7 +40,7 @@ AccountStore::~AccountStore()
 
 void AccountStore::addAccount(Account* account)
 {
-
+	data[count++] = account->clone();
 }
 
 void AccountStore::copyFrom(const AccountStore& other)

@@ -4,6 +4,5 @@ enum class AccountType
 {
 	Normal,
 	Privilige,
-	Savings,
-	Default
+	Savings
 };
