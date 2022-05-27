@@ -29,6 +29,14 @@ int Bank::getAccountIndex(const MyString& iban) const
 	return -1;
 }
 
+Bank::Bank() :Bank("", "") {}
+
+Bank::Bank(const MyString& name, const MyString& address)
+{
+	setBankName(name);
+	setBankAdress(address);
+}
+
 void Bank::addCustomer(const MyString& username, const MyString& address)
 {
 	if (getUserIndex(username) >= 0)
@@ -57,29 +65,29 @@ void Bank::deleteCustomer(const MyString& username)
 	log.add(std::move(transaction));
 }
 
-void Bank::addAccount(const MyString& iban, const MyString& username, const MyString& password, size_t accountType, double additional)
+void Bank::addAccount(const MyString& iban, const MyString& username, const MyString& password, const MyString& accountType, double additional)
 {
 	if (getUserIndex(username) == -1)
 	{
 		throw std::invalid_argument("This user does not exists!");
 	}
 
-	size_t accountId = accounts.count > 0 ? accounts.data[accounts.count - 1]->getId() + 1 : 1;
+	size_t customerId = customers.data[getUserIndex(username)]->getId();
 	MyString accType;
 
-	if (accountType == 1)
+	if (accountType == "1")
 	{
-		accounts.addNormalAccount(username, password, iban, accountId);
+		accounts.addNormalAccount(username, password, iban, customerId);
 		accType = "normal account";
 	}
-	else if (accountType == 2)
+	else if (accountType == "2")
 	{
-		accounts.addPrivilegeAccount(username, password, iban, accountId, additional);
+		accounts.addPrivilegeAccount(username, password, iban, customerId, additional);
 		accType = "privilege account";
 	}
-	else if (accountType == 3)
+	else if (accountType == "3")
 	{
-		accounts.addSavingsAccount(username, password, iban, accountId, additional);
+		accounts.addSavingsAccount(username, password, iban, customerId, additional);
 		accType = "savings account";
 	}
 	else
@@ -104,6 +112,11 @@ void Bank::deleteAccount(const MyString& iban)
 
 void Bank::listAllCustomers() const
 {
+	if (customers.count == 0)
+	{
+		std::cout << "There are no customers in the system yet!" << std::endl;
+	}
+
 	for (size_t i = 0; i < customers.count; i++)
 	{
 		std::cout << customers.data[i]->getName() << std::endl;
@@ -144,6 +157,11 @@ void Bank::listCustomerAccounts(const MyString& username) const
 		throw std::invalid_argument("This user does not exist!");
 	}
 
+	if (accounts.count == 0)
+	{
+		std::cout << "This customer has no accounts in the system yet!" << std::endl;
+	}
+
 	for (size_t i = 0; i < accounts.count; i++)
 	{
 		if (accounts.data[i]->getUsername() == username)
@@ -173,6 +191,13 @@ void Bank::transfer(const MyString& senderIban, const MyString& receiverIban, do
 	accounts.data[receiverAccountIndex]->deposit(amount);
 }
 
+void Bank::display() const
+{
+	std::cout << "Bank: " << name << std::endl;
+	std::cout << "Customers count: " << customers.count << std::endl;
+	std::cout << "Accounts count: " << accounts.count << std::endl;
+}
+
 void Bank::deposit(const MyString& iban, double amount)
 {
 	int receiverAccountIndex = getAccountIndex(iban);
@@ -195,6 +220,36 @@ void Bank::withdraw(const MyString& iban, double amount)
 	}
 
 	accounts.data[accountIndex]->withdraw(amount);
+}
+
+void Bank::setBankName(const MyString& name)
+{
+	if (name.getSize() > MaxNameLength)
+	{
+		throw std::invalid_argument("Entered name is too long.");
+	}
+
+	this->name = name;
+}
+
+void Bank::setBankAdress(const MyString& address)
+{
+	if (address.getSize() > MaxContentLength)
+	{
+		throw std::invalid_argument("Entered adress is too long.");
+	}
+
+	this->address = address;
+}
+
+MyString Bank::getBankName() const
+{
+	return name;
+}
+
+MyString Bank::getBankAdress() const
+{
+	return address;
 }
 
 void Bank::load(std::ifstream& sourceFile)
@@ -223,8 +278,20 @@ void Bank::load(std::ifstream& sourceFile)
 	for (size_t i = 0; i < accounts.count; i++)
 	{
 		Account* account;
-		account->readFromFile(sourceFile);
-		//get type and if else
+		double additional = 0;
+		/*account->readFromFile(sourceFile);
+		if (account->getAccountType() == NormalAccountType)
+		{
+			accounts.addNormalAccount(account->username,account->password, account->iban, account->id, account->amount, account->dateOfCreation);
+		}
+		else if (account->getAccountType() == PrivilegeAccountType)
+		{
+			accounts.addPrivilegeAccount(account->username, account->password, account->iban, account->id, additional, account->amount, account->dateOfCreation);
+		}
+		else if (account->getAccountType() == SavingsAccountType)
+		{
+			accounts.addSavingsAccount(account->username, account->password, account->iban, account->id, additional, account->amount, account->dateOfCreation);
+		}*/
 	}
 }
 

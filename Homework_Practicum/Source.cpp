@@ -16,10 +16,14 @@ void main()
 	MyString command;
 
 	Bank bank;
-	bank.load(sourceFile);
+	//bank.load(sourceFile);
 
 	sourceFile.close();
 
+	if (bank.getBankName() == EmptyString)
+	{
+		initBank(bank);
+	}
 	printMenu();
 	std::cout << ">";
 	command.getline(std::cin);
@@ -52,6 +56,7 @@ void main()
 						address.getline(std::cin);
 
 						bank.addCustomer(username, address);
+						std::cout << "Customer added successfully!" << std::endl;
 					}
 					else if (isPrefix(command, "ii"))
 					{
@@ -60,6 +65,7 @@ void main()
 						username.getline(std::cin);
 
 						bank.deleteCustomer(username);
+						std::cout << "Customer deleted successfully!" << std::endl;
 					}
 				}
 				else if (isPrefix(command, "b"))
@@ -82,12 +88,13 @@ void main()
 						std::cout << "Enter account iban: ";
 						iban.getline(std::cin);
 
-						size_t accountType;
+						MyString accountType;
 						printAccountTypes();
 						std::cout << ">";
-						std::cin >> accountType;
+						accountType.getline(std::cin);
 
 						bank.addAccount(iban, username, password, accountType);
+						std::cout << "Account added successfully!" << std::endl;
 					}
 					else if (isPrefix(command, "ii"))
 					{
@@ -96,6 +103,7 @@ void main()
 						iban.getline(std::cin);
 
 						bank.deleteAccount(iban);
+						std::cout << "Account deleted successfully!" << std::endl;
 					}
 				}
 			}
@@ -139,8 +147,7 @@ void main()
 					std::cout << "Enter amount to withdraw: ";
 					double amount;
 					std::cin >> amount;
-
-					bank.deposit(iban, amount);
+					bank.withdraw(iban, amount);
 				}
 				else if (isPrefix(command, "b"))
 				{
@@ -185,7 +192,6 @@ void main()
 			{
 				throw std::invalid_argument("Invalid command");
 			}
-
 		}
 		catch (std::invalid_argument& e)
 		{

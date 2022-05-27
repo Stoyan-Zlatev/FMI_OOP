@@ -6,7 +6,7 @@ void AccountStore::free()
 	{
 		delete data[i];
 	}
-	
+
 	delete[] data;
 }
 
@@ -36,6 +36,11 @@ AccountStore& AccountStore::operator=(const AccountStore& other)
 AccountStore::~AccountStore()
 {
 	free();
+}
+
+void AccountStore::addAccount(Account* account)
+{
+
 }
 
 void AccountStore::copyFrom(const AccountStore& other)
@@ -87,22 +92,37 @@ void AccountStore::resizeDown(size_t index)
 	return;
 }
 
+bool AccountStore::isIbanUnique(const MyString& iban)
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		if (data[i]->getIban() == iban)
+		{
+			throw std::invalid_argument("Account with this iban already exist!");
+		}
+	}
+	return true;
+}
+
 void AccountStore::addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 	double amount, time_t dateOfCreation)
 {
-	data[count++] = new NormalAccount(username, password, iban, id, amount, dateOfCreation);
+	if (isIbanUnique(iban))
+		data[count++] = new NormalAccount(username, password, iban, id, amount, dateOfCreation);
 }
 
 void AccountStore::addPrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 	double overdraft, double amount, time_t dateOfCreation)
 {
-	data[count++] = new PriviligeAccount(username, password, iban, id, overdraft, amount, dateOfCreation);
+	if (isIbanUnique(iban))
+		data[count++] = new PrivilegeAccount(username, password, iban, id, overdraft, amount, dateOfCreation);
 }
 
 void AccountStore::addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 	double interestRate, double amount, time_t dateOfCreation)
 {
-	data[count++] = new SavingsAccount(username, password, iban, id, interestRate, amount, dateOfCreation);
+	if (isIbanUnique(iban))
+		data[count++] = new SavingsAccount(username, password, iban, id, interestRate, amount, dateOfCreation);
 }
 
 void AccountStore::remove(const Account& element)
@@ -145,8 +165,14 @@ void AccountStore::removeAt(size_t index)
 
 void AccountStore::printAllAccounts() const
 {
+	if (count == 0)
+	{
+		std::cout << "There are no accounts in the system yet!" << std::endl;
+	}
+
 	for (size_t i = 0; i < count; i++)
 	{
 		data[i]->display();
+		std::cout << std::endl;
 	}
 }

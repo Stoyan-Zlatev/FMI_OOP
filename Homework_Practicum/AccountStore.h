@@ -17,11 +17,14 @@ private:
 	void free();
 	void resize();
 	void resizeDown(size_t index);
+	bool isIbanUnique(const MyString& iban);
 public:
 	AccountStore();
 	AccountStore(const AccountStore& other);
 	AccountStore& operator=(const AccountStore& other);
 	~AccountStore();
+
+	void addAccount(Account* account);
 
 	void addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
 		double amount = 0, time_t dateOfCreation = std::time(0));

@@ -68,3 +68,15 @@ void printAccountTypes()
 	std::cout << "2. Privilege account" << std::endl;
 	std::cout << "3. Savings account" << std::endl;
 }
+
+void initBank(Bank& bank)
+{
+	MyString field;
+	std::cout << "Enter bank name: ";
+	field.getline(std::cin);
+	bank.setBankName(field);
+
+	std::cout << "Enter bank address: ";
+	field.getline(std::cin);
+	bank.setBankAdress(field);
+}

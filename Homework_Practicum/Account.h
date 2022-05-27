@@ -1,5 +1,6 @@
 #pragma once
 #include "MyString.h"
+#include "AccountType.h"
 #include <ctime>
 
 class Account
@@ -8,7 +9,7 @@ protected:
 	MyString username;
 	MyString password;
 	MyString iban;
-	MyString accountType;//write save and int
+	AccountType accountType;
 	size_t id;
 	double amount;
 	time_t dateOfCreation;
@@ -19,10 +20,9 @@ public:
 	virtual bool withdraw(double amount) = 0;
 	virtual void display() const;
 	virtual double getBalance() const;
-	virtual void printAccountType() const = 0;
 	virtual Account* clone()  const = 0;
 
-	void setAccountType(const MyString& accType);
+	virtual void setAccountType() = 0;
 	void setIban(const MyString& iban);
 	void setUsername(const MyString& username);
 	void setId(size_t id);
@@ -30,15 +30,18 @@ public:
 	void setDateOfCreation(const time_t& date);
 	void setPassword(const MyString& password);
 
-	MyString getAccountType() const;
+	virtual MyString getAccountType() const = 0;
 	MyString getIban() const;
 	MyString getUsername() const;
+	MyString getPassword() const;
 	size_t getId() const;
 	double getAmount() const;
 	time_t getDateOfCreation() const;
 
-	void saveToFile(std::ofstream& file);
-	void readFromFile(std::ifstream& file);
+	virtual void saveToFile(std::ofstream& file) = 0;
+	virtual void readFromFile(std::ifstream& file) = 0;
+
+	friend class Bank;
 
 	virtual ~Account();
 };

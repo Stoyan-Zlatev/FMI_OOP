@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ctime>
 
-Account::Account() : Account("", "", "", -1, 0,std::time(0)) {}
+Account::Account() : Account("", "", "", -1, 0, std::time(0)) {}
 
 Account::Account(const MyString& username, const MyString& password, const MyString& iban, size_t id, double amount, time_t dateOfCreation)
 {
@@ -22,15 +22,16 @@ void Account::deposit(double amount)
 }
 
 void Account::display() const {
-	printAccountType();
+	std::cout << "Account type: " << getAccountType() << std::endl;
 	std::cout << "Iban: " << iban << std::endl;
-	std::cout << "Customer id: " << id << std::endl;
+	std::cout << "Holder: " << username << std::endl;
 	std::cout << "Balance: " << amount << std::endl;
 }
 double Account::getBalance() const
 {
 	return amount;
 }
+
 
 void Account::setIban(const MyString& iban)
 {
@@ -97,6 +98,11 @@ MyString Account::getUsername() const
 	return username;
 }
 
+MyString Account::getPassword() const
+{
+	return password;
+}
+
 size_t Account::getId() const
 {
 	return id;
@@ -112,22 +118,4 @@ time_t Account::getDateOfCreation() const
 	return dateOfCreation;
 }
 
-void Account::saveToFile(std::ofstream& sourceFile)
-{
-	writeString(sourceFile, username);
-	writeString(sourceFile, password);
-	sourceFile.write((const char*)&id, sizeof(id));
-	sourceFile.write((const char*)&amount, sizeof(amount));
-	sourceFile.write((const char*)&dateOfCreation, sizeof(dateOfCreation));
-}
-
-void Account::readFromFile(std::ifstream& file)
-{
-	readString(file, username);
-	readString(file, password);
-	file.read((char*)&id, sizeof(id));
-	file.read((char*)&amount, sizeof(amount));
-	file.read((char*)&dateOfCreation, sizeof(dateOfCreation));
-}
-
-Account::~Account(){}
+Account::~Account() {}
