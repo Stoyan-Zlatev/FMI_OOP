@@ -7,16 +7,16 @@ class Collection
 	size_t count;
 	size_t capacity;
 	T** data;
-	void copyFrom(const Collection& other);
+	void copyFrom(const Collection<T>& other);
 	void free();
 	void resize();
 	void resizeDown(size_t index);
 public:
 	Collection();
 	Collection(const Collection<T>& other);
-	Collection(const Collection&& other);
+	Collection(const Collection<T>&& other);
 	Collection<T>& operator=(const Collection<T>& other);
-	Collection<T>& operator= (Collection&& other);
+	Collection<T>& operator= (Collection<T>&& other);
 
 	void add(const T& element);
 	void edit(const T& element, int index);
@@ -32,7 +32,7 @@ public:
 template <typename T>
 Collection<T>::Collection()
 {
-	data = new T*[DEFAULT_ALLOCATED_CELLS]();
+	data = new T * [DEFAULT_ALLOCATED_CELLS]();
 	count = 0;
 	capacity = DEFAULT_ALLOCATED_CELLS;
 }
@@ -62,14 +62,14 @@ Collection<T>::~Collection()
 }
 
 template <typename T>
-void Collection<T>::copyFrom(const Collection& other)
+void Collection<T>::copyFrom(const Collection<T>& other)
 {
-	data = new  T*[other.capacity];
+	data = new  T * [other.capacity];
 	for (size_t i = 0; i < other.count; i++)
 	{
 		data[i] = new T(*other.data[i]);
 	}
-	
+
 	count = other.count;
 	capacity = other.capacity;
 }
@@ -79,7 +79,7 @@ void Collection<T>::free()
 {
 	for (size_t i = 0; i < capacity; i++)
 	{
-		delete data[i];
+		delete[] data[i];
 	}
 
 	delete[] data;
@@ -88,8 +88,8 @@ void Collection<T>::free()
 template <typename T>
 void Collection<T>::resize()
 {
-	capacity *= 2;
-	T** newData = new T*[capacity];
+	capacity *= ResizeFactor;
+	T** newData = new T * [capacity];
 
 	for (int i = 0; i < count; i++) {
 		newData[i] = data[i];
@@ -142,7 +142,7 @@ template <typename T>
 void Collection<T>::resizeDown(size_t index)
 {
 	capacity /= ResizeFactor;
-	T** newData = new T*[capacity];
+	T** newData = new T * [capacity];
 
 	for (size_t i = 0; i < index; i++)
 	{
@@ -154,13 +154,9 @@ void Collection<T>::resizeDown(size_t index)
 		newData[i] = data[i + 1];
 	}
 
-	for (size_t i = 0; i < capacity; i++)
-	{
-		delete data[i];
-	}
-
 	delete[] data;
 	data = newData;
+
 	return;
 }
 
@@ -173,7 +169,7 @@ void Collection<T>::removeAt(size_t index) {
 
 	--count;
 
-	if (count * ResizeFactor * ResizeFactor <= capacity) 
+	if (count * ResizeFactor * ResizeFactor <= capacity)
 	{
 		resizeDown(index);
 	}
@@ -183,7 +179,7 @@ void Collection<T>::removeAt(size_t index) {
 		data[index] = data[index + 1];
 	}
 
-	delete data[count - 1];
+	delete[] data[count - 1];
 }
 
 template <typename T>
@@ -193,15 +189,15 @@ size_t Collection<T>::getCount() const
 }
 
 template <typename T>
-Collection<T>::Collection(const Collection&& other) {
+Collection<T>::Collection(const Collection<T>&& other) {
 	data = other.data;
 	count = other.count;
 	capacity = other.capacity;
 	other.data = nullptr;
 }
- 
+
 template <typename T>
-Collection<T>& Collection<T>::operator= (Collection&& other) {
+Collection<T>& Collection<T>::operator= (Collection<T>&& other) {
 	for (size_t i = 0; i < capacity; i++)
 	{
 		delete data[i];
@@ -212,6 +208,6 @@ Collection<T>& Collection<T>::operator= (Collection&& other) {
 	count = other.count;
 	capacity = other.capacity;
 	other.data = nullptr;
- 
-	return (* this);
+
+	return (*this);
 }
