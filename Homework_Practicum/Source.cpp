@@ -15,8 +15,8 @@ void main()
 	}
 	else
 	{
-		std::cout << "File loaded successfully" << std::endl;
 		bank.load(sourceFile);
+		std::cout << "File loaded successfully" << std::endl;
 	}
 
 	MyString command;
