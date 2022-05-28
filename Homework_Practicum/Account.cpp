@@ -25,7 +25,7 @@ void Account::display() const {
 	std::cout << "Account type: " << getAccountType() << std::endl;
 	std::cout << "Iban: " << iban << std::endl;
 	std::cout << "Holder: " << username << std::endl;
-	std::cout << "Balance: " << amount << std::endl;
+	std::cout << "Balance: " << amount << "$" << std::endl;
 }
 double Account::getBalance() const
 {

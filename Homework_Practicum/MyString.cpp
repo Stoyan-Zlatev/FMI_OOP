@@ -45,6 +45,7 @@ MyString::MyString(size_t n)
 	size = numSize;
 }
 
+
 MyString::MyString(const char* data)
 {
 	size = strlen(data);

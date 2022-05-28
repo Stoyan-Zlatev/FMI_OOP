@@ -130,7 +130,10 @@ void Bank::listAllCustomers() const
 
 	for (size_t i = 0; i < customers.count; i++)
 	{
-		std::cout << customers.data[i]->getName() << std::endl;
+		std::cout << "Customer number " << (i + 1) << std::endl;
+		std::cout << "Name: " << customers.data[i]->getName() << std::endl;
+		std::cout << "Address: " << customers.data[i]->getAddress() << std::endl;
+		std::cout << std::endl;
 	}
 }
 
@@ -235,6 +238,9 @@ void Bank::transfer(const MyString& senderIban, const MyString& receiverIban, do
 
 	accounts.data[senderAccountIndex]->withdraw(amount);
 	accounts.data[receiverAccountIndex]->deposit(amount);
+	MyString transaction = "Transfered money from account with iban: " + accounts.data[senderAccountIndex]->getIban() + "to account with iban: " 
+							+ accounts.data[receiverAccountIndex]->getIban();
+	log.add(transaction);
 }
 
 void Bank::display() const
@@ -254,6 +260,8 @@ void Bank::deposit(const MyString& iban, double amount)
 	}
 
 	accounts.data[receiverAccountIndex]->deposit(amount);
+	MyString transaction = "Deposited to account with iban: " + accounts.data[receiverAccountIndex]->getIban();
+	log.add(transaction);
 }
 
 void Bank::withdraw(const MyString& iban, double amount)
@@ -266,6 +274,8 @@ void Bank::withdraw(const MyString& iban, double amount)
 	}
 
 	accounts.data[accountIndex]->withdraw(amount);
+	MyString transaction = "Withdrew from account with iban: " + accounts.data[accountIndex]->getIban();
+	log.add(transaction);
 }
 
 void Bank::setBankName(const MyString& name)

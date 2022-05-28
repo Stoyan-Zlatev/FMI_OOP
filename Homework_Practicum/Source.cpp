@@ -169,6 +169,7 @@ void main()
 					std::cin >> amount;
 					std::cin.ignore();
 					bank.withdraw(iban, amount);
+					std::cout << "Successfully withdrew " << amount << "$" <<std::endl;
 				}
 				else if (isPrefix(command, "b"))
 				{
@@ -182,6 +183,7 @@ void main()
 					std::cin.ignore();
 
 					bank.deposit(receiverIban, amount);
+					std::cout << "Successfully deposited " << amount << "$" << std::endl;
 				}
 				else if (isPrefix(command, "c"))
 				{
@@ -199,6 +201,7 @@ void main()
 					std::cin.ignore();
 
 					bank.transfer(senderIban, receiverIban, amount);
+					std::cout << "Successfully transfered " << amount << "$" << std::endl;
 				}
 				else
 				{

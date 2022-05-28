@@ -13,7 +13,6 @@ public:
 	MyString();
 	MyString(const char*);
 	explicit MyString(size_t n);
-
 	MyString(const MyString&);
 
 	MyString(MyString&&);
