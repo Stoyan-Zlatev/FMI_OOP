@@ -67,31 +67,6 @@ void AccountStore::resize()
 	data = newCollection;
 }
 
-void AccountStore::resizeDown(size_t index)
-{
-	capacity /= ResizeFactor;
-	Account** newData = new Account * [capacity];
-
-	for (size_t i = 0; i < index; i++)
-	{
-		newData[i] = data[i];
-	}
-
-	for (size_t i = index; i < count; i++)
-	{
-		newData[i] = data[i + 1];
-	}
-
-	for (size_t i = 0; i < capacity; i++)
-	{
-		delete data[i];
-	}
-
-	delete[] data;
-	data = newData;
-	return;
-}
-
 bool AccountStore::isIbanUnique(const MyString& iban)
 {
 	for (size_t i = 0; i < count; i++)
@@ -150,17 +125,11 @@ void AccountStore::removeAt(size_t index)
 
 	--count;
 
-	if (count * ResizeFactor * ResizeFactor <= capacity)
-	{
-		resizeDown(index);
-	}
-
 	for (size_t i = index; i < count; i++)
 	{
 		data[index] = data[index + 1];
 	}
-
-	delete data[count - 1];
+	delete data[count];
 }
 
 void AccountStore::printAllAccounts() const

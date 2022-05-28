@@ -16,7 +16,6 @@ private:
 	void copyFrom(const AccountStore& other);
 	void free();
 	void resize();
-	void resizeDown(size_t index);
 	bool isIbanUnique(const MyString& iban);
 public:
 	AccountStore();

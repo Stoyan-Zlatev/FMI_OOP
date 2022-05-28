@@ -60,8 +60,19 @@ void Bank::deleteCustomer(const MyString& username)
 		throw std::invalid_argument("This user does not exists!");
 	}
 
+	MyString transaction;
+	for (size_t i = 0; i < accounts.count; i++)
+	{
+		if (accounts.data[i]->getUsername() == customers.data[userIndex]->getName())
+		{
+			transaction = "Deleted account with iban: " + accounts.data[i]->getIban();
+			accounts.removeAt(i);
+			log.add(std::move(transaction));
+		}
+	}
+
 	customers.removeAt(userIndex);
-	MyString transaction = "Deleted customer " + username;
+	transaction = "Deleted customer " + username;
 	log.add(std::move(transaction));
 }
 
@@ -137,7 +148,7 @@ void Bank::listLog() const
 
 	for (size_t i = 0; i < log.count; i++)
 	{
-		std::cout << log.data[i] << std::endl;
+		std::cout << log.data[i]->c_str() << std::endl;
 	}
 }
 
@@ -162,14 +173,16 @@ void Bank::exportLog()
 void Bank::importLog()
 {
 	size_t count;
-	std::ifstream logFile("log.txt");
+	std::ifstream logFile("log.txt", std::ios::in);
 
 	if (!logFile.is_open())
 	{
 		std::cout << "Error while opening the file!" << std::endl;
 	}
 
-	logFile >> count;
+	MyString accountCount;
+	accountCount.readLine(logFile);
+	count = std::atoi(accountCount.c_str());
 
 	for (size_t i = 0; i < count; i++)
 	{

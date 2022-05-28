@@ -167,6 +167,7 @@ void main()
 					std::cout << "Enter amount to withdraw: ";
 					double amount;
 					std::cin >> amount;
+					std::cin.ignore();
 					bank.withdraw(iban, amount);
 				}
 				else if (isPrefix(command, "b"))
@@ -212,7 +213,7 @@ void main()
 			{
 				std::ofstream file("Bank.dat");
 				bank.saveToFile(file);
-				return;
+				break;
 			}
 			else
 			{

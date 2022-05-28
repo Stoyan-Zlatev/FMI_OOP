@@ -10,7 +10,6 @@ class Collection
 	void copyFrom(const Collection<T>& other);
 	void free();
 	void resize();
-	void resizeDown(size_t index);
 public:
 	Collection();
 	Collection(const Collection<T>& other);
@@ -77,9 +76,9 @@ void Collection<T>::copyFrom(const Collection<T>& other)
 template <typename T>
 void Collection<T>::free()
 {
-	for (size_t i = 0; i < capacity; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		delete[] data[i];
+		delete data[i];
 	}
 
 	delete[] data;
@@ -139,28 +138,6 @@ void Collection<T>::remove(const T& element)
 }
 
 template <typename T>
-void Collection<T>::resizeDown(size_t index)
-{
-	capacity /= ResizeFactor;
-	T** newData = new T * [capacity];
-
-	for (size_t i = 0; i < index; i++)
-	{
-		newData[i] = data[i];
-	}
-
-	for (size_t i = index; i < count; i++)
-	{
-		newData[i] = data[i + 1];
-	}
-
-	delete[] data;
-	data = newData;
-
-	return;
-}
-
-template <typename T>
 void Collection<T>::removeAt(size_t index) {
 	if (index >= count)
 	{
@@ -169,17 +146,11 @@ void Collection<T>::removeAt(size_t index) {
 
 	--count;
 
-	if (count * ResizeFactor * ResizeFactor <= capacity)
-	{
-		resizeDown(index);
-	}
-
 	for (size_t i = index; i < count; i++)
 	{
 		data[index] = data[index + 1];
 	}
-
-	delete[] data[count - 1];
+	delete data[count];
 }
 
 template <typename T>
