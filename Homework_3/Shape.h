@@ -57,4 +57,5 @@ public:
 	virtual bool isPointIn(double x, double y) const = 0;
 	
 	virtual void loadShape(const MyString& line, size_t& lineSize, size_t& currentIndex) = 0;
+	virtual void saveShape(std::ofstream& file) = 0;
 };

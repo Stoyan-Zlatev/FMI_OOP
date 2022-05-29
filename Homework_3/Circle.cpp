@@ -2,6 +2,7 @@
 #include "Rectangle.h"
 #include "GlobalConstants.h"
 #include "Utils.h"
+#include "Serialize.h"
 
 const double PI = 3.1415;
 
@@ -53,8 +54,8 @@ MyString Circle::getType() const
 bool Circle::withinRectangle(double x, double y, double width, double height) const
 {
 	Shape::Point center = getPointAtIndex(0);
-	return center.x + radius < x + width && center.x - radius > x &&
-		center.y + radius < y&& center.y - radius > y - height;
+	return center.x + radius <= x + width && center.x - radius >= x &&
+		center.y + radius <= y&& center.y - radius >= y - height;
 }
 
 bool Circle::withinCircle(double x, double y, double radius) const
@@ -79,3 +80,11 @@ void Circle::loadShape(const MyString& line, size_t& lineSize, size_t& currentIn
 	setRadius(radius);
 	setColor(color);
 }
+
+void Circle::saveShape(std::ofstream& file)
+{
+	Shape::Point center = getPointAtIndex(0);
+	saveCircle(file, center.x, center.y, radius, getColor());
+
+}
+

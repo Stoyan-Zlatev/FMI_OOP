@@ -92,21 +92,22 @@ void ShapeCollection::addLine(double x1, double y1, double x2, double y2, const 
 	addShape(line);
 }
 
-void ShapeCollection::eraseFigure(size_t index)
+void ShapeCollection::eraseFigure(size_t index, MyString& shapeType)
 {
 	if (index >= count)
 	{
-		throw std::invalid_argument("Index out of range!");
+		throw std::invalid_argument("This figure does not exist!\n");
 	}
 
 	--count;
+
+	shapeType = data[index]->getType();
+	delete data[index];
 
 	for (size_t i = index; i < count; i++)
 	{
 		data[index] = data[index + 1];
 	}
-
-	delete data[count];
 }
 
 void ShapeCollection::translate(double vertical, double horizontal)
@@ -117,53 +118,69 @@ void ShapeCollection::translate(double vertical, double horizontal)
 	}
 }
 
-void ShapeCollection::translate(double vertical, double horizontal, size_t index)
+void ShapeCollection::translate(double vertical, double horizontal, size_t index, MyString& shapeType)
 {
 	if (index > count)
 	{
-		throw std::out_of_range("Index out of range!");
+		throw std::out_of_range("This figure does not exist!\n");
 	}
 
 	data[index]->translate(vertical, horizontal);
+	shapeType = data[index]->getType();
 }
 
-bool ShapeCollection::withinRectangle(double x, double y, double width, double heigth) const
+void ShapeCollection::withinRectangle(double x, double y, double width, double height) const
 {
+	bool containsFigures = false;
 	for (size_t i = 0; i < count; i++)
 	{
-		if (data[i]->withinRectangle(x, y, width, heigth))
+		if (data[i]->withinRectangle(x, y, width, height))
 		{
 			data[i]->print();
+			containsFigures = true;
 		}
 	}
 
-	return true;
+	if (!containsFigures)
+	{
+		std::cout << "No figures are located within rectangle " << x << " " << y << " " << width << " " << height << std::endl;
+	}
 }
 
-bool ShapeCollection::withinCircle(double cx, double cy, double radius) const
+void ShapeCollection::withinCircle(double cx, double cy, double radius) const
 {
+	bool containsFigures = false;
 	for (size_t i = 0; i < count; i++)
 	{
 		if (data[i]->withinCircle(cx, cy, radius))
 		{
 			data[i]->print();
+			containsFigures = true;
 		}
 	}
 
-	return true;
+	if (!containsFigures)
+	{
+		std::cout << "No figures are located within circle " << cx << " " << cy << " " << radius << std::endl;
+	}
 }
 
-bool ShapeCollection::pointIn(double x, double y) const
+void ShapeCollection::pointIn(double x, double y) const
 {
+	bool containsFigures = false;
 	for (size_t i = 0; i < count; i++)
 	{
 		if (data[i]->isPointIn(x, y))
 		{
 			data[i]->print();
+			containsFigures = true;
 		}
 	}
 
-	return true;
+	if (!containsFigures)
+	{
+		std::cout << "No figures contain point " << x << " " << y << std::endl;
+	}
 }
 
 double ShapeCollection::getPerOfFigureByIndex(size_t ind) const
@@ -196,10 +213,16 @@ double ShapeCollection::getIfPointInShapeByIndex(size_t ind, double x, double y)
 	return data[ind]->isPointIn(x, y);
 }
 
+size_t ShapeCollection::getShapesCount() const
+{
+	return count;
+}
+
 void ShapeCollection::printShapes() const
 {
 	for (size_t i = 0; i < count; i++)
 	{
+		std::cout << (i + 1) << ". ";
 		data[i]->print();
 	}
 }
@@ -228,7 +251,7 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 	readUnnecessaryLines(sourceFile, line);
 
 	Shape* shape = nullptr;
-	
+
 	//Found open tag <svg>
 	while (true)
 	{
@@ -239,8 +262,7 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 		}
 
 		MyString shapeType = "";
-		size_t currentIndex = 0;
-		size_t lineSize = strlen(line.c_str());
+		size_t currentIndex = 0, lineSize = strlen(line.c_str());
 		getShapeType(line, shapeType, lineSize, currentIndex);
 		if (shapeType == "rect")
 		{
@@ -254,11 +276,24 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 		{
 			shape = new Line();
 		}
+
 		shape->loadShape(line, lineSize, currentIndex);
 		addShape(shape);
 	}
 }
 
-void ShapeCollection::saveToFile(std::ofstream& sourceFile)
+void ShapeCollection::saveToFile(const MyString& path)
 {
+	std::ofstream file(path.c_str());
+
+
+
+	for (size_t i = 0; i < count; i++)
+	{
+		data[i]->saveShape(file);
+	}
+
+	file << "</svg>";
+
+	file.close();
 }

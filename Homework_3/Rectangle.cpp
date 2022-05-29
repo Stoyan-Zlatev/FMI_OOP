@@ -1,6 +1,9 @@
 #include "Rectangle.h"
 #include "GlobalConstants.h"
 #include "Utils.h"
+#include "Serialize.h"
+
+const MyString typeRectangle = "rectangle";
 
 Rectangle::Rectangle() :Rectangle(0, 0, 0, 0, DefaultColor) {}
 
@@ -17,7 +20,7 @@ void Rectangle::setWidth(double width)
 {
 	if (width < 0)
 	{
-		throw std::invalid_argument("Width cannot be negative number!");
+		throw std::invalid_argument("Width cannot be negative number!\n");
 	}
 
 	this->width = width;
@@ -26,7 +29,7 @@ void Rectangle::setHeight(double height)
 {
 	if (height < 0)
 	{
-		throw std::invalid_argument("Height cannot be negative number!");
+		throw std::invalid_argument("Height cannot be negative number!\n");
 	}
 
 	this->height = height;
@@ -70,7 +73,7 @@ Shape* Rectangle::clone() const
 
 void Rectangle::printData() const
 {
-	std::cout << "rectangle " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " "
+	std::cout << typeRectangle << " " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " "
 		<< width << " " << height << " " << getColor();
 }
 
@@ -84,10 +87,10 @@ void Rectangle::translate(double vertical, double horizontal)
 
 MyString Rectangle::getType() const
 {
-	return "rectangle";
+	return typeRectangle;
 }
 
-bool Rectangle::withinRectangle(double x, double y, double width, double heigth) const
+bool Rectangle::withinRectangle(double x, double y, double width, double height) const
 {
 	Shape::Point p0 = getPointAtIndex(0);
 	Shape::Point p2 = getPointAtIndex(2);
@@ -109,12 +112,8 @@ void Rectangle::loadShape(const MyString& line, size_t& lineSize, size_t& curren
 {
 	double x = 0, y = 0, width = 0, height = 0;
 	MyString color = "";
-	
-	loadArgument(line, lineSize, currentIndex, x);
-	loadArgument(line, lineSize, currentIndex, y);
-	loadArgument(line, lineSize, currentIndex, width);
-	loadArgument(line, lineSize, currentIndex, height);
-	loadArgument(line, lineSize, currentIndex, color);
+
+	readRectangle(line, lineSize, currentIndex, x, y, width, height, color);
 
 	setPoint(0, x, y);
 	setPoint(1, x, (y - height));
@@ -123,4 +122,10 @@ void Rectangle::loadShape(const MyString& line, size_t& lineSize, size_t& curren
 	setWidth(width);
 	setHeight(height);
 	setColor(color);
+}
+
+void Rectangle::saveShape(std::ofstream& file)
+{
+	Shape::Point p = getPointAtIndex(0);
+	saveRectangle(file, p.x, p.y, width, height, getColor());
 }

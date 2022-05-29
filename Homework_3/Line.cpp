@@ -2,6 +2,7 @@
 #include "Rectangle.h"
 #include "GlobalConstants.h"
 #include "Utils.h"
+#include "Serialize.h"
 #include <limits>
 
 Line::Line() :Line(0, 0, 0, 0, DefaultColor) {}
@@ -80,4 +81,12 @@ void Line::loadShape(const MyString& line, size_t& lineSize, size_t& currentInde
 	setPoint(0, x1, y1);
 	setPoint(1, x2, y2);
 	setColor(color);
+}
+
+void Line::saveShape(std::ofstream& file)
+{
+	Shape::Point p1 = getPointAtIndex(0);
+	Shape::Point p2 = getPointAtIndex(1);
+	
+	
 }

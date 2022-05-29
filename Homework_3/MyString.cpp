@@ -99,17 +99,17 @@ MyString& MyString::operator+=(const MyString& other)
 	return *this;
 }
 
-//MyString& MyString::operator+=(char& el)
+//MyString& MyString::operator+=(char el)
 //{
 //	concat(el);
 //	return *this;
 //}
 //
-//void MyString::concat(char& other)
+//void MyString::concat(char other)
 //{
 //	char* temp = new char[getSize() + 2];
 //	strcpy(temp, str);
-//	temp[getSize()] = other;
+//	temp[getSize()] = (char)other;
 //	temp[getSize() + 1] = '\0';
 //	delete[] str;
 //	str = temp;

@@ -4,7 +4,6 @@
 
 bool isPrefix(const MyString& text, const MyString& prefix)
 {
-	int i = 0;
 	for (size_t i = 0; i < prefix.getSize(); i++)
 	{
 		if (i >= text.getSize() || text[i] != prefix[i])
@@ -42,24 +41,29 @@ int getStartindex(const MyString& line, size_t& lineSize)
 		}
 	}
 
-	throw std::invalid_argument("Incorrect line in file!");
+	throw std::invalid_argument("Incorrect line in file!\n");
 }
 
 void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
 {
-	parseArgument(line, lineSize, currentIndex, argument, ' ');
+	parseArgument(line, lineSize, currentIndex, argument, ' ', ' ');
+}
+
+void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
+{
+	parseArgument(line, lineSize, currentIndex, argument, '=', ' ');
 }
 
 void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
 {
-	parseArgument(line, lineSize, currentIndex, argument, '\"');
+	parseArgument(line, lineSize, currentIndex, argument, '\"', '\"');
 }
 
-void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument, char el)
+void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument, char startSeparator, char endSeparator)
 {
 	for (currentIndex; currentIndex < lineSize; currentIndex++)
 	{
-		if (line[currentIndex] == el)
+		if (line[currentIndex] == startSeparator)
 		{
 			break;
 		}
@@ -70,7 +74,7 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 	size_t i = 0;
 	for (i = currentIndex; i < lineSize; i++)
 	{
-		if (line[i] == el)
+		if (line[i] == endSeparator)
 		{
 			break;
 		}
@@ -79,17 +83,21 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 	}
 
 	buffer[i - currentIndex] = '\0';
-	argument = std::atof(buffer);
-	el == ' ' ? currentIndex = i : currentIndex = i + 1;
+
+	if (strlen(buffer) > 0)
+	{
+		argument = std::atof(buffer);
+		endSeparator == ' ' ? currentIndex = i : currentIndex = i + 1;
+	}
 
 	delete[] buffer;
 }
 
-void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument, char el)
+void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument, char startSeparator, char endSeparator)
 {
 	for (currentIndex; currentIndex < lineSize; currentIndex++)
 	{
-		if (line[currentIndex] == el)
+		if (line[currentIndex] == startSeparator)
 		{
 			break;
 		}
@@ -100,7 +108,7 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 	size_t i = 0;
 	for (i = currentIndex; i < lineSize; i++)
 	{
-		if (line[i] == el)
+		if (line[i] == endSeparator)
 		{
 			break;
 		}
@@ -110,19 +118,19 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 
 	buffer[i - currentIndex] = '\0';
 	argument = buffer;
-	el == ' ' ? currentIndex = i : currentIndex = i + 1;
+	endSeparator == ' ' ? currentIndex = i : currentIndex = i + 1;
 
 	delete[] buffer;
 }
 
 void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument)
 {
-	parseArgument(line, lineSize, currentIndex, argument, '\"');
+	parseArgument(line, lineSize, currentIndex, argument, '\"', '\"');
 }
 
 void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument)
 {
-	parseArgument(line, lineSize, currentIndex, argument, ' ');
+	parseArgument(line, lineSize, currentIndex, argument, ' ', ' ');
 }
 
 void readUnnecessaryLines(std::ifstream& sourceFile, MyString& line)
@@ -144,10 +152,10 @@ void getShapeType(const MyString& line, MyString& type, size_t& lineSize, size_t
 		{
 			break;
 		}
-
+	
 		shapeType[currentIndex - startIndex] = line[currentIndex];
 	}
-
+	
 	shapeType[currentIndex - startIndex] = '\0';
 	type = shapeType;
 

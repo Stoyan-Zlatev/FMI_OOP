@@ -17,4 +17,5 @@ public:
 	bool withinRectangle(double x, double y, double width, double heigth) const override;
 	bool withinCircle(double x, double y, double radius) const override;
 	void loadShape(const MyString& line, size_t& lineSize, size_t& currentIndex) override;
+	void saveShape(std::ofstream& file) override;
 };

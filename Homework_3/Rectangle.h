@@ -26,6 +26,8 @@ public:
 	bool isPointIn(double x, double y) const override;
 	
 	void loadShape(const MyString& line, size_t& lineSize, size_t& currentIndex) override;
+	void saveShape(std::ofstream& file) override;
+
 
 	void printData() const override;
 };
