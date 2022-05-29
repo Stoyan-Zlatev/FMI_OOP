@@ -13,7 +13,7 @@ bool isPrefix(const MyString& text, const MyString& prefix)
 	return true;
 }
 
-void loadFigures(const MyString& path, ShapeCollection& shapes)
+void loadFigures(const MyString& path, ShapeCollection& shapes, Collection<MyString>& headers)
 {
 	std::ifstream sourceFile(path.c_str());
 
@@ -24,6 +24,7 @@ void loadFigures(const MyString& path, ShapeCollection& shapes)
 	}
 	else
 	{
+		readUnnecessaryLines(sourceFile, headers);
 		shapes.load(sourceFile);
 		std::cout << "File loaded successfully" << std::endl;
 	}
@@ -133,11 +134,14 @@ void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, M
 	parseArgument(line, lineSize, currentIndex, argument, ' ', ' ');
 }
 
-void readUnnecessaryLines(std::ifstream& sourceFile, MyString& line)
+void readUnnecessaryLines(std::ifstream& sourceFile, Collection<MyString>& headers)
 {
+	MyString line;
+	line.getline(sourceFile);
 	while (!(line == SvgOpenTag))
 	{
-		line.readLine(sourceFile);
+		headers.add(line);
+		line.getline(sourceFile);
 	}
 }
 

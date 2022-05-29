@@ -99,23 +99,6 @@ MyString& MyString::operator+=(const MyString& other)
 	return *this;
 }
 
-//MyString& MyString::operator+=(char el)
-//{
-//	concat(el);
-//	return *this;
-//}
-//
-//void MyString::concat(char other)
-//{
-//	char* temp = new char[getSize() + 2];
-//	strcpy(temp, str);
-//	temp[getSize()] = (char)other;
-//	temp[getSize() + 1] = '\0';
-//	delete[] str;
-//	str = temp;
-//	size++;
-//}
-
 
 MyString operator+(const MyString& lhs, const MyString& rhs)
 {
@@ -130,18 +113,19 @@ std::ostream& operator<<(std::ostream& stream, const MyString& str)
 	return stream;
 }
 
-std::istream& MyString::readLine(std::istream& stream)
-{
-	delete[] str;
-	char buff[MaxContentLength];
-	stream.getline(buff, MaxContentLength);
-
-	size = strlen(buff);
-	str = new char[size + 1];
-	strcpy(str, buff);
-
-	return stream;
-}
+//std::istream& MyString::readLine(std::istream& stream)
+//{
+//	//delete[] str;
+//	//char buff[MaxContentLength];
+//	//stream.getline(buff, MaxContentLength);
+//	getline(stream);
+//
+//	//size = strlen(buff);
+//	//str = new char[size + 1];
+//	//strcpy(str, buff);
+//
+//	return stream;
+//}
 
 std::istream& operator>>(std::istream& stream, MyString& str)
 {

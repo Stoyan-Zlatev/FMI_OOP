@@ -45,7 +45,7 @@ const Shape::Point& Shape::getPointAtIndex(size_t index) const
 {
 	if (index >= pointsCount)
 	{
-		throw std::exception("Invalid point index!");
+		throw std::exception("Invalid point index!\n");
 	}
 
 	return  points[index];
@@ -55,7 +55,7 @@ void Shape::setPoint(size_t pointIndex, double x, double y)
 {
 	if (pointIndex >= pointsCount)
 	{
-		throw std::exception("Invalid point index!");
+		throw std::exception("Invalid point index!\n");
 	}
 
 	points[pointIndex] = Point(x, y);
@@ -65,7 +65,7 @@ void Shape::setColor(const MyString& color)
 {
 	if (color.getSize() >= MaxContentLength)
 	{
-		throw std::invalid_argument("Entered color is too long!");
+		throw std::invalid_argument("Entered color is too long!\n");
 	}
 
 	this->color = color;

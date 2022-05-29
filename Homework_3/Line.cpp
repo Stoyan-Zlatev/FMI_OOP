@@ -5,6 +5,8 @@
 #include "Serialize.h"
 #include <limits>
 
+const MyString typeLine = "line";
+
 Line::Line() :Line(0, 0, 0, 0, DefaultColor) {}
 
 Line::Line(double x1, double y1, double x2, double y2, const MyString& color) : Shape(2, color)
@@ -37,7 +39,7 @@ Shape* Line::clone() const
 
 void Line::printData() const
 {
-	std::cout << "line " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " "
+	std::cout << typeLine << " " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " "
 		<< getPointAtIndex(1).x << " " << getPointAtIndex(1).y << " " << getColor();
 }
 
@@ -49,7 +51,7 @@ void Line::translate(double vertical, double horizontal)
 
 MyString Line::getType() const
 {
-	return "line";
+	return typeLine;
 }
 
 bool Line::withinRectangle(double x, double y, double width, double height) const
@@ -72,11 +74,7 @@ void Line::loadShape(const MyString& line, size_t& lineSize, size_t& currentInde
 	double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 	MyString color = "";
 	
-	loadArgument(line, lineSize, currentIndex, x1);
-	loadArgument(line, lineSize, currentIndex, y1);
-	loadArgument(line, lineSize, currentIndex, x2);
-	loadArgument(line, lineSize, currentIndex, y2);
-	loadArgument(line, lineSize, currentIndex, color);
+	readLine(line,lineSize,currentIndex, x1, y1, x2, y2, color);
 
 	setPoint(0, x1, y1);
 	setPoint(1, x2, y2);
@@ -88,5 +86,5 @@ void Line::saveShape(std::ofstream& file)
 	Shape::Point p1 = getPointAtIndex(0);
 	Shape::Point p2 = getPointAtIndex(1);
 	
-	
+	saveLine(file, p1.x, p1.y, p2.x, p2.y, getColor());
 }

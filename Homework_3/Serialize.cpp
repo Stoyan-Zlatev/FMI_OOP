@@ -85,3 +85,11 @@ void readLine(const MyString& line,size_t& lineSize, size_t& currentIndex, doubl
 	loadArgument(line, lineSize, currentIndex, y2);
 	loadArgument(line, lineSize, currentIndex, color);
 }
+
+void saveHeaders(std::ofstream& file, const Collection<MyString>& headers)
+{
+	for (size_t i = 0; i < headers.getCount(); i++)
+	{
+		file << headers.getElementAt(i)<<"\n";
+	}
+}

@@ -1,5 +1,7 @@
 #pragma once
 #include "Shape.h"
+#include "Collection.hpp"
+#include "MyString.h"
 
 class ShapeCollection
 {
@@ -41,5 +43,5 @@ public:
 	void printPerimteres() const;
 
 	void load(std::ifstream& sourceFile);
-	void saveToFile(const MyString& path);
+	void saveToFile(const MyString& path,const Collection<MyString>& headers);
 };

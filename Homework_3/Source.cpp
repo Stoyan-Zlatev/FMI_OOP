@@ -4,15 +4,17 @@
 #include "ShapeCollection.h"
 #include "MyString.h"
 #include "Utils.h"
+#include "Collection.hpp"
 
 void main()
 {
-	MyString path = "figures.svg";
-	//command.readLine(std::cin);
+	MyString path;
+	path.getline(std::cin);
 
+	Collection<MyString> headers;
 	ShapeCollection shapes;
-	loadFigures(path, shapes);
-
+	loadFigures(path, shapes, headers);
+	
 	std::cout << ">";
 	MyString command;
 	command.getline(std::cin);
@@ -36,7 +38,7 @@ void main()
 			}
 			else if (isPrefix(command, "save"))
 			{
-				shapes.saveToFile(path);
+				shapes.saveToFile(path , headers);
 			}
 			else if (isPrefix(command, "exit"))
 			{

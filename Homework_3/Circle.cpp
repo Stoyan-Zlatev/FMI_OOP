@@ -5,6 +5,7 @@
 #include "Serialize.h"
 
 const double PI = 3.1415;
+const MyString typeCircle = "circle";
 
 void Circle::setRadius(double radius)
 {
@@ -12,6 +13,7 @@ void Circle::setRadius(double radius)
 }
 
 Circle::Circle() : Circle(0, 0, 0, DefaultColor) {}
+
 Circle::Circle(double x, double y, double radius, const MyString& color) : Shape(1, color), radius(radius)
 {
 	setPoint(0, x, y);
@@ -38,7 +40,7 @@ Shape* Circle::clone() const
 
 void Circle::printData() const
 {
-	std::cout << "circle " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " " << radius << " " << getColor();
+	std::cout << typeCircle << " " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " " << radius << " " << getColor();
 }
 
 void Circle::translate(double vertical, double horizontal)
@@ -48,7 +50,7 @@ void Circle::translate(double vertical, double horizontal)
 
 MyString Circle::getType() const
 {
-	return "circle";
+	return typeCircle;
 }
 
 bool Circle::withinRectangle(double x, double y, double width, double height) const
@@ -71,10 +73,7 @@ void Circle::loadShape(const MyString& line, size_t& lineSize, size_t& currentIn
 	double x = 0, y = 0, radius = 0;
 	MyString color = "";
 
-	loadArgument(line, lineSize, currentIndex, x);
-	loadArgument(line, lineSize, currentIndex, y);
-	loadArgument(line, lineSize, currentIndex, radius);
-	loadArgument(line, lineSize, currentIndex, color);
+	readCircle(line, lineSize, currentIndex, x, y, radius, color);
 
 	setPoint(0, x, y);
 	setRadius(radius);
@@ -85,6 +84,5 @@ void Circle::saveShape(std::ofstream& file)
 {
 	Shape::Point center = getPointAtIndex(0);
 	saveCircle(file, center.x, center.y, radius, getColor());
-
 }
 

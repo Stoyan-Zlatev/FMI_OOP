@@ -6,6 +6,7 @@
 #include "MyString.h"
 #include "GlobalConstants.h"
 #include "Utils.h"
+#include "Serialize.h"
 
 void ShapeCollection::free()
 {
@@ -187,7 +188,7 @@ double ShapeCollection::getPerOfFigureByIndex(size_t ind) const
 {
 	if (ind >= count)
 	{
-		throw std::out_of_range("Out of range in shapes collection");
+		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
 	return data[ind]->getPer();
@@ -197,7 +198,7 @@ double ShapeCollection::getAreaOfFigureByIndex(size_t ind) const
 {
 	if (ind >= count)
 	{
-		throw std::out_of_range("Out of range in shapes collection");
+		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
 	return data[ind]->getArea();
@@ -207,7 +208,7 @@ double ShapeCollection::getIfPointInShapeByIndex(size_t ind, double x, double y)
 {
 	if (ind >= count)
 	{
-		throw std::out_of_range("Out of range in shapes collection");
+		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
 	return data[ind]->isPointIn(x, y);
@@ -220,6 +221,11 @@ size_t ShapeCollection::getShapesCount() const
 
 void ShapeCollection::printShapes() const
 {
+	if (count == 0)
+	{
+		throw std::exception("There are no shapes in the list yet!\n");
+	}
+
 	for (size_t i = 0; i < count; i++)
 	{
 		std::cout << (i + 1) << ". ";
@@ -229,6 +235,11 @@ void ShapeCollection::printShapes() const
 
 void ShapeCollection::printAreas() const
 {
+	if (count == 0)
+	{
+		throw std::exception("There are no shapes in the list yet!\n");
+	}
+
 	for (size_t i = 0; i < count; i++)
 	{
 		data[i]->printArea();
@@ -237,6 +248,11 @@ void ShapeCollection::printAreas() const
 
 void ShapeCollection::printPerimteres() const
 {
+	if (count == 0)
+	{
+		throw std::exception("There are no shapes in the list yet!\n");
+	}
+
 	for (size_t i = 0; i < count; i++)
 	{
 		data[i]->printPerimeter();
@@ -247,15 +263,12 @@ void ShapeCollection::printPerimteres() const
 void ShapeCollection::load(std::ifstream& sourceFile)
 {
 	MyString line;
-	line.readLine(sourceFile);
-	readUnnecessaryLines(sourceFile, line);
-
 	Shape* shape = nullptr;
 
 	//Found open tag <svg>
 	while (true)
 	{
-		line.readLine(sourceFile);
+		line.getline(sourceFile);
 		if (line == SvgCloseTag)
 		{
 			break;
@@ -282,11 +295,13 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 	}
 }
 
-void ShapeCollection::saveToFile(const MyString& path)
+void ShapeCollection::saveToFile(const MyString& path, const Collection<MyString>& headers)
 {
 	std::ofstream file(path.c_str());
 
+	saveHeaders(file, headers);
 
+	file << "<svg>\n";
 
 	for (size_t i = 0; i < count; i++)
 	{
