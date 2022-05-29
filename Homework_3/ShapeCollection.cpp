@@ -97,7 +97,7 @@ void ShapeCollection::eraseFigure(size_t index, MyString& shapeType)
 {
 	if (index >= count)
 	{
-		throw std::invalid_argument("This figure does not exist!\n");
+		std::cout << "There is no figure number " << (index+1)<<std::endl;
 	}
 
 	--count;
@@ -107,7 +107,7 @@ void ShapeCollection::eraseFigure(size_t index, MyString& shapeType)
 
 	for (size_t i = index; i < count; i++)
 	{
-		data[index] = data[index + 1];
+		data[i] = data[i + 1];
 	}
 }
 

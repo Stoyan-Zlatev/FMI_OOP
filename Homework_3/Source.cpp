@@ -9,6 +9,7 @@
 void main()
 {
 	MyString path;
+	std::cout << ">";
 	path.getline(std::cin);
 
 	Collection<MyString> headers;
