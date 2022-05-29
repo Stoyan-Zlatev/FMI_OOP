@@ -3,8 +3,8 @@
 
 class ShapeCollection
 {
-	Shape** shapes;
-	size_t shapesCount;
+	Shape** data;
+	size_t count;
 	size_t capacity;
 
 	void free();
@@ -19,14 +19,25 @@ public:
 	ShapeCollection& operator=(const ShapeCollection& other);
 	~ShapeCollection();
 
+	void addRectangle(double x1, double y1, double width, double height, const MyString& color);
+	void addCircle(double x1, double y1, int radius, const MyString& color);
+	void addLine(double x1, double y1, double x2, double y2, const MyString& color);
 
-	void addRectangle(int x1, int y1, int x3, int y3);
-	void addCircle(int x1, int y1, int r);
+	void eraseFigure(size_t index);
+	void translate(double vertical, double horizontal);
+	void translate(double vertical, double horizontal, size_t index);
 
-	void addTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+	bool withinRectangle(double x, double y, double width, double heigth) const;
+	bool withinCircle(double cx, double cy, double radius) const;
+	bool pointIn(double x, double y) const;
 
 	double getPerOfFigureByIndex(size_t ind) const;
 	double getAreaOfFigureByIndex(size_t ind) const;
-	double getIfPointInShapeByIndex(size_t ind, int x, int y) const;
+	double getIfPointInShapeByIndex(size_t ind, double x, double y) const;
 
+	void load(std::ifstream& sourceFile);
+	void saveToFile(std::ofstream& sourceFile);
+	void printShapes() const;
+	void printAreas() const;
+	void printPerimteres() const;
 };

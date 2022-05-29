@@ -1,42 +1,50 @@
 #include "ShapeCollection.h"
-#include <stdexcept>      // std::out_of_range
+#include <stdexcept>
 #include "Rectangle.h"
 #include "Circle.h"
-
-#include "Triangle.h"
+#include "Line.h"
+#include "MyString.h"
+#include "GlobalConstants.h"
+#include "Utils.h"
 
 void ShapeCollection::free()
 {
-	for (size_t i = 0; i < shapesCount; i++)
-		delete shapes[i];  //не се инт. какъв обект е. (вирт дестр)
-	delete[] shapes;
+	for (size_t i = 0; i < count; i++)
+	{
+		delete data[i];
+	}
+
+	delete[] data;
 }
 void ShapeCollection::copyFrom(const ShapeCollection& other)
 {
-	shapes = new Shape * [other.shapesCount];
-	shapesCount = other.shapesCount;
+	data = new Shape * [other.count];
+	count = other.count;
 	capacity = other.capacity;
 
-	for (size_t i = 0; i < shapesCount; i++)
+	for (size_t i = 0; i < count; i++)
 	{
-		shapes[i] = other.shapes[i]->clone();
+		data[i] = other.data[i]->clone();
 	}
 }
 
 void ShapeCollection::resize()
 {
 	Shape** newCollection = new Shape * [capacity *= 2];
-	for (size_t i = 0; i < shapesCount; i++)
-		newCollection[i] = shapes[i]; // !!не правим клониране
-	delete[] shapes;
-	shapes = newCollection;
+	for (size_t i = 0; i < count; i++)
+	{
+		newCollection[i] = data[i];
+	}
+
+	delete[] data;
+	data = newCollection;
 }
 
 ShapeCollection::ShapeCollection()
 {
 	capacity = 8;
-	shapesCount = 0;
-	shapes = new Shape * [capacity];
+	count = 0;
+	data = new Shape * [capacity];
 }
 
 ShapeCollection::ShapeCollection(const ShapeCollection& other)
@@ -59,44 +67,198 @@ ShapeCollection::~ShapeCollection()
 
 void ShapeCollection::addShape(Shape* shape)
 {
-	if (shapesCount == capacity)
+	if (count == capacity)
+	{
 		resize();
-	shapes[shapesCount++] = shape; //we dont make a copy here (it's a private function, called from creation funcions)
+	}
+
+	data[count++] = shape;
 }
 
-void ShapeCollection::addRectangle(int x1, int y1, int x3, int y3)
+void ShapeCollection::addRectangle(double x1, double y1, double width, double height, const MyString& color)
 {
-	Rectangle* rect = new Rectangle(x1, y1, x3, y3);
+	Rectangle* rect = new Rectangle(x1, y1, width, height, color);
 	addShape(rect);
 }
-void ShapeCollection::addCircle(int x1, int y1, int r)
+void ShapeCollection::addCircle(double x1, double y1, int radius, const MyString& color)
 {
-	Circle* circlce = new Circle(x1, y1, r);
+	Circle* circlce = new Circle(x1, y1, radius, color);
 	addShape(circlce);
-
 }
 
-void ShapeCollection::addTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+void ShapeCollection::addLine(double x1, double y1, double x2, double y2, const MyString& color)
 {
-	Triangle* tr = new Triangle(x1, y1, x2, y2, x3, y3);
-	addShape(tr);
+	Line* line = new Line(x1, y1, x2, y2, color);
+	addShape(line);
+}
+
+void ShapeCollection::eraseFigure(size_t index)
+{
+	if (index >= count)
+	{
+		throw std::invalid_argument("Index out of range!");
+	}
+
+	--count;
+
+	for (size_t i = index; i < count; i++)
+	{
+		data[index] = data[index + 1];
+	}
+
+	delete data[count];
+}
+
+void ShapeCollection::translate(double vertical, double horizontal)
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		data[i]->translate(vertical, horizontal);
+	}
+}
+
+void ShapeCollection::translate(double vertical, double horizontal, size_t index)
+{
+	if (index > count)
+	{
+		throw std::out_of_range("Index out of range!");
+	}
+
+	data[index]->translate(vertical, horizontal);
+}
+
+bool ShapeCollection::withinRectangle(double x, double y, double width, double heigth) const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		if (data[i]->withinRectangle(x, y, width, heigth))
+		{
+			data[i]->print();
+		}
+	}
+
+	return true;
+}
+
+bool ShapeCollection::withinCircle(double cx, double cy, double radius) const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		if (data[i]->withinCircle(cx, cy, radius))
+		{
+			data[i]->print();
+		}
+	}
+
+	return true;
+}
+
+bool ShapeCollection::pointIn(double x, double y) const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		if (data[i]->isPointIn(x, y))
+		{
+			data[i]->print();
+		}
+	}
+
+	return true;
 }
 
 double ShapeCollection::getPerOfFigureByIndex(size_t ind) const
 {
-	if (ind >= shapesCount)
+	if (ind >= count)
+	{
 		throw std::out_of_range("Out of range in shapes collection");
-	return shapes[ind]->getPer();
+	}
+
+	return data[ind]->getPer();
 }
+
 double ShapeCollection::getAreaOfFigureByIndex(size_t ind) const
 {
-	if (ind >= shapesCount)
+	if (ind >= count)
+	{
 		throw std::out_of_range("Out of range in shapes collection");
-	return shapes[ind]->getArea();
+	}
+
+	return data[ind]->getArea();
 }
-double ShapeCollection::getIfPointInShapeByIndex(size_t ind, int x, int y) const
+
+double ShapeCollection::getIfPointInShapeByIndex(size_t ind, double x, double y) const
 {
-	if (ind >= shapesCount)
+	if (ind >= count)
+	{
 		throw std::out_of_range("Out of range in shapes collection");
-	return shapes[ind]->isPointIn(x, y);
+	}
+
+	return data[ind]->isPointIn(x, y);
+}
+
+void ShapeCollection::printShapes() const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		data[i]->print();
+	}
+}
+
+void ShapeCollection::printAreas() const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		data[i]->printArea();
+	}
+}
+
+void ShapeCollection::printPerimteres() const
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		data[i]->printPerimeter();
+	}
+}
+
+
+void ShapeCollection::load(std::ifstream& sourceFile)
+{
+	MyString line;
+	line.readLine(sourceFile);
+	readUnnecessaryLines(sourceFile, line);
+
+	Shape* shape = nullptr;
+	
+	//Found open tag <svg>
+	while (true)
+	{
+		line.readLine(sourceFile);
+		if (line == SvgCloseTag)
+		{
+			break;
+		}
+
+		MyString shapeType = "";
+		size_t currentIndex = 0;
+		size_t lineSize = strlen(line.c_str());
+		getShapeType(line, shapeType, lineSize, currentIndex);
+		if (shapeType == "rect")
+		{
+			shape = new Rectangle();
+		}
+		else if (shapeType == "circle")
+		{
+			shape = new Circle();
+		}
+		else if (shapeType == "line")
+		{
+			shape = new Line();
+		}
+		shape->loadShape(line, lineSize, currentIndex);
+		addShape(shape);
+	}
+}
+
+void ShapeCollection::saveToFile(std::ofstream& sourceFile)
+{
 }

@@ -1,15 +1,13 @@
 #pragma once
+
 #include "Shape.h"
 
-class Circle : public Shape
+class Line : public Shape
 {
-	double radius;
-	void setRadius(double radius);
 public:
-	Circle();
-	Circle(double x, double y, double radius, const MyString& color);
-
-	double getArea() const override;
+	Line();
+	Line(double x1, double y1, double x2, double y2, const MyString& color);
+	double  getArea() const override;
 	double getPer() const override;
 	bool isPointIn(double x, double y) const override;
 	Shape* clone() const override;
