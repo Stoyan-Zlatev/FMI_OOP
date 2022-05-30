@@ -32,7 +32,7 @@ void NormalAccount::readFromFile(std::ifstream& file)
 NormalAccount::NormalAccount() : NormalAccount("", "", "", -1, 0, std::time(0)) {}
 
 NormalAccount::NormalAccount(const MyString& username, const MyString& password, const MyString& iban,
-	size_t id, double amount, time_t dateOfCreation) : Account(username, password, iban, id, amount, dateOfCreation)
+	size_t customerId, double amount, time_t dateOfCreation) : Account(username, password, iban, customerId, amount, dateOfCreation)
 {
 	setAccountType();
 }

@@ -6,7 +6,7 @@
 PrivilegeAccount::PrivilegeAccount() : PrivilegeAccount("", "", "", -1, 0, 0, std::time(0)) {}
 
 PrivilegeAccount::PrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban,
-	size_t id, double overdraft, double amount, time_t dateOfCreation) : Account(username, password, iban, id, amount, dateOfCreation)
+	size_t customerId, double overdraft, double amount, time_t dateOfCreation) : Account(username, password, iban, customerId, amount, dateOfCreation)
 {
 	setAccountType();
 	this->overdraft = overdraft;

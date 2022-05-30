@@ -10,12 +10,12 @@ protected:
 	MyString password;
 	MyString iban;
 	AccountType accountType;
-	size_t id;
+	size_t customerId;
 	double amount;
 	time_t dateOfCreation;
 public:
 	Account();
-	Account(const MyString& username, const MyString& password, const MyString& iban, size_t id, double amount = 0, time_t dateOfCreation = std::time(0));
+	Account(const MyString& username, const MyString& password, const MyString& iban, size_t customerId, double amount = 0, time_t dateOfCreation = std::time(0));
 	virtual void deposit(double amount);
 	virtual bool withdraw(double amount) = 0;
 	virtual void display() const;
@@ -25,7 +25,7 @@ public:
 	virtual void setAccountType() = 0;
 	void setIban(const MyString& iban);
 	void setUsername(const MyString& username);
-	void setId(size_t id);
+	void setId(size_t customerId);
 	void setAmount(double amount);
 	void setDateOfCreation(const time_t& date);
 	void setPassword(const MyString& password);
@@ -34,7 +34,7 @@ public:
 	MyString getIban() const;
 	MyString getUsername() const;
 	MyString getPassword() const;
-	size_t getId() const;
+	size_t getCustomerId() const;
 	double getAmount() const;
 	time_t getDateOfCreation() const;
 

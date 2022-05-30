@@ -11,7 +11,7 @@ bool SavingsAccount::withdraw(double amount)
 SavingsAccount::SavingsAccount() : SavingsAccount("", "", "", -1, 0, 0, std::time(0)) {}
 
 SavingsAccount::SavingsAccount(const MyString& username, const MyString& password, const MyString& iban,
-	size_t id, double interestRate, double amount, time_t dateOfCreation) : Account(username, password, iban, id, amount, dateOfCreation)
+	size_t customerId, double interestRate, double amount, time_t dateOfCreation) : Account(username, password, iban, customerId, amount, dateOfCreation)
 {
 	setAccountType();
 	this->interestRate = interestRate;

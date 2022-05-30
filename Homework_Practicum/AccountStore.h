@@ -25,15 +25,15 @@ public:
 
 	void addAccount(Account* account);
 
-	void addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+	void addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t customerId,
 		double amount = 0, time_t dateOfCreation = std::time(0));
-	void addPrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+	void addPrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t customerId,
 		double overdraft = 0, double amount = 0, time_t dateOfCreation = std::time(0));
-	void addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+	void addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t customerId,
 		double interestRate = 0, double amount = 0, time_t dateOfCreation = std::time(0));
 
 	void remove(const Account& element);
-	void removeAt(size_t index);
+	void removeAt(size_t accountIndex);
 
 	void printAllAccounts() const;
 	friend class Bank;

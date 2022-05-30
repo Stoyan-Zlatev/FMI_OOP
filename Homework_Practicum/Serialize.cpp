@@ -1,14 +1,16 @@
 #include "Serialize.h"
 
 
-void writeString(std::ofstream& sourceFile, const MyString& str) {
+void writeString(std::ofstream& sourceFile, const MyString& str)
+{
 	int len = str.getSize();
 	sourceFile.write((const char*)&len, sizeof(int));
 
 	sourceFile.write(str.c_str(), sizeof(char) * len);
 }
 
-void readString(std::ifstream& sourceFile, MyString& field) {
+void readString(std::ifstream& sourceFile, MyString& field)
+{
 	int len = 0;
 	sourceFile.read((char*)&len, sizeof(len));
 

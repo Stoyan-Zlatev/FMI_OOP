@@ -79,55 +79,55 @@ bool AccountStore::isIbanUnique(const MyString& iban)
 	return true;
 }
 
-void AccountStore::addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+void AccountStore::addNormalAccount(const MyString& username, const MyString& password, const MyString& iban, size_t custoemrId,
 	double amount, time_t dateOfCreation)
 {
 	if (isIbanUnique(iban))
-		data[count++] = new NormalAccount(username, password, iban, id, amount, dateOfCreation);
+		data[count++] = new NormalAccount(username, password, iban, custoemrId, amount, dateOfCreation);
 }
 
-void AccountStore::addPrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+void AccountStore::addPrivilegeAccount(const MyString& username, const MyString& password, const MyString& iban, size_t custoemrId,
 	double overdraft, double amount, time_t dateOfCreation)
 {
 	if (isIbanUnique(iban))
-		data[count++] = new PrivilegeAccount(username, password, iban, id, overdraft, amount, dateOfCreation);
+		data[count++] = new PrivilegeAccount(username, password, iban, custoemrId, overdraft, amount, dateOfCreation);
 }
 
-void AccountStore::addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t id,
+void AccountStore::addSavingsAccount(const MyString& username, const MyString& password, const MyString& iban, size_t custoemrId,
 	double interestRate, double amount, time_t dateOfCreation)
 {
 	if (isIbanUnique(iban))
-		data[count++] = new SavingsAccount(username, password, iban, id, interestRate, amount, dateOfCreation);
+		data[count++] = new SavingsAccount(username, password, iban, custoemrId, interestRate, amount, dateOfCreation);
 }
 
 void AccountStore::remove(const Account& element)
 {
 	if (count == 0)
 	{
-		throw std::invalid_argument("It is already empty!");
+		throw std::invalid_argument("There are no available accounts!");
 	}
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t accountIndex = 0; accountIndex < count; accountIndex++)
 	{
-		if (data[i]->getIban() == element.getIban()) {
-			removeAt(i);
+		if (data[accountIndex]->getIban() == element.getIban()) {
+			removeAt(accountIndex);
 			return;
 		}
 	}
 }
 
-void AccountStore::removeAt(size_t index)
+void AccountStore::removeAt(size_t accountIndex)
 {
-	if (index >= count)
+	if (accountIndex >= count)
 	{
 		throw std::invalid_argument("Index out of range!");
 	}
 
 	--count;
 
-	for (size_t i = index; i < count; i++)
+	for (size_t currentAccountIndex = accountIndex; currentAccountIndex < count; currentAccountIndex++)
 	{
-		data[index] = data[index + 1];
+		data[currentAccountIndex] = data[currentAccountIndex + 1];
 	}
 	delete data[count];
 }
@@ -139,9 +139,9 @@ void AccountStore::printAllAccounts() const
 		std::cout << "There are no accounts in the system yet!" << std::endl;
 	}
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t accountIndex = 0; accountIndex < count; accountIndex++)
 	{
-		data[i]->display();
+		data[accountIndex]->display();
 		std::cout << std::endl;
 	}
 }

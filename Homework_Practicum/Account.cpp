@@ -3,15 +3,16 @@
 #include "Serialize.h"
 #include <iostream>
 #include <ctime>
+#pragma warning(disable : 4996)
 
 Account::Account() : Account("", "", "", -1, 0, std::time(0)) {}
 
-Account::Account(const MyString& username, const MyString& password, const MyString& iban, size_t id, double amount, time_t dateOfCreation)
+Account::Account(const MyString& username, const MyString& password, const MyString& iban, size_t customerId, double amount, time_t dateOfCreation)
 {
 	setUsername(username);
 	setPassword(password);
 	setIban(iban);
-	setId(id);
+	setId(customerId);
 	setAmount(amount);
 	setDateOfCreation(dateOfCreation);
 }
@@ -25,7 +26,9 @@ void Account::display() const {
 	std::cout << "Account type: " << getAccountType() << std::endl;
 	std::cout << "Iban: " << iban << std::endl;
 	std::cout << "Holder: " << username << std::endl;
+	std::cout << "Holder id: " << customerId << std::endl;
 	std::cout << "Balance: " << amount << "$" << std::endl;
+	std::cout << "Date of creation: " << std::ctime(&dateOfCreation) << std::endl;
 }
 double Account::getBalance() const
 {
@@ -53,14 +56,14 @@ void Account::setUsername(const MyString& username)
 	this->username = username;
 }
 
-void Account::setId(size_t id)
+void Account::setId(size_t customerId)
 {
-	if (id < 0)
+	if (customerId < 0)
 	{
 		throw std::invalid_argument("Entered id is invalid!");
 	}
 
-	this->id = id;
+	this->customerId = customerId;
 }
 
 void Account::setAmount(double amount)
@@ -103,9 +106,9 @@ MyString Account::getPassword() const
 	return password;
 }
 
-size_t Account::getId() const
+size_t Account::getCustomerId() const
 {
-	return id;
+	return customerId;
 }
 
 double Account::getAmount() const
@@ -124,7 +127,7 @@ void Account::saveToFile(std::ofstream& file)
 	writeString(file, username);
 	writeString(file, password);
 	writeString(file, iban);
-	file.write((const char*)&id, sizeof(id));
+	file.write((const char*)&customerId, sizeof(customerId));
 	file.write((const char*)&amount, sizeof(amount));
 	file.write((const char*)&dateOfCreation, sizeof(dateOfCreation));
 }
@@ -134,7 +137,7 @@ void Account::readFromFile(std::ifstream& file)
 	readString(file, username);
 	readString(file, password);
 	readString(file, iban);
-	file.read((char*)&id, sizeof(id));
+	file.read((char*)&customerId, sizeof(customerId));
 	file.read((char*)&amount, sizeof(amount));
 	file.read((char*)&dateOfCreation, sizeof(dateOfCreation));
 }

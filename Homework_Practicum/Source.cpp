@@ -26,7 +26,7 @@ void main()
 		initBank(bank);
 	}
 	printMenu();
-	
+
 	MyString command;
 	std::cout << ">";
 	command.getline(std::cin);
@@ -48,14 +48,15 @@ void main()
 					std::cout << ">";
 					command.getline(std::cin);
 
-					
+
 					if (isPrefix(command, "ii"))
 					{
-						MyString username;
-						std::cout << "Enter username:";
-						username.getline(std::cin);
+						size_t customerId;
+						std::cout << "Enter customer id:";
+						std::cin >> customerId;
+						std::cin.ignore();
 
-						bank.deleteCustomer(std::move(username));
+						bank.deleteCustomer(customerId);
 						std::cout << "Customer deleted successfully!" << std::endl;
 					}
 					else if (isPrefix(command, "i"))
@@ -105,12 +106,18 @@ void main()
 						std::cout << "Enter account iban: ";
 						iban.getline(std::cin);
 
-						MyString accountType;
+						size_t customerId;
+						std::cout << "Enter holder id: ";
+						std::cin >> customerId;
+						std::cin.ignore();
+
+						size_t accountType;
 						printAccountTypes();
 						std::cout << ">";
-						accountType.getline(std::cin);
+						std::cin >> accountType;
+						std::cin.ignore();
 
-						bank.addAccount(std::move(iban), std::move(username), std::move(password), std::move(accountType));
+						bank.addAccount(std::move(iban), std::move(username), std::move(password), customerId, accountType);
 						std::cout << "Account added successfully!" << std::endl;
 					}
 					else
@@ -138,11 +145,12 @@ void main()
 				}
 				else if (isPrefix(command, "c"))
 				{
-					MyString username;
-					std::cout << "Enter username: ";
-					username.getline(std::cin);
+					size_t customerId;
+					std::cout << "Enter customer id:";
+					std::cin >> customerId;
+					std::cin.ignore();
 
-					bank.listCustomerAccounts(std::move(username));
+					bank.listCustomerAccounts(customerId);
 				}
 				else if (isPrefix(command, "d"))
 				{
@@ -169,7 +177,7 @@ void main()
 					std::cin >> amount;
 					std::cin.ignore();
 					bank.withdraw(std::move(iban), amount);
-					std::cout << "Successfully withdrew " << amount << "$" <<std::endl;
+					std::cout << "Successfully withdrew " << amount << "$" << std::endl;
 				}
 				else if (isPrefix(command, "b"))
 				{

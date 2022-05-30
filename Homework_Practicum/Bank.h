@@ -12,19 +12,19 @@ class Bank
 	AccountStore accounts;
 	Collection<Customer> customers;
 	Collection<MyString> log;
-	int getUserIndex(const MyString& customerName) const;
+	int getUserIndex(size_t customerId) const;
 	int getAccountIndex(const MyString& iban) const;
 public:
 	Bank();
-	Bank(const MyString& name, const MyString& address);
+	Bank(const MyString& bankName, const MyString& bankAddress);
 
-	void addCustomer(const MyString& username, const MyString& address);
-	void deleteCustomer(const MyString& username);
-	void addAccount(const MyString& iban, const MyString& username, const MyString& password, const MyString& accountType, double additional = 0);
+	void addCustomer(const MyString& customerName, const MyString& customerAddress);
+	void deleteCustomer(size_t customerId);
+	void addAccount(const MyString& iban, const MyString& customerName, const MyString& password, size_t customerId, size_t accountType, double additional = 0);
 	void deleteAccount(const MyString& iban);
 	void listAllCustomers() const;
 	void listAllAccounts() const;
-	void listCustomerAccounts(const MyString& username) const;;
+	void listCustomerAccounts(size_t customerId) const;;
 	void listLog() const;
 	void exportLog();
 	void importLog();
@@ -33,8 +33,8 @@ public:
 	void deposit(const MyString& iban, double amount);
 	void withdraw(const MyString& iban, double amount);
 
-	void setBankName(const MyString& name);
-	void setBankAdress(const MyString& address);
+	void setBankName(const MyString& bankName);
+	void setBankAdress(const MyString& bankAddress);
 
 	MyString getBankName() const;
 	MyString getBankAdress() const;
