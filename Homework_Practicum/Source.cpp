@@ -19,9 +19,6 @@ void main()
 		std::cout << "File loaded successfully" << std::endl;
 	}
 
-	MyString command;
-
-
 	sourceFile.close();
 
 	if (bank.getBankName() == EmptyString)
@@ -29,6 +26,8 @@ void main()
 		initBank(bank);
 	}
 	printMenu();
+	
+	MyString command;
 	std::cout << ">";
 	command.getline(std::cin);
 
@@ -49,26 +48,27 @@ void main()
 					std::cout << ">";
 					command.getline(std::cin);
 
+					
 					if (isPrefix(command, "ii"))
 					{
-						std::cout << "Enter username:";
 						MyString username;
+						std::cout << "Enter username:";
 						username.getline(std::cin);
 
-						bank.deleteCustomer(username);
+						bank.deleteCustomer(std::move(username));
 						std::cout << "Customer deleted successfully!" << std::endl;
 					}
 					else if (isPrefix(command, "i"))
 					{
-						std::cout << "Enter username:";
 						MyString username;
+						std::cout << "Enter username:";
 						username.getline(std::cin);
 
 						std::cout << "Enter customer address:";
 						MyString address;
 						address.getline(std::cin);
 
-						bank.addCustomer(username, address);
+						bank.addCustomer(std::move(username), std::move(address));
 						std::cout << "Customer added successfully!" << std::endl;
 					}
 					else
@@ -110,7 +110,7 @@ void main()
 						std::cout << ">";
 						accountType.getline(std::cin);
 
-						bank.addAccount(iban, username, password, accountType);
+						bank.addAccount(std::move(iban), std::move(username), std::move(password), std::move(accountType));
 						std::cout << "Account added successfully!" << std::endl;
 					}
 					else
@@ -142,7 +142,7 @@ void main()
 					std::cout << "Enter username: ";
 					username.getline(std::cin);
 
-					bank.listCustomerAccounts(username);
+					bank.listCustomerAccounts(std::move(username));
 				}
 				else if (isPrefix(command, "d"))
 				{
@@ -168,7 +168,7 @@ void main()
 					double amount;
 					std::cin >> amount;
 					std::cin.ignore();
-					bank.withdraw(iban, amount);
+					bank.withdraw(std::move(iban), amount);
 					std::cout << "Successfully withdrew " << amount << "$" <<std::endl;
 				}
 				else if (isPrefix(command, "b"))
@@ -182,7 +182,7 @@ void main()
 					std::cin >> amount;
 					std::cin.ignore();
 
-					bank.deposit(receiverIban, amount);
+					bank.deposit(std::move(receiverIban), amount);
 					std::cout << "Successfully deposited " << amount << "$" << std::endl;
 				}
 				else if (isPrefix(command, "c"))
@@ -200,7 +200,7 @@ void main()
 					std::cin >> amount;
 					std::cin.ignore();
 
-					bank.transfer(senderIban, receiverIban, amount);
+					bank.transfer(std::move(senderIban), std::move(receiverIban), amount);
 					std::cout << "Successfully transfered " << amount << "$" << std::endl;
 				}
 				else

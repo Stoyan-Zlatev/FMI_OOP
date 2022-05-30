@@ -57,13 +57,13 @@ void Bank::deleteCustomer(const MyString& username)
 	int userIndex = getUserIndex(username);
 	if (userIndex == -1)
 	{
-		throw std::invalid_argument("This user does not exists!");
+		throw std::invalid_argument("This user does not exists!\n");
 	}
 
 	MyString transaction;
 	for (size_t i = 0; i < accounts.count; i++)
 	{
-		if (accounts.data[i]->getUsername() == customers.data[userIndex]->getName())
+		if (accounts.data[i]->getId() == customers.data[userIndex]->getId())
 		{
 			transaction = "Deleted account with iban: " + accounts.data[i]->getIban();
 			accounts.removeAt(i);
@@ -78,12 +78,13 @@ void Bank::deleteCustomer(const MyString& username)
 
 void Bank::addAccount(const MyString& iban, const MyString& username, const MyString& password, const MyString& accountType, double additional)
 {
-	if (getUserIndex(username) == -1)
+	size_t userIndex = getUserIndex(username);
+	if (userIndex == -1)
 	{
 		throw std::invalid_argument("This user does not exists!");
 	}
 
-	size_t customerId = customers.data[getUserIndex(username)]->getId();
+	size_t customerId = customers.data[userIndex]->getId();
 	MyString accType;
 
 	if (accountType == "1")
@@ -146,7 +147,7 @@ void Bank::listLog() const
 {
 	if (log.count == 0)
 	{
-		throw std::invalid_argument("There are not any transactions yet!");
+		throw std::invalid_argument("There are not any transactions yet!\n");
 	}
 
 	for (size_t i = 0; i < log.count; i++)
@@ -161,7 +162,7 @@ void Bank::exportLog()
 
 	if (!logFile.is_open())
 	{
-		std::cout << "Error while opening the file!" << std::endl;
+		throw std::invalid_argument("Error while opening the file!\n");
 	}
 
 	logFile << log.count << '\n';
@@ -180,7 +181,7 @@ void Bank::importLog()
 
 	if (!logFile.is_open())
 	{
-		std::cout << "Error while opening the file!" << std::endl;
+		throw std::invalid_argument("Error while opening the file!\n");
 	}
 
 	MyString accountCount;
@@ -206,7 +207,7 @@ void Bank::listCustomerAccounts(const MyString& username) const
 
 	if (accounts.count == 0)
 	{
-		std::cout << "This customer has no accounts in the system yet!" << std::endl;
+		throw std::invalid_argument("This customer has no accounts in the system yet!\n");
 	}
 
 	for (size_t i = 0; i < accounts.count; i++)
@@ -226,20 +227,20 @@ void Bank::transfer(const MyString& senderIban, const MyString& receiverIban, do
 
 	if (senderAccountIndex == -1)
 	{
-		throw std::invalid_argument("Account with this iban does not exist!");
+		throw std::invalid_argument("Account with this iban does not exist!\n");
 	}
 
 	int receiverAccountIndex = getAccountIndex(receiverIban);
 
 	if (receiverAccountIndex == -1)
 	{
-		throw std::invalid_argument("Account with this iban does not exist!");
+		throw std::invalid_argument("Account with this iban does not exist!\n");
 	}
 
 	accounts.data[senderAccountIndex]->withdraw(amount);
 	accounts.data[receiverAccountIndex]->deposit(amount);
-	MyString transaction = "Transfered money from account with iban: " + accounts.data[senderAccountIndex]->getIban() + "to account with iban: " 
-							+ accounts.data[receiverAccountIndex]->getIban();
+	MyString transaction = "Transfered money from account with iban: " + accounts.data[senderAccountIndex]->getIban()
+		+ "to account with iban: " + accounts.data[receiverAccountIndex]->getIban();
 	log.add(transaction);
 }
 
@@ -256,7 +257,7 @@ void Bank::deposit(const MyString& iban, double amount)
 
 	if (receiverAccountIndex == -1)
 	{
-		throw std::invalid_argument("Account with this iban does not exist!");
+		throw std::invalid_argument("Account with this iban does not exist!\n");
 	}
 
 	accounts.data[receiverAccountIndex]->deposit(amount);
@@ -270,7 +271,7 @@ void Bank::withdraw(const MyString& iban, double amount)
 
 	if (accountIndex == -1)
 	{
-		throw std::invalid_argument("Account with this iban does not exist!");
+		throw std::invalid_argument("Account with this iban does not exist!\n");
 	}
 
 	accounts.data[accountIndex]->withdraw(amount);
@@ -282,7 +283,7 @@ void Bank::setBankName(const MyString& name)
 {
 	if (name.getSize() > MaxNameLength)
 	{
-		throw std::invalid_argument("Entered name is too long.");
+		throw std::invalid_argument("Entered name is too long.\n");
 	}
 
 	this->name = name;
@@ -292,7 +293,7 @@ void Bank::setBankAdress(const MyString& address)
 {
 	if (address.getSize() > MaxContentLength)
 	{
-		throw std::invalid_argument("Entered adress is too long.");
+		throw std::invalid_argument("Entered adress is too long.\n");
 	}
 
 	this->address = address;
@@ -346,6 +347,8 @@ void Bank::load(std::ifstream& sourceFile)
 		accounts.addAccount(account);
 	}
 
+	sourceFile.close();
+
 	importLog();
 }
 
@@ -364,6 +367,8 @@ void Bank::saveToFile(std::ofstream& sourceFile)
 	{
 		accounts.data[i]->saveToFile(sourceFile);
 	}
+
+	sourceFile.close();
 
 	exportLog();
 }
