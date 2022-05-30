@@ -11,6 +11,8 @@ Rectangle::Rectangle(double x, double y, double width, double height, const MySt
 {
 	setHeight(height);
 	setWidth(width);
+
+	//It is top left rectangle point
 	setPoint(0, x, y);
 	setPoint(1, x, (y - height));
 	setPoint(2, (x + width), (y - height));

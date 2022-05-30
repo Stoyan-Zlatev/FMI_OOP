@@ -180,7 +180,7 @@ void ShapeCollection::pointIn(double x, double y) const
 
 	if (!containsFigures)
 	{
-		std::cout << "No figures contain point " << x << " " << y << std::endl;
+		std::cout << "No figures contains point " << x << " " << y << std::endl;
 	}
 }
 

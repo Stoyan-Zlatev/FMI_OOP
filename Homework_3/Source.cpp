@@ -39,7 +39,7 @@ void main()
 			}
 			else if (isPrefix(command, "save"))
 			{
-				shapes.saveToFile(path , headers);
+				shapes.saveToFile(std::move(path) , headers);
 			}
 			else if (isPrefix(command, "exit"))
 			{
@@ -51,9 +51,11 @@ void main()
 				if (isPrefix(command, "erase"))
 				{
 					double index = 0;
-					getArgument(command, lineSize, currentIndex, index);
-					shapes.eraseFigure((index - 1), shapeType);
-					std::cout << "Erased a " << shapeType << " (" << index << ")" << std::endl;
+					getArgument(std::move(command), lineSize, currentIndex, index);
+					if (shapes.eraseFigure((index - 1), shapeType))
+					{
+						std::cout << "Erased a " << shapeType << " (" << index << ")" << std::endl;
+					}
 				}
 				else
 				{
