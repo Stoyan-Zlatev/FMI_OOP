@@ -5,7 +5,6 @@
 #include "Serialize.h"
 
 const double PI = 3.1415;
-const MyString typeCircle = "circle";
 
 void Circle::setRadius(double radius)
 {
@@ -14,9 +13,9 @@ void Circle::setRadius(double radius)
 
 Circle::Circle() : Circle(0, 0, 0, DefaultColor) {}
 
-Circle::Circle(double x, double y, double radius, const MyString& color) : Shape(1, color), radius(radius)
+Circle::Circle(double cx, double cy, double radius, const MyString& color) : Shape(1, color), radius(radius)
 {
-	setPoint(0, x, y);
+	setPoint(0, cx, cy);
 }
 
 double Circle::getArea() const
@@ -27,9 +26,9 @@ double Circle::getPer() const
 {
 	return 2 * PI * radius;
 }
-bool Circle::isPointIn(double x, double y) const
+bool Circle::isPointIn(double cx, double cy) const
 {
-	Shape::Point p(x, y);
+	Shape::Point p(cx, cy);
 
 	return p.getDist(getPointAtIndex(0)) <= radius;
 }
@@ -40,12 +39,14 @@ Shape* Circle::clone() const
 
 void Circle::printData() const
 {
-	std::cout << typeCircle << " " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " " << radius << " " << getColor();
+	Shape::Point center(getPointAtIndex(0));
+	std::cout << typeCircle << " " << center.x << " " << center.y << " " << radius << " " << getColor();
 }
 
 void Circle::translate(double vertical, double horizontal)
 {
-	setPoint(0, getPointAtIndex(0).x + horizontal, getPointAtIndex(0).y + vertical);
+	Shape::Point center(getPointAtIndex(0));
+	setPoint(0, center.x + horizontal, center.y + vertical);
 }
 
 MyString Circle::getType() const
@@ -56,16 +57,17 @@ MyString Circle::getType() const
 bool Circle::withinRectangle(double x, double y, double width, double height) const
 {
 	Shape::Point center = getPointAtIndex(0);
+
 	return center.x + radius <= x + width && center.x - radius >= x &&
 		center.y + radius <= y&& center.y - radius >= y - height;
 }
 
 bool Circle::withinCircle(double x, double y, double radius) const
 {
-	Shape::Point center(x, y);
-	double distance = center.getDist(getPointAtIndex(0));
+	Shape::Point otherCenter(x, y);
+	double distance = otherCenter.getDist(getPointAtIndex(0));
 
-	return radius > (distance + this->radius);
+	return radius >= (distance + this->radius);
 }
 
 void Circle::loadShape(const MyString& line, size_t& lineSize, size_t& currentIndex)

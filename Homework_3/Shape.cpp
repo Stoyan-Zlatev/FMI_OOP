@@ -41,14 +41,14 @@ Shape::~Shape()
 	free();
 }
 
-const Shape::Point& Shape::getPointAtIndex(size_t index) const
+const Shape::Point& Shape::getPointAtIndex(size_t pointIndex) const
 {
-	if (index >= pointsCount)
+	if (pointIndex >= pointsCount)
 	{
 		throw std::exception("Invalid point index!\n");
 	}
 
-	return  points[index];
+	return  points[pointIndex];
 }
 
 void Shape::setPoint(size_t pointIndex, double x, double y)

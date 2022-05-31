@@ -1,5 +1,7 @@
-#include "ShapeCollection.h"
 #include <stdexcept>
+#include <string>
+#include <iomanip>
+#include "ShapeCollection.h"
 #include "Rectangle.h"
 #include "Circle.h"
 #include "Line.h"
@@ -76,14 +78,14 @@ void ShapeCollection::addShape(Shape* shape)
 	data[count++] = shape;
 }
 
-void ShapeCollection::addRectangle(double x1, double y1, double width, double height, const MyString& color)
+void ShapeCollection::addRectangle(double x, double y, double width, double height, const MyString& color)
 {
-	Rectangle* rect = new Rectangle(x1, y1, width, height, color);
+	Rectangle* rect = new Rectangle(x, y, width, height, color);
 	addShape(rect);
 }
-void ShapeCollection::addCircle(double x1, double y1, int radius, const MyString& color)
+void ShapeCollection::addCircle(double cx, double cy, int radius, const MyString& color)
 {
-	Circle* circlce = new Circle(x1, y1, radius, color);
+	Circle* circlce = new Circle(cx, cy, radius, color);
 	addShape(circlce);
 }
 
@@ -93,125 +95,126 @@ void ShapeCollection::addLine(double x1, double y1, double x2, double y2, const 
 	addShape(line);
 }
 
-void ShapeCollection::eraseFigure(size_t index, MyString& shapeType)
+void ShapeCollection::eraseFigure(size_t shapeIndex, MyString& shapeType)
 {
-	if (index >= count)
+	if (shapeIndex >= count)
 	{
-		std::cout << "There is no figure number " << (index+1)<<std::endl;
+		throw std::invalid_argument("There is no figure number " + std::to_string(shapeIndex + 1) + "!\n");
 	}
 
 	--count;
 
-	shapeType = data[index]->getType();
-	delete data[index];
+	shapeType = data[shapeIndex]->getType();
+	delete data[shapeIndex];
 
-	for (size_t i = index; i < count; i++)
+	for (size_t currentShapeIndex = shapeIndex; currentShapeIndex < count; currentShapeIndex++)
 	{
-		data[i] = data[i + 1];
+		data[currentShapeIndex] = data[currentShapeIndex + 1];
 	}
 }
 
 void ShapeCollection::translate(double vertical, double horizontal)
 {
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		data[i]->translate(vertical, horizontal);
+		data[shapeIndex]->translate(vertical, horizontal);
 	}
 }
 
-void ShapeCollection::translate(double vertical, double horizontal, size_t index, MyString& shapeType)
+void ShapeCollection::translate(double vertical, double horizontal, size_t shapeIndex, MyString& shapeType)
 {
-	if (index > count)
+	if (shapeIndex > count)
 	{
-		throw std::out_of_range("This figure does not exist!\n");
+		throw std::out_of_range("There is no figure number " + std::to_string(shapeIndex + 1) + "!\n");
 	}
 
-	data[index]->translate(vertical, horizontal);
-	shapeType = data[index]->getType();
+	data[shapeIndex]->translate(vertical, horizontal);
+	shapeType = data[shapeIndex]->getType();
 }
 
 void ShapeCollection::withinRectangle(double x, double y, double width, double height) const
 {
 	bool containsFigures = false;
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		if (data[i]->withinRectangle(x, y, width, height))
+		if (data[shapeIndex]->withinRectangle(x, y, width, height))
 		{
-			data[i]->print();
+			data[shapeIndex]->print();
 			containsFigures = true;
 		}
 	}
 
 	if (!containsFigures)
 	{
-		std::cout << "No figures are located within rectangle " << x << " " << y << " " << width << " " << height << std::endl;
+		throw std::invalid_argument("No figures are located within rectangle " + std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(width) + std::to_string(height) + "\n");
 	}
 }
 
 void ShapeCollection::withinCircle(double cx, double cy, double radius) const
 {
 	bool containsFigures = false;
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		if (data[i]->withinCircle(cx, cy, radius))
+		if (data[shapeIndex]->withinCircle(cx, cy, radius))
 		{
-			data[i]->print();
+			data[shapeIndex]->print();
 			containsFigures = true;
 		}
 	}
 
 	if (!containsFigures)
 	{
-		std::cout << "No figures are located within circle " << cx << " " << cy << " " << radius << std::endl;
+		throw std::invalid_argument("No figures are located within circle " + std::to_string(cx) + " " + std::to_string(cy) + " " + std::to_string(radius) + "\n");
+
 	}
 }
 
 void ShapeCollection::pointIn(double x, double y) const
 {
 	bool containsFigures = false;
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		if (data[i]->isPointIn(x, y))
+		if (data[shapeIndex]->isPointIn(x, y))
 		{
-			data[i]->print();
+			data[shapeIndex]->print();
 			containsFigures = true;
 		}
 	}
 
 	if (!containsFigures)
 	{
-		std::cout << "No figures contains point " << x << " " << y << std::endl;
+		throw std::invalid_argument("No figures contains point " + std::to_string(x) + " " + std::to_string(y) + "\n");
 	}
 }
 
-double ShapeCollection::getPerOfFigureByIndex(size_t ind) const
+double ShapeCollection::getPerOfFigureByIndex(size_t shapeIndex) const
 {
-	if (ind >= count)
+	if (shapeIndex >= count)
 	{
 		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
-	return data[ind]->getPer();
+	return data[shapeIndex]->getPer();
 }
 
-double ShapeCollection::getAreaOfFigureByIndex(size_t ind) const
+double ShapeCollection::getAreaOfFigureByIndex(size_t shapeIndex) const
 {
-	if (ind >= count)
+	if (shapeIndex >= count)
 	{
 		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
-	return data[ind]->getArea();
+	return data[shapeIndex]->getArea();
 }
 
-double ShapeCollection::getIfPointInShapeByIndex(size_t ind, double x, double y) const
+double ShapeCollection::getIfPointInShapeByIndex(size_t shapeIndex, double x, double y) const
 {
-	if (ind >= count)
+	if (shapeIndex >= count)
 	{
 		throw std::out_of_range("Out of range in shapes collection!\n");
 	}
 
-	return data[ind]->isPointIn(x, y);
+	return data[shapeIndex]->isPointIn(x, y);
 }
 
 size_t ShapeCollection::getShapesCount() const
@@ -226,10 +229,10 @@ void ShapeCollection::printShapes() const
 		throw std::exception("There are no shapes in the list yet!\n");
 	}
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		std::cout << (i + 1) << ". ";
-		data[i]->print();
+		std::cout << (shapeIndex + 1) << ". ";
+		data[shapeIndex]->print();
 	}
 }
 
@@ -240,9 +243,9 @@ void ShapeCollection::printAreas() const
 		throw std::exception("There are no shapes in the list yet!\n");
 	}
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		data[i]->printArea();
+		data[shapeIndex]->printArea();
 	}
 }
 
@@ -253,9 +256,9 @@ void ShapeCollection::printPerimteres() const
 		throw std::exception("There are no shapes in the list yet!\n");
 	}
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		data[i]->printPerimeter();
+		data[shapeIndex]->printPerimeter();
 	}
 }
 
@@ -277,15 +280,15 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 		MyString shapeType = "";
 		size_t currentIndex = 0, lineSize = strlen(line.c_str());
 		getShapeType(line, shapeType, lineSize, currentIndex);
-		if (shapeType == "rect")
+		if (shapeType == tagRectangle)
 		{
 			shape = new Rectangle();
 		}
-		else if (shapeType == "circle")
+		else if (shapeType == typeCircle)
 		{
 			shape = new Circle();
 		}
-		else if (shapeType == "line")
+		else if (shapeType == typeLine)
 		{
 			shape = new Line();
 		}
@@ -301,14 +304,14 @@ void ShapeCollection::saveToFile(const MyString& path, const Collection<MyString
 
 	saveHeaders(file, headers);
 
-	file << "<svg>\n";
+	file << SvgOpenTag << "\n";
 
-	for (size_t i = 0; i < count; i++)
+	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
-		data[i]->saveShape(file);
+		data[shapeIndex]->saveShape(file);
 	}
 
-	file << "</svg>";
+	file << SvgCloseTag;
 
 	file.close();
 }

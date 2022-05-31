@@ -85,7 +85,7 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 
 	buffer[i - currentIndex] = '\0';
 
-	if (strlen(buffer) > 0)
+	if (buffer[0] != '\0')
 	{
 		argument = std::atof(buffer);
 		endSeparator == ' ' ? currentIndex = i : currentIndex = i + 1;
@@ -156,10 +156,10 @@ void getShapeType(const MyString& line, MyString& type, size_t& lineSize, size_t
 		{
 			break;
 		}
-	
+
 		shapeType[currentIndex - startIndex] = line[currentIndex];
 	}
-	
+
 	shapeType[currentIndex - startIndex] = '\0';
 	type = shapeType;
 

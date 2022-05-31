@@ -5,8 +5,6 @@
 #include "Serialize.h"
 #include <limits>
 
-const MyString typeLine = "line";
-
 Line::Line() :Line(0, 0, 0, 0, DefaultColor) {}
 
 Line::Line(double x1, double y1, double x2, double y2, const MyString& color) : Shape(2, color)
@@ -39,14 +37,20 @@ Shape* Line::clone() const
 
 void Line::printData() const
 {
-	std::cout << typeLine << " " << getPointAtIndex(0).x << " " << getPointAtIndex(0).y << " "
-		<< getPointAtIndex(1).x << " " << getPointAtIndex(1).y << " " << getColor();
+	Shape::Point p0 = getPointAtIndex(0);
+	Shape::Point p1 = getPointAtIndex(1);
+
+	std::cout << typeLine << " " << p0.x << " " << p0.y << " "
+		<< p1.x << " " << p1.y << " " << getColor();
 }
 
 void Line::translate(double vertical, double horizontal)
 {
-	setPoint(0, getPointAtIndex(0).x + horizontal, getPointAtIndex(0).y + vertical);
-	setPoint(1, getPointAtIndex(1).x + horizontal, getPointAtIndex(1).y + vertical);
+	Shape::Point p0 = getPointAtIndex(0);
+	Shape::Point p1 = getPointAtIndex(1);
+
+	setPoint(0, p0.x + horizontal, p0.y + vertical);
+	setPoint(1, p1.x + horizontal, p1.y + vertical);
 }
 
 MyString Line::getType() const
@@ -56,8 +60,11 @@ MyString Line::getType() const
 
 bool Line::withinRectangle(double x, double y, double width, double height) const
 {
-	return getPointAtIndex(0).x >= x && getPointAtIndex(1).x <= x + width
-		&& getPointAtIndex(0).y <= y && getPointAtIndex(1).y >= y - height;
+	Shape::Point p0 = getPointAtIndex(0);
+	Shape::Point p1 = getPointAtIndex(1);
+
+	return p0.x >= x && p1.x <= x + width
+		&& p0.y <= y && p1.y >= y - height;
 }
 
 bool Line::withinCircle(double x, double y, double radius) const
