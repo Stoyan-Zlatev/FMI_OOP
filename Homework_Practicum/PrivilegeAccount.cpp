@@ -38,6 +38,12 @@ Account* PrivilegeAccount::clone() const
 	return new PrivilegeAccount(*this);
 }
 
+void PrivilegeAccount::display() const
+{
+	Account::display();
+	std::cout << "Overdraft: " << overdraft << std::endl << std::endl;
+}
+
 void PrivilegeAccount::saveToFile(std::ofstream& file)
 {
 	Account::saveToFile(file);

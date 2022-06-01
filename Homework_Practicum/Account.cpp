@@ -28,7 +28,7 @@ void Account::display() const {
 	std::cout << "Holder: " << username << std::endl;
 	std::cout << "Holder id: " << customerId << std::endl;
 	std::cout << "Balance: " << amount << "$" << std::endl;
-	std::cout << "Date of creation: " << std::ctime(&dateOfCreation) << std::endl;
+	std::cout << "Date of creation: " << std::ctime(&dateOfCreation);
 }
 double Account::getBalance() const
 {

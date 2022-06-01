@@ -9,6 +9,7 @@ public:
 					 double overdraft = 0, double amount = 0, time_t dateOfCreation = std::time(0));
 	bool withdraw(double amount) override;
 	virtual Account* clone()  const override;
+	virtual void display() const override;
 
 	void setAccountType() override;
 	MyString getAccountType() const override;

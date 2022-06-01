@@ -15,7 +15,14 @@ void main()
 	}
 	else
 	{
-		bank.load(sourceFile);
+		try
+		{
+			bank.load(sourceFile);
+		}
+		catch (const std::invalid_argument& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 		std::cout << "File loaded successfully" << std::endl;
 	}
 
@@ -231,7 +238,7 @@ void main()
 				throw std::invalid_argument("Invalid command");
 			}
 		}
-		catch (std::invalid_argument& e)
+		catch (const std::invalid_argument& e)
 		{
 			std::cout << e.what() << std::endl;
 		}

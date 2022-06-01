@@ -146,11 +146,12 @@ void Collection<T>::removeAt(size_t index) {
 
 	--count;
 
+	delete data[index];
+
 	for (size_t i = index; i < count; i++)
 	{
-		data[index] = data[index + 1];
+		data[i] = data[i + 1];
 	}
-	delete data[count];
 }
 
 template <typename T>

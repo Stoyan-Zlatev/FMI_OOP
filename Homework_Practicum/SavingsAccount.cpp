@@ -32,6 +32,12 @@ Account* SavingsAccount::clone() const
 	return new SavingsAccount(*this);
 }
 
+void SavingsAccount::display() const
+{
+	Account::display();
+	std::cout << "Interest rate: " << interestRate << std::endl << std::endl;
+}
+
 void SavingsAccount::saveToFile(std::ofstream& file)
 {
 	Account::saveToFile(file);

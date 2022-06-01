@@ -142,6 +142,5 @@ void AccountStore::printAllAccounts() const
 	for (size_t accountIndex = 0; accountIndex < count; accountIndex++)
 	{
 		data[accountIndex]->display();
-		std::cout << std::endl;
 	}
 }

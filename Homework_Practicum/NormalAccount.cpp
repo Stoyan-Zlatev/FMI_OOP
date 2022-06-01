@@ -8,6 +8,12 @@ Account* NormalAccount::clone() const
 	return new NormalAccount(*this);
 }
 
+void NormalAccount::display() const
+{
+	Account::display();
+	std::cout << std::endl;
+}
+
 void NormalAccount::setAccountType()
 {
 	accountType = AccountType::Normal;

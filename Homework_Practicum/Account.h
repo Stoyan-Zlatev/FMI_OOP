@@ -13,6 +13,11 @@ protected:
 	size_t customerId;
 	double amount;
 	time_t dateOfCreation;
+	
+	void setId(size_t customerId);
+	void setIban(const MyString& iban);
+	void setDateOfCreation(const time_t& date);
+	virtual void setAccountType() = 0;
 public:
 	Account();
 	Account(const MyString& username, const MyString& password, const MyString& iban, size_t customerId, double amount = 0, time_t dateOfCreation = std::time(0));
@@ -22,12 +27,8 @@ public:
 	virtual double getBalance() const;
 	virtual Account* clone()  const = 0;
 
-	virtual void setAccountType() = 0;
-	void setIban(const MyString& iban);
 	void setUsername(const MyString& username);
-	void setId(size_t customerId);
 	void setAmount(double amount);
-	void setDateOfCreation(const time_t& date);
 	void setPassword(const MyString& password);
 
 	virtual MyString getAccountType() const = 0;

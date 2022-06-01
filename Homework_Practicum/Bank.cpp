@@ -55,7 +55,7 @@ void Bank::deleteCustomer(size_t customerId)
 		throw std::invalid_argument("This user does not exists!\n");
 	}
 
-	MyString transaction;
+	MyString transaction = "";
 	for (size_t accountIndex = 0; accountIndex < accounts.count; accountIndex++)
 	{
 		if (accounts.data[accountIndex]->getCustomerId() == customers.data[userIndex]->getId())
@@ -67,11 +67,11 @@ void Bank::deleteCustomer(size_t customerId)
 	}
 
 	customers.removeAt(userIndex);
-	transaction = "Deleted customer with id: " + customerId;
+	transaction = "Deleted customer with id: " + (MyString)customerId;
 	log.add(std::move(transaction));
 }
 
-void Bank::addAccount(const MyString& iban, const MyString& username, const MyString& password, size_t customerId, size_t accountType, double additional)
+void Bank::addAccount(const MyString& iban, const MyString& username, const MyString& password, size_t customerId, size_t accountType)
 {
 	size_t userIndex = getUserIndex(customerId);
 	if (userIndex == -1)
@@ -88,12 +88,20 @@ void Bank::addAccount(const MyString& iban, const MyString& username, const MySt
 	}
 	else if (accountType == 2)
 	{
-		accounts.addPrivilegeAccount(username, password, iban, customerId, additional);
+		double overdraft;
+		std::cout << "Enter overdraft: ";
+		std::cin >> overdraft;
+		std::cin.ignore();
+		accounts.addPrivilegeAccount(username, password, iban, customerId, overdraft);
 		accType = "privilege account";
 	}
 	else if (accountType == 3)
 	{
-		accounts.addSavingsAccount(username, password, iban, customerId, additional);
+		double interestRate;
+		std::cout << "Enter interest rate: ";
+		std::cin >> interestRate;
+		std::cin.ignore();
+		accounts.addSavingsAccount(username, password, iban, customerId, interestRate);
 		accType = "savings account";
 	}
 	else
@@ -125,7 +133,7 @@ void Bank::listAllCustomers() const
 		std::cout << "There are no customers in the system yet!" << std::endl;
 	}
 
-	for (size_t customerIndex= 0; customerIndex < customers.count; customerIndex++)
+	for (size_t customerIndex = 0; customerIndex < customers.count; customerIndex++)
 	{
 		std::cout << "Customer number " << (customerIndex + 1) << std::endl;
 		std::cout << "Name: " << customers.data[customerIndex]->getName() << std::endl;
@@ -178,7 +186,7 @@ void Bank::importLog()
 
 	if (!logFile.is_open())
 	{
-		throw std::invalid_argument("Error while opening the file!\n");
+		throw std::invalid_argument("Error while opening the log file!\n");
 	}
 
 	MyString accountCount;
@@ -236,7 +244,7 @@ void Bank::transfer(const MyString& senderIban, const MyString& receiverIban, do
 
 	accounts.data[senderAccountIndex]->withdraw(amount);
 	accounts.data[receiverAccountIndex]->deposit(amount);
-	MyString transaction = "Transfered money from account with iban: " + accounts.data[senderAccountIndex]->getIban()
+	MyString transaction = "Transfered money from account with iban: " + accounts.data[senderAccountIndex]->getIban() + " "
 		+ "to account with iban: " + accounts.data[receiverAccountIndex]->getIban();
 	log.add(std::move(transaction));
 }

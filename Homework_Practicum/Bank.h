@@ -20,7 +20,7 @@ public:
 
 	void addCustomer(const MyString& customerName, const MyString& customerAddress);
 	void deleteCustomer(size_t customerId);
-	void addAccount(const MyString& iban, const MyString& customerName, const MyString& password, size_t customerId, size_t accountType, double additional = 0);
+	void addAccount(const MyString& iban, const MyString& customerName, const MyString& password, size_t customerId, size_t accountType);
 	void deleteAccount(const MyString& iban);
 	void listAllCustomers() const;
 	void listAllAccounts() const;
