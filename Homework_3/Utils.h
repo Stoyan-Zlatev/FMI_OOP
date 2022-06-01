@@ -26,3 +26,13 @@ void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, 
 void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument);
 
 void readUnnecessaryLines(std::ifstream& sourceFile, Collection<MyString>& headers);
+
+MyString parseDoubleToString(double value);
+
+MyString parseIntToString(int value);
+
+char parseIntToChar(size_t value);
+
+size_t getNumSize(int number);
+
+void swap(char& el1, char& el2);

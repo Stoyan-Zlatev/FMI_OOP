@@ -13,6 +13,25 @@ bool isPrefix(const MyString& text, const MyString& prefix)
 	return true;
 }
 
+size_t getNumSize(int number)
+{
+	size_t counter = 0;
+	while (number != 0)
+	{
+		counter++;
+		number /= 10;
+	}
+
+	return counter;
+}
+
+void swap(char& el1, char& el2)
+{
+	char temp = el1;
+	el1 = el2;
+	el2 = temp;
+}
+
 void loadFigures(const MyString& path, ShapeCollection& shapes, Collection<MyString>& headers)
 {
 	std::ifstream sourceFile(path.c_str());
@@ -143,6 +162,56 @@ void readUnnecessaryLines(std::ifstream& sourceFile, Collection<MyString>& heade
 		headers.add(line);
 		line.getline(sourceFile);
 	}
+}
+
+MyString parseDoubleToString(double value)
+{
+	//To get the part before decimal point and two digits after the decimal point
+	int temp = abs(value * 100);
+	size_t tempLength = getNumSize(temp);
+	size_t index = 0;
+
+	char* buffer;
+	value < 0 ? buffer = new char[tempLength + 3] : buffer = new char[tempLength + 2];
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		buffer[index++] = parseIntToChar(temp % 10);
+		temp /= 10;
+	}
+
+	buffer[index++] = '.';
+
+	while (temp != 0)
+	{
+		buffer[index++] = parseIntToChar(temp % 10);
+		temp /= 10;
+	}
+
+	if (value < 0)
+	{
+		buffer[tempLength + 1] = '-';
+		buffer[tempLength + 2] = '\0';
+	}
+	else
+	{
+		buffer[tempLength + 1] = '\0';
+	}
+
+	MyString doubleValue = buffer;
+	delete[] buffer;
+
+	return doubleValue.reverse();
+}
+
+char parseIntToChar(size_t value)
+{
+	if (value > 9)
+	{
+		throw std::invalid_argument("Invalid argument to parse digit\n");
+	}
+
+	return value + '0';
 }
 
 void getShapeType(const MyString& line, MyString& type, size_t& lineSize, size_t& currentIndex)

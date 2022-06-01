@@ -1,5 +1,6 @@
 #include "MyString.h"
 #include "GlobalConstants.h"
+#include "Utils.h"
 #include <cstring>
 #include <iostream>
 #include <iomanip>
@@ -207,4 +208,14 @@ MyString MyString::substring(size_t startIndex, size_t endIndex) const
 	MyString substr = temp;
 
 	return substr;
+}
+
+MyString MyString::reverse()
+{
+	for (size_t i = 0; i < size / 2; i++)
+	{
+		swap(str[i], str[size - 1 - i]);
+	}
+
+	return *this;
 }

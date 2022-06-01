@@ -1,5 +1,4 @@
 #include <stdexcept>
-#include <string>
 #include <iomanip>
 #include "ShapeCollection.h"
 #include "Rectangle.h"
@@ -99,7 +98,8 @@ void ShapeCollection::eraseFigure(size_t shapeIndex, MyString& shapeType)
 {
 	if (shapeIndex >= count)
 	{
-		throw std::invalid_argument("There is no figure number " + std::to_string(shapeIndex + 1) + "!\n");
+		MyString exception = "There is no figure number " + (MyString)(shapeIndex + 1) + "!\n";
+		throw std::out_of_range(exception.c_str());
 	}
 
 	--count;
@@ -125,7 +125,8 @@ void ShapeCollection::translate(double vertical, double horizontal, size_t shape
 {
 	if (shapeIndex > count)
 	{
-		throw std::out_of_range("There is no figure number " + std::to_string(shapeIndex + 1) + "!\n");
+		MyString exception = "There is no figure number " + (MyString)(shapeIndex + 1) + "!\n";
+		throw std::out_of_range(exception.c_str());
 	}
 
 	data[shapeIndex]->translate(vertical, horizontal);
@@ -146,7 +147,10 @@ void ShapeCollection::withinRectangle(double x, double y, double width, double h
 
 	if (!containsFigures)
 	{
-		throw std::invalid_argument("No figures are located within rectangle " + std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(width) + std::to_string(height) + "\n");
+		MyString exception = "No figures are located within rectangle " + parseDoubleToString(x) + " " + parseDoubleToString(y) + " "
+			+ parseDoubleToString(width) + " " + parseDoubleToString(height) + "\n";
+
+		throw std::invalid_argument(exception.c_str());
 	}
 }
 
@@ -164,8 +168,8 @@ void ShapeCollection::withinCircle(double cx, double cy, double radius) const
 
 	if (!containsFigures)
 	{
-		throw std::invalid_argument("No figures are located within circle " + std::to_string(cx) + " " + std::to_string(cy) + " " + std::to_string(radius) + "\n");
-
+		MyString exception = "No figures are located within circle " + parseDoubleToString(cx) + " " + parseDoubleToString(cy) + " " + parseDoubleToString(radius) + "\n";
+		throw std::invalid_argument(exception.c_str());
 	}
 }
 
@@ -183,7 +187,8 @@ void ShapeCollection::pointIn(double x, double y) const
 
 	if (!containsFigures)
 	{
-		throw std::invalid_argument("No figures contains point " + std::to_string(x) + " " + std::to_string(y) + "\n");
+		MyString exception = "No figures contains point " + parseDoubleToString(x) + " " + parseDoubleToString(y) + "\n";
+		throw std::invalid_argument(exception.c_str());
 	}
 }
 
