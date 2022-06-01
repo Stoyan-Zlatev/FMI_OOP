@@ -7,6 +7,7 @@
 #include "MyString.h"
 #include "GlobalConstants.h"
 #include "Utils.h"
+#include "Parser.h"
 #include "Serialize.h"
 
 void ShapeCollection::free()
