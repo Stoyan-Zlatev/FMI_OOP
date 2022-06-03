@@ -64,10 +64,9 @@ bool Rectangle::isPointIn(double x, double y) const
 {
 	Shape::Point p(x, y);
 	Shape::Point p0 = getPointAtIndex(0);
-	Shape::Point p1 = getPointAtIndex(1);
 	Shape::Point p2 = getPointAtIndex(2);
 
-	return p.x >= p0.x && p.y >= p1.y &&
+	return p.x >= p0.x && p.y >= p2.y &&
 		p.y <= p0.y && p.x <= p2.x;
 }
 Shape* Rectangle::clone() const

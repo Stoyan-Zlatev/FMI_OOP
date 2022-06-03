@@ -72,6 +72,23 @@ void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& curren
 	parseArgument(line, lineSize, currentIndex, argument, '=', ' ');
 }
 
+void printHelpMenu()
+{
+	std::cout << "Enter: " << std::endl;
+	std::cout << " print - to print all available figures." << std::endl;
+	std::cout << " create rectangle <x> <y> <width> <height> <color>" << std::endl;
+	std::cout << " create circle <cx> <cy> <radius> <color>" << std::endl;
+	std::cout << " create line <x1> <y1> <x2> <y2> <color>" << std::endl;
+	std::cout << " erase <index> - delete figure at \"index\" positioin." << std::endl;
+	std::cout << " translateAll vercital=<y> horizontal=<x> - translates all figures." << std::endl;
+	std::cout << " translate vercital=<y> horizontal=<x> <index> - translates only figure at position \"index\"." << std::endl;
+	std::cout << " within circle <cx> <cy> <radius> - prints all figures inside this circle." << std::endl;
+	std::cout << " within rectangle <x> <y> <width> <height> - prints all figures inside this rectangle." << std::endl;
+	std::cout << " pointIn <x> <y> - prints all figures that contain this point." << std::endl;
+	std::cout << " areas - prints all figures' areas." << std::endl;
+	std::cout << " pers - prints all figures' perimeters."<< std::endl;
+}
+
 int getStartindex(const MyString& line, size_t& lineSize)
 {
 	for (size_t i = 0; i < lineSize; i++)

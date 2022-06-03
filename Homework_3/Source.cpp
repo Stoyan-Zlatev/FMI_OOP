@@ -9,13 +9,14 @@
 void main()
 {
 	MyString path;
-	std::cout << ">";
+	std::cout << "Enter file name: ";
 	path.getline(std::cin);
 
 	Collection<MyString> headers;
 	ShapeCollection shapes;
 	loadFigures(path, shapes, headers);
 
+	std::cout << "Enter \"@\" to see help menu!" << std::endl;
 	std::cout << ">";
 	MyString command;
 	command.getline(std::cin);
@@ -27,7 +28,11 @@ void main()
 		currentIndex = 0;
 		try
 		{
-			if (isPrefix(command, "print"))
+			if (isPrefix(command, "@"))
+			{
+				printHelpMenu();
+			}
+			else if (isPrefix(command, "print"))
 			{
 				shapes.printShapes();
 			}
@@ -55,7 +60,7 @@ void main()
 					double shapeIndex = 0;
 					getArgument(std::move(command), lineSize, currentIndex, shapeIndex);
 					shapes.eraseFigure((shapeIndex - 1), shapeType);
-						std::cout << "Erased a " << shapeType << " (" << shapeIndex << ")" << std::endl;
+					std::cout << "Erased a " << shapeType << " (" << shapeIndex << ")" << std::endl;
 				}
 				else
 				{
@@ -66,23 +71,24 @@ void main()
 						getArgument(command, lineSize, currentIndex, field2);
 						shapes.pointIn(field1, field2);
 					}
+					else if (isPrefix(command, "translateAll"))
+					{
+						double shapeIndex = -1;
+						getTranslateArgument(command, lineSize, currentIndex, field1);
+						getTranslateArgument(command, lineSize, currentIndex, field2);
+
+						shapes.translate(field1, field2);
+						std::cout << "Translated all figures" << std::endl;
+					}
 					else if (isPrefix(command, "translate"))
 					{
 						double shapeIndex = -1;
 						getTranslateArgument(command, lineSize, currentIndex, field1);
 						getTranslateArgument(command, lineSize, currentIndex, field2);
 						getArgument(command, lineSize, currentIndex, shapeIndex);
-						if (shapeIndex == -1)
-						{
-							shapes.translate(field1, field2);
-							std::cout << "Translated all figures" << std::endl;
-						}
-						else
-						{
-							shapes.translate(field1, field2, (shapeIndex - 1), shapeType);
-							std::cout << "Translated a " << shapeType << " (" << shapeIndex << ")" << std::endl;
 
-						}
+						shapes.translate(field1, field2, (shapeIndex - 1), shapeType);
+						std::cout << "Translated a " << shapeType << " (" << shapeIndex << ")" << std::endl;
 					}
 					else
 					{

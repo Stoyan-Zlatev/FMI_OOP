@@ -85,11 +85,11 @@ void Shape::print() const
 void Shape::printArea() const
 {
 	printData();
-	std::cout << " " << getArea() << std::endl;
+	std::cout << " " << std::endl << "Area: " << getArea() << std::endl;
 }
 
 void Shape::printPerimeter() const
 {
 	printData();
-	std::cout << " " << getPer() << std::endl;
+	std::cout << " " << std::endl << "Perimeter: " << getPer() << std::endl;
 }

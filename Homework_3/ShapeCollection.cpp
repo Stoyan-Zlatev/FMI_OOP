@@ -95,13 +95,18 @@ void ShapeCollection::addLine(double x1, double y1, double x2, double y2, const 
 	addShape(line);
 }
 
-void ShapeCollection::eraseFigure(size_t shapeIndex, MyString& shapeType)
+void ShapeCollection::eraseFigure(int shapeIndex, MyString& shapeType)
 {
+	if (shapeIndex < 0)
+	{
+		throw std::out_of_range("Invalid shape index entered!\n");
+	}
 	if (shapeIndex >= count)
 	{
 		MyString exception = "There is no figure number " + (MyString)(shapeIndex + 1) + "!\n";
 		throw std::out_of_range(exception.c_str());
 	}
+	
 
 	--count;
 
@@ -124,7 +129,7 @@ void ShapeCollection::translate(double vertical, double horizontal)
 
 void ShapeCollection::translate(double vertical, double horizontal, size_t shapeIndex, MyString& shapeType)
 {
-	if (shapeIndex > count)
+	if (shapeIndex >= count)
 	{
 		MyString exception = "There is no figure number " + (MyString)(shapeIndex + 1) + "!\n";
 		throw std::out_of_range(exception.c_str());
@@ -252,6 +257,7 @@ void ShapeCollection::printAreas() const
 	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
 		data[shapeIndex]->printArea();
+		std::cout << std::endl;
 	}
 }
 
@@ -265,6 +271,7 @@ void ShapeCollection::printPerimteres() const
 	for (size_t shapeIndex = 0; shapeIndex < count; shapeIndex++)
 	{
 		data[shapeIndex]->printPerimeter();
+		std::cout << std::endl;
 	}
 }
 
@@ -283,6 +290,7 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 			break;
 		}
 
+		shape = nullptr; 
 		MyString shapeType = "";
 		size_t currentIndex = 0, lineSize = strlen(line.c_str());
 		getShapeType(line, shapeType, lineSize, currentIndex);
@@ -299,8 +307,11 @@ void ShapeCollection::load(std::ifstream& sourceFile)
 			shape = new Line();
 		}
 
-		shape->loadShape(line, lineSize, currentIndex);
-		addShape(shape);
+		if (shape != nullptr)
+		{
+			shape->loadShape(line, lineSize, currentIndex);
+			addShape(shape);
+		}
 	}
 }
 

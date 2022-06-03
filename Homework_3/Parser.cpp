@@ -29,6 +29,11 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 			break;
 		}
 	}
+	
+	if (currentIndex == lineSize)
+	{
+		throw std::invalid_argument("Invalid command entered!\n");
+	}
 
 	currentIndex++;
 	char* buffer = new char[lineSize];
@@ -62,6 +67,11 @@ void parseArgument(const MyString& line, size_t& lineSize, size_t& currentIndex,
 		{
 			break;
 		}
+	}
+
+	if (currentIndex == lineSize)
+	{
+		throw std::invalid_argument("Invalid command entered!\n");
 	}
 
 	currentIndex++;

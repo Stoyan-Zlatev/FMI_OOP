@@ -22,3 +22,5 @@ void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, M
 void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument);
 
 void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument);
+
+void printHelpMenu();

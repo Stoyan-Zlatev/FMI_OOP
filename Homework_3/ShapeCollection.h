@@ -25,7 +25,7 @@ public:
 	void addCircle(double x1, double y1, int radius, const MyString& color);
 	void addLine(double x1, double y1, double x2, double y2, const MyString& color);
 
-	void eraseFigure(size_t index, MyString& shapeType);
+	void eraseFigure(int index, MyString& shapeType);
 	void translate(double vertical, double horizontal);
 	void translate(double vertical, double horizontal, size_t index, MyString& shapeType);
 
