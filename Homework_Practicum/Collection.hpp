@@ -23,7 +23,7 @@ public:
 	void removeAt(size_t index);
 
 	size_t getCount() const;
-	friend class Bank;
+	T getElementAt(size_t index) const;
 
 	~Collection();
 };
@@ -114,7 +114,7 @@ void Collection<T>::edit(const T& element, int index)
 {
 	if (index<0 || index>count)
 	{
-		throw std::invalid_argument("This element does not exist!");
+		throw std::invalid_argument("This element does not exist!\n");
 	}
 
 	(*data)[index] = element;
@@ -125,7 +125,7 @@ void Collection<T>::remove(const T& element)
 {
 	if (count == 0)
 	{
-		throw std::invalid_argument("It is already empty!");
+		throw std::invalid_argument("It is already empty!\n");
 	}
 
 	for (size_t i = 0; i < count; i++)
@@ -141,17 +141,16 @@ template <typename T>
 void Collection<T>::removeAt(size_t index) {
 	if (index >= count)
 	{
-		throw std::invalid_argument("Index out of range!");
+		throw std::invalid_argument("Index out of range!\n");
 	}
 
 	--count;
 
-	delete data[index];
-
 	for (size_t i = index; i < count; i++)
 	{
-		data[i] = data[i + 1];
+		data[index] = data[index + 1];
 	}
+	delete data[count];
 }
 
 template <typename T>
@@ -182,4 +181,10 @@ Collection<T>& Collection<T>::operator= (Collection<T>&& other) {
 	other.data = nullptr;
 
 	return (*this);
+}
+
+template <typename T>
+T Collection<T>::getElementAt(size_t index) const
+{
+	return (*data[index]);
 }

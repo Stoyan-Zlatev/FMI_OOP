@@ -1,6 +1,6 @@
 #pragma once
-
 #include <fstream>
+
 class MyString
 {
 	char* str;
@@ -31,11 +31,10 @@ public:
 
 	MyString& operator+=(const MyString& other);
 	MyString substring(size_t startIndex, size_t endIndex) const;
-	std::istream& readLine(std::istream& stream);
+	MyString reverse();
 
 	friend std::ostream& operator<<(std::ostream& stream, const MyString& str);
 	friend std::istream& operator>>(std::istream& stream, MyString& str);
-
 };
 
 MyString operator+(const MyString& lhs, const MyString& rhs);

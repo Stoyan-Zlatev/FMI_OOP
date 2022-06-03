@@ -1,246 +1,169 @@
 #include <iostream>
+#include <fstream>
 #include <exception>
+#include "ShapeCollection.h"
 #include "MyString.h"
-#include "Bank.h"
 #include "Utils.h"
+#include "Collection.hpp"
 
 void main()
 {
-	std::ifstream sourceFile("Bank.dat", std::ios::in | std::ios::binary);
+	MyString path;
+	std::cout << "Enter file name: ";
+	path.getline(std::cin);
 
-	Bank bank;
-	if (!sourceFile.is_open())
-	{
-		std::cout << "Error while opening the file!" << std::endl;
-	}
-	else
-	{
-		try
-		{
-			bank.load(sourceFile);
-		}
-		catch (const std::invalid_argument& e)
-		{
-			std::cout << e.what() << std::endl;
-		}
-		std::cout << "File loaded successfully" << std::endl;
-	}
+	Collection<MyString> headers;
+	ShapeCollection shapes;
+	loadFigures(path, shapes, headers);
 
-	sourceFile.close();
-
-	if (bank.getBankName() == EmptyString)
-	{
-		initBank(bank);
-	}
-	printMenu();
-
-	MyString command;
+	std::cout << "Enter \"@\" to see help menu!" << std::endl;
 	std::cout << ">";
+	MyString command;
 	command.getline(std::cin);
-
-
+	size_t lineSize = 0;
+	size_t currentIndex = 0;
 	while (true)
 	{
+		lineSize = strlen(command.c_str());
+		currentIndex = 0;
 		try
 		{
-			if (isPrefix(command, "1"))
+			if (isPrefix(command, "@"))
 			{
-				printEditMenu();
-				std::cout << ">";
-				command.getline(std::cin);
-
-				if (isPrefix(command, "a"))
-				{
-					printCustomerMenu();
-					std::cout << ">";
-					command.getline(std::cin);
-
-
-					if (isPrefix(command, "ii"))
-					{
-						size_t customerId;
-						std::cout << "Enter customer id:";
-						std::cin >> customerId;
-						std::cin.ignore();
-
-						bank.deleteCustomer(customerId);
-						std::cout << "Customer deleted successfully!" << std::endl;
-					}
-					else if (isPrefix(command, "i"))
-					{
-						MyString username;
-						std::cout << "Enter username:";
-						username.getline(std::cin);
-
-						std::cout << "Enter customer address:";
-						MyString address;
-						address.getline(std::cin);
-
-						bank.addCustomer(std::move(username), std::move(address));
-						std::cout << "Customer added successfully!" << std::endl;
-					}
-					else
-					{
-						throw std::invalid_argument("Invalid command!");
-					}
-				}
-				else if (isPrefix(command, "b"))
-				{
-					printAccountMenu();
-					std::cout << ">";
-					command.getline(std::cin);
-
-					if (isPrefix(command, "ii"))
-					{
-						MyString iban;
-						std::cout << "Enter account iban: ";
-						iban.getline(std::cin);
-
-						bank.deleteAccount(iban);
-						std::cout << "Account deleted successfully!" << std::endl;
-					}
-					else if (isPrefix(command, "i"))
-					{
-						MyString username;
-						std::cout << "Enter holder username: ";
-						username.getline(std::cin);
-
-						MyString password;
-						std::cout << "Enter holder password: ";
-						password.getline(std::cin);
-
-						MyString iban;
-						std::cout << "Enter account iban: ";
-						iban.getline(std::cin);
-
-						size_t customerId;
-						std::cout << "Enter holder id: ";
-						std::cin >> customerId;
-						std::cin.ignore();
-
-						size_t accountType;
-						printAccountTypes();
-						std::cout << ">";
-						std::cin >> accountType;
-						std::cin.ignore();
-
-						bank.addAccount(std::move(iban), std::move(username), std::move(password), customerId, accountType);
-						std::cout << "Account added successfully!" << std::endl;
-					}
-					else
-					{
-						throw std::invalid_argument("Invalid command!");
-					}
-				}
-				else
-				{
-					throw std::invalid_argument("Invalid command!");
-				}
+				printHelpMenu();
 			}
-			else if (isPrefix(command, "2"))
+			else if (isPrefix(command, "print"))
 			{
-				printListMenu();
-				std::cout << ">";
-				command.getline(std::cin);
-				if (isPrefix(command, "a"))
-				{
-					bank.listAllCustomers();
-				}
-				else if (isPrefix(command, "b"))
-				{
-					bank.listAllAccounts();
-				}
-				else if (isPrefix(command, "c"))
-				{
-					size_t customerId;
-					std::cout << "Enter customer id:";
-					std::cin >> customerId;
-					std::cin.ignore();
-
-					bank.listCustomerAccounts(customerId);
-				}
-				else if (isPrefix(command, "d"))
-				{
-					bank.listLog();
-				}
-				else
-				{
-					throw std::invalid_argument("Invalid command!");
-				}
+				shapes.printShapes();
 			}
-			else if (isPrefix(command, "3"))
+			else if (isPrefix(command, "areas"))
 			{
-				printActionMenu();
-				std::cout << ">";
-				command.getline(std::cin);
-				if (isPrefix(command, "a"))
-				{
-					std::cout << "Enter account iban: ";
-					MyString iban;
-					iban.getline(std::cin);
-
-					std::cout << "Enter amount to withdraw: ";
-					double amount;
-					std::cin >> amount;
-					std::cin.ignore();
-					bank.withdraw(std::move(iban), amount);
-					std::cout << "Successfully withdrew " << amount << "$" << std::endl;
-				}
-				else if (isPrefix(command, "b"))
-				{
-					std::cout << "Enter account iban: ";
-					MyString receiverIban;
-					receiverIban.getline(std::cin);
-
-					std::cout << "Enter amount to deposit: ";
-					double amount;
-					std::cin >> amount;
-					std::cin.ignore();
-
-					bank.deposit(std::move(receiverIban), amount);
-					std::cout << "Successfully deposited " << amount << "$" << std::endl;
-				}
-				else if (isPrefix(command, "c"))
-				{
-					std::cout << "Enter your iban: ";
-					MyString senderIban;
-					senderIban.getline(std::cin);
-
-					std::cout << "Enter receiver's iban: ";
-					MyString receiverIban;
-					receiverIban.getline(std::cin);
-
-					std::cout << "Enter amount you want to transfer: ";
-					double amount;
-					std::cin >> amount;
-					std::cin.ignore();
-
-					bank.transfer(std::move(senderIban), std::move(receiverIban), amount);
-					std::cout << "Successfully transfered " << amount << "$" << std::endl;
-				}
-				else
-				{
-					throw std::invalid_argument("Invalid command!");
-				}
+				shapes.printAreas();
 			}
-			else if (isPrefix(command, "4"))
+			else if (isPrefix(command, "pers"))
 			{
-				bank.display();
+				shapes.printPerimteres();
 			}
-			else if (isPrefix(command, "5"))
+			else if (isPrefix(command, "save"))
 			{
-				std::ofstream file("Bank.dat");
-				bank.saveToFile(file);
-				break;
+				shapes.saveToFile(std::move(path), headers);
+			}
+			else if (isPrefix(command, "exit"))
+			{
+				return;
 			}
 			else
 			{
-				throw std::invalid_argument("Invalid command");
+				MyString shapeType;
+				if (isPrefix(command, "erase"))
+				{
+					double shapeIndex = 0;
+					getArgument(std::move(command), lineSize, currentIndex, shapeIndex);
+					shapes.eraseFigure((shapeIndex - 1), shapeType);
+					std::cout << "Erased a " << shapeType << " (" << shapeIndex << ")" << std::endl;
+				}
+				else
+				{
+					double field1 = 0, field2 = 0;
+					if (isPrefix(command, "pointIn"))
+					{
+						getArgument(command, lineSize, currentIndex, field1);
+						getArgument(command, lineSize, currentIndex, field2);
+						shapes.pointIn(field1, field2);
+					}
+					else if (isPrefix(command, "translateAll"))
+					{
+						double shapeIndex = -1;
+						getTranslateArgument(command, lineSize, currentIndex, field1);
+						getTranslateArgument(command, lineSize, currentIndex, field2);
+
+						shapes.translate(field1, field2);
+						std::cout << "Translated all figures" << std::endl;
+					}
+					else if (isPrefix(command, "translate"))
+					{
+						double shapeIndex = -1;
+						getTranslateArgument(command, lineSize, currentIndex, field1);
+						getTranslateArgument(command, lineSize, currentIndex, field2);
+						getArgument(command, lineSize, currentIndex, shapeIndex);
+
+						shapes.translate(field1, field2, (shapeIndex - 1), shapeType);
+						std::cout << "Translated a " << shapeType << " (" << shapeIndex << ")" << std::endl;
+					}
+					else
+					{
+						double field3 = 0, field4 = 0;
+						if (isPrefix(command, "create"))
+						{
+							MyString color;
+							getArgument(command, lineSize, currentIndex, shapeType);
+							getArgument(command, lineSize, currentIndex, field1);
+							getArgument(command, lineSize, currentIndex, field2);
+							getArgument(command, lineSize, currentIndex, field3);
+
+							if (shapeType == "rectangle")
+							{
+								getArgument(command, lineSize, currentIndex, field4);
+								getArgument(command, lineSize, currentIndex, color);
+								shapes.addRectangle(field1, field2, field3, field4, color);
+							}
+							else if (shapeType == "circle")
+							{
+								getArgument(command, lineSize, currentIndex, color);
+								shapes.addCircle(field1, field2, field3, color);
+							}
+							else if (shapeType == "line")
+							{
+								getArgument(command, lineSize, currentIndex, field4);
+								getArgument(command, lineSize, currentIndex, color);
+								shapes.addLine(field1, field2, field3, field4, color);
+							}
+							else
+							{
+								throw std::invalid_argument("You cannot create this shape!\n");
+							}
+
+							std::cout << "Successfully created " << shapeType << " (" << shapes.getShapesCount() << ")" << std::endl;
+						}
+						else if (isPrefix(command, "within"))
+						{
+							getArgument(command, lineSize, currentIndex, shapeType);
+							getArgument(command, lineSize, currentIndex, field1);
+							getArgument(command, lineSize, currentIndex, field2);
+							getArgument(command, lineSize, currentIndex, field3);
+							if (shapeType == "circle")
+							{
+								shapes.withinCircle(field1, field2, field3);
+							}
+							else if (shapeType == "rectangle")
+							{
+								getArgument(command, lineSize, currentIndex, field4);
+								shapes.withinRectangle(field1, field2, field3, field4);
+							}
+							else
+							{
+								throw std::invalid_argument("Invalid shape entered!\n");
+							}
+						}
+						else
+						{
+							throw std::invalid_argument("Invalid command!\n");
+						}
+					}
+				}
 			}
 		}
-		catch (const std::invalid_argument& e)
+		catch (std::invalid_argument& e)
 		{
-			std::cout << e.what() << std::endl;
+			std::cout << e.what();
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+		}
+		catch (std::out_of_range& e)
+		{
+			std::cout << e.what();
 		}
 
 		std::cout << ">";

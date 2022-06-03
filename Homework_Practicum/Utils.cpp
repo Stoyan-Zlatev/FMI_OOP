@@ -1,10 +1,10 @@
 #include "Utils.h"
+#include "Parser.h"
 #include "GlobalConstants.h"
 #include <iostream>
 
 bool isPrefix(const MyString& text, const MyString& prefix)
 {
-	int i = 0;
 	for (size_t i = 0; i < prefix.getSize(); i++)
 	{
 		if (i >= text.getSize() || text[i] != prefix[i])
@@ -14,69 +14,111 @@ bool isPrefix(const MyString& text, const MyString& prefix)
 	return true;
 }
 
-void printMenu()
+void loadFigures(const MyString& path, ShapeCollection& shapes, Collection<MyString>& headers)
 {
-	std::cout << "1. Edit" << std::endl;
-	std::cout << "  a. Customer" << std::endl;
-	printCustomerMenu();
-	std::cout << "  b. Account" << std::endl;
-	printAccountMenu();
-	std::cout << "2. List" << std::endl;
-	printListMenu();
-	std::cout << "3. Action" << std::endl;
-	printActionMenu();
-	std::cout << "4. Display info for the bank" << std::endl;
-	std::cout << "5. Quit" << std::endl;
+	std::ifstream sourceFile(path.c_str());
+
+	shapes;
+	if (!sourceFile.is_open())
+	{
+		std::cout << "Error while opening the file!" << std::endl;
+	}
+	else
+	{
+		readUnnecessaryLines(sourceFile, headers);
+		shapes.load(sourceFile);
+		std::cout << "File loaded successfully" << std::endl;
+	}
+
+	sourceFile.close();
 }
 
-void printEditMenu()
+
+void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
 {
-	std::cout << "  a. Customer" << std::endl;
-	std::cout << "  b. Account" << std::endl;
+	parseArgument(line, lineSize, currentIndex, argument, '\"', '\"');
 }
 
-void printCustomerMenu()
+
+
+void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument)
 {
-	std::cout << "    i. Add new customer" << std::endl;
-	std::cout << "    ii. Delete customer" << std::endl;
+	parseArgument(line, lineSize, currentIndex, argument, '\"', '\"');
 }
 
-void printAccountMenu()
+void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument)
 {
-	std::cout << "    i. Add new account" << std::endl;
-	std::cout << "    ii. Delete account" << std::endl;
+	parseArgument(line, lineSize, currentIndex, argument, ' ', ' ');
 }
 
-void printListMenu()
+void readUnnecessaryLines(std::ifstream& sourceFile, Collection<MyString>& headers)
 {
-	std::cout << "  a. List all customers" << std::endl;
-	std::cout << "  b. List all accounts" << std::endl;
-	std::cout << "  c. List customer account" << std::endl;
-	std::cout << "  d. List log" << std::endl;
+	MyString line;
+	line.getline(sourceFile);
+	while (!(line == SvgOpenTag))
+	{
+		headers.add(line);
+		line.getline(sourceFile);
+	}
 }
 
-void printActionMenu()
+void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
 {
-	std::cout << "  a. Withdraw from account" << std::endl;
-	std::cout << "  b. Deposit to account" << std::endl;
-	std::cout << "  c. Transfer" << std::endl;
+	parseArgument(line, lineSize, currentIndex, argument, ' ', ' ');
 }
 
-void printAccountTypes()
+void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument)
 {
-	std::cout << "1. Normal account" << std::endl;
-	std::cout << "2. Privilege account" << std::endl;
-	std::cout << "3. Savings account" << std::endl;
+	parseArgument(line, lineSize, currentIndex, argument, '=', ' ');
 }
 
-void initBank(Bank& bank)
+void printHelpMenu()
 {
-	MyString field;
-	std::cout << "Enter bank name: ";
-	field.getline(std::cin);
-	bank.setBankName(field);
+	std::cout << "Enter: " << std::endl;
+	std::cout << " print - to print all available figures." << std::endl;
+	std::cout << " create rectangle <x> <y> <width> <height> <color>" << std::endl;
+	std::cout << " create circle <cx> <cy> <radius> <color>" << std::endl;
+	std::cout << " create line <x1> <y1> <x2> <y2> <color>" << std::endl;
+	std::cout << " erase <index> - delete figure at \"index\" positioin." << std::endl;
+	std::cout << " translateAll vercital=<y> horizontal=<x> - translates all figures." << std::endl;
+	std::cout << " translate vercital=<y> horizontal=<x> <index> - translates only figure at position \"index\"." << std::endl;
+	std::cout << " within circle <cx> <cy> <radius> - prints all figures inside this circle." << std::endl;
+	std::cout << " within rectangle <x> <y> <width> <height> - prints all figures inside this rectangle." << std::endl;
+	std::cout << " pointIn <x> <y> - prints all figures that contain this point." << std::endl;
+	std::cout << " areas - prints all figures' areas." << std::endl;
+	std::cout << " pers - prints all figures' perimeters."<< std::endl;
+}
 
-	std::cout << "Enter bank address: ";
-	field.getline(std::cin);
-	bank.setBankAdress(field);
+int getStartindex(const MyString& line, size_t& lineSize)
+{
+	for (size_t i = 0; i < lineSize; i++)
+	{
+		if (line[i] == '<')
+		{
+			return i + 1;
+		}
+	}
+
+	throw std::invalid_argument("Incorrect line in file!\n");
+}
+
+void getShapeType(const MyString& line, MyString& type, size_t& lineSize, size_t& currentIndex)
+{
+	char* shapeType = new char[lineSize];
+	size_t startIndex = getStartindex(line, lineSize);
+
+	for (currentIndex = startIndex; currentIndex < lineSize; currentIndex++)
+	{
+		if (line[currentIndex] == ' ' || line[currentIndex] == '\t')
+		{
+			break;
+		}
+
+		shapeType[currentIndex - startIndex] = line[currentIndex];
+	}
+
+	shapeType[currentIndex - startIndex] = '\0';
+	type = shapeType;
+
+	delete[] shapeType;
 }
