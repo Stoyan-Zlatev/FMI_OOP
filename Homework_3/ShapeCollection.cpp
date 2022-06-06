@@ -19,9 +19,10 @@ void ShapeCollection::free()
 
 	delete[] data;
 }
+
 void ShapeCollection::copyFrom(const ShapeCollection& other)
 {
-	data = new Shape * [other.count];
+	data = new Shape * [other.capacity];
 	count = other.count;
 	capacity = other.capacity;
 
