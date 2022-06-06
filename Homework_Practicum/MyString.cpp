@@ -1,6 +1,5 @@
 #include "MyString.h"
 #include "GlobalConstants.h"
-#include "Parser.h"
 #include <cstring>
 #include <iostream>
 #include <iomanip>
@@ -114,19 +113,18 @@ std::ostream& operator<<(std::ostream& stream, const MyString& str)
 	return stream;
 }
 
-//std::istream& MyString::readLine(std::istream& stream)
-//{
-//	//delete[] str;
-//	//char buff[MaxContentLength];
-//	//stream.getline(buff, MaxContentLength);
-//	getline(stream);
-//
-//	//size = strlen(buff);
-//	//str = new char[size + 1];
-//	//strcpy(str, buff);
-//
-//	return stream;
-//}
+std::istream& MyString::readLine(std::istream& stream)
+{
+	delete[] str;
+	char buff[MaxContentLength];
+	stream.getline(buff, MaxContentLength);
+
+	size = strlen(buff);
+	str = new char[size + 1];
+	strcpy(str, buff);
+
+	return stream;
+}
 
 std::istream& operator>>(std::istream& stream, MyString& str)
 {
@@ -208,14 +206,4 @@ MyString MyString::substring(size_t startIndex, size_t endIndex) const
 	MyString substr = temp;
 
 	return substr;
-}
-
-MyString MyString::reverse()
-{
-	for (size_t i = 0; i < size / 2; i++)
-	{
-		swap(str[i], str[size - 1 - i]);
-	}
-
-	return *this;
 }

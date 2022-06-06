@@ -1,26 +1,21 @@
 #pragma once
 #include "MyString.h"
-#include "ShapeCollection.h"
-#include "Collection.hpp"
+#include "Bank.h"
 
 bool isPrefix(const MyString& text, const MyString& prefix);
 
-void loadFigures(const MyString& path, ShapeCollection& shapes, Collection<MyString>& headers);
+void printMenu();
 
-void getShapeType(const MyString& line, MyString& type, size_t& lineSize, size_t& currentIndex);
+void printEditMenu();
 
-void readUnnecessaryLines(std::ifstream& sourceFile, Collection<MyString>& headers);
+void printCustomerMenu();
 
-int getStartindex(const MyString& line, size_t& lineSize);
+void printAccountMenu();
 
-void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument);
+void printListMenu();
 
-void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument);
+void printActionMenu();
 
-void getArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument);
+void printAccountTypes();
 
-void loadArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, MyString& argument);
-
-void getTranslateArgument(const MyString& line, size_t& lineSize, size_t& currentIndex, double& argument);
-
-void printHelpMenu();
+void initBank(Bank& bank);

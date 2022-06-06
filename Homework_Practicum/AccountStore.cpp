@@ -45,7 +45,7 @@ void AccountStore::addAccount(Account* account)
 
 void AccountStore::copyFrom(const AccountStore& other)
 {
-	data = new Account * [other.count];
+	data = new Account * [other.capacity];
 	count = other.count;
 	capacity = other.capacity;
 
@@ -125,11 +125,12 @@ void AccountStore::removeAt(size_t accountIndex)
 
 	--count;
 
+	delete data[accountIndex];
+
 	for (size_t currentAccountIndex = accountIndex; currentAccountIndex < count; currentAccountIndex++)
 	{
 		data[currentAccountIndex] = data[currentAccountIndex + 1];
 	}
-	delete data[count];
 }
 
 void AccountStore::printAllAccounts() const
