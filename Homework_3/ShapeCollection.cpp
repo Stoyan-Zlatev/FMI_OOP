@@ -333,3 +333,7 @@ void ShapeCollection::saveToFile(const MyString& path, const Collection<MyString
 
 	file.close();
 }
+
+void ShapeCollection::run()
+{
+}
