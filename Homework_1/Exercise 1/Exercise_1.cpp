@@ -9,7 +9,6 @@ int main()
 	std::ofstream file("source.dat");
 	file.write((const char*)&x, sizeof(x));
 	file.close();*/
-
 	std::cout << "Enter a file path:" << std::endl;
 	std::cout << ">";
 	char filePath[BUFF];
