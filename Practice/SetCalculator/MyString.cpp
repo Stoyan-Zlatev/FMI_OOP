@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+
 #pragma warning(disable:4996)
 
 void MyString::copyFrom(const MyString& other)
