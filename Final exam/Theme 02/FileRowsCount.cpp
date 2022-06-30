@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 const size_t BUFF = 1024;
 
 size_t getFileRowsCount(std::ifstream& file)
 {
 	size_t currentPosition = file.tellg();
-	file.seekg(0, ios::beg);
+	file.seekg(0, std::ios::beg);
 	
 	size_t counter = 0;
 	char buff[BUFF];
@@ -17,12 +16,12 @@ size_t getFileRowsCount(std::ifstream& file)
 		counter++;
 	}
 
-	file.seekg(currentPosition);
+	file.seekg(0, currentPosition);
 	return counter;
 }
 int main()
 {
-	ifstream file("name.txt");
+	std::ifstream file("name.txt");
 
 	if (!file.is_open())
 	{
