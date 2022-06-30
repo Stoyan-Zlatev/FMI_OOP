@@ -1,19 +1,18 @@
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 size_t getFileSize(std::ifstream& file)
 {
 	size_t currentPosition = file.tellg();
 
-	file.seekg(0, ios::end);
+	file.seekg(0, std::ios::end);
 	size_t result = file.tellg();
-	file.seekg(currentPosition);
+	file.seekg(0, currentPosition);
 	return result;
 }
 int main()
 {
-	ifstream file("name.txt");
+	std::ifstream file("name.txt");
 
 	if (!file.is_open())
 	{
