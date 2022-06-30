@@ -1,30 +1,33 @@
 #include <iostream>
 #include <fstream>
+using namespace std;
 
-const size_t BUFF_SIZE = 1024;
+
+bool copyFile(const char* source, const char* dest)
+{
+	ifstream inputFile(source);
+	ofstream outputFile(dest);
+
+	if (!inputFile.is_open() || !outputFile.is_open())
+		return false;
+
+	while (!inputFile.eof())
+	{
+		char line[1024];
+		inputFile.getline(line, 1024);
+		outputFile << line << std::endl;
+	}
+	inputFile.close();
+	outputFile.close();
+	return true;
+}
+
+
 
 int main()
 {
-	std::ifstream sourceFile("Source.cpp");
-	std::ofstream destFile("Dest.cpp");
-
-	if (!sourceFile.is_open())
-	{
-		std::cout << "Error, opening source file." << std::endl;
-	}
-	if (!destFile.is_open())
-	{
-		std::cout << "Error, opening source file." << std::endl;
-	}
-
-	char buff[BUFF_SIZE];
-
-	while (!sourceFile.eof())
-	{
-		sourceFile.getline(buff, BUFF_SIZE);
-		destFile << buff<<"\n";
-	}
-
-	sourceFile.close();
-	destFile.close();
+	if (copyFile("Source.cpp", "AnotherSource.cpp"))
+		std::cout << "Succesfully copied!";
+	else
+		std::cout << "Error while copying!";
 }
