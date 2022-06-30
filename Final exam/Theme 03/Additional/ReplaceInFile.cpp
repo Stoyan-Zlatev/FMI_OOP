@@ -27,4 +27,6 @@ int main()
 	}
 
 	replaceInFile(file, 'c', 'x');
+
+	file.close();
 }
