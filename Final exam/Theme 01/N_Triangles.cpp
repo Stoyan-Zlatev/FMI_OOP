@@ -3,8 +3,8 @@
 
 struct Point
 {
-	int x;
-	int y;
+	double x;
+	double y;
 };
 
 void readPoint(Point& p)
@@ -14,10 +14,10 @@ void readPoint(Point& p)
 
 void printPoint(const Point& p)
 {
-	std::cout << p.x << " " << p.y;
+	std::cout << p.x << " "<<p.y;
 }
 
-double getDist(const Point& p1, const Point& p2)
+double getDistance(const Point& p1, const Point& p2)
 {
 	double dx = p1.x - p2.x;
 	double dy = p1.y - p2.y;
@@ -32,92 +32,90 @@ struct Triangle
 	Point p3;
 };
 
-void readTriangle(Triangle& tr)
+void readTriangle(Triangle& triangle)
 {
-	readPoint(tr.p1);
-	readPoint(tr.p2);
-	readPoint(tr.p3);
+	readPoint(triangle.p1);
+	readPoint(triangle.p2);
+	readPoint(triangle.p3);
 }
 
-void printTriangle(const Triangle& tr)
+void printTriangle(const Triangle& triangle)
 {
-	printPoint(tr.p1);
+	printPoint(triangle.p1);
 	std::cout << " ";
-	printPoint(tr.p2);
+	printPoint(triangle.p2);
 	std::cout << " ";
-	printPoint(tr.p3);
+	printPoint(triangle.p3);
 	std::cout << std::endl;
 }
 
-double getArea(const Triangle& tr)
+double getArea(const Triangle& triangle)
 {
-	double sideA = getDist(tr.p1, tr.p2);
-	double sideB = getDist(tr.p2, tr.p3);
-	double sideC = getDist(tr.p3, tr.p1);
+	double sideA = getDistance(triangle.p1, triangle.p2);
+	double sideB = getDistance(triangle.p1, triangle.p3);
+	double sideC = getDistance(triangle.p2, triangle.p3);
 
-	double halfPer = (sideA + sideB + sideC) / 2;
+	double halfPer = (sideA + sideB + sideC) / 2.0;
 
 	return sqrt(halfPer * (halfPer - sideA) * (halfPer - sideB) * (halfPer - sideC));
 }
 
-void swap(double& a, double& b)
+void swap(double& first, double& second)
 {
-	int temp = a;
-	a = b;
-	b = temp;
-}
-void swap(Triangle& tr1, Triangle& tr2)
-{
-	Triangle temp = tr1;
-	tr1 = tr2;
-	tr2 = temp;
+	double temp = first;
+	first = second;
+	second = temp;
 }
 
-void selectionSort(double* areas, Triangle* triangles, unsigned size)
+void swap(Triangle& first, Triangle& second)
 {
-	for (unsigned i = 0; i < size - 1; i++)
+	Triangle temp = first;
+	first = second;
+	second = temp;
+}
+
+void selectionSort(double* areas, Triangle* triangles, size_t n)
+{
+	for (size_t i = 0; i < n-1; i++)
 	{
-		//findMin
-		int minElementIndex = i;
-		for (unsigned j = i + 1; j < size; j++)
+		size_t minIndex = i;
+		for (size_t j = i + 1; j < n; j++)
 		{
-			if (areas[j] < areas[minElementIndex])
-				minElementIndex = j;
+			if (areas[j] < areas[minIndex])
+				minIndex = j;
 		}
-		if (minElementIndex != i)
+		if (minIndex != i)
 		{
-			swap(areas[i], areas[minElementIndex]);
-			swap(triangles[i], triangles[minElementIndex]);
+			swap(areas[i], areas[minIndex]);
+			swap(triangles[i], triangles[minIndex]);
 		}
 	}
 }
 
-double* calculateAreas(const Triangle* arr, int n)
+double* calculateAreas(const Triangle* triangles, size_t n)
 {
 	double* areas = new double[n];
 
-	for (int i = 0; i < n; i++)
-		areas[i] = getArea(arr[i]);
+	for (size_t i = 0; i < n; i++)
+	{
+		areas[i] = getArea(triangles[i]);
+	}
 
 	return areas;
 }
 
 int main()
 {
-	int n;
+	size_t n;
 	std::cin >> n;
 
 	Triangle* triangles = new Triangle[n];
 
-	for (int i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 		readTriangle(triangles[i]);
 
 	double* areas = calculateAreas(triangles, n);
 
-	selectionSort(areas, triangles, n);
-
-	for (int i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 		printTriangle(triangles[i]);
-
-	delete[] triangles, areas;
 }
