@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cmath>
 
 struct Point
 {
@@ -14,7 +13,7 @@ void readPoint(Point& p)
 
 void printPoint(const Point& p)
 {
-	std::cout << p.x << " "<<p.y;
+	std::cout << p.x << " " << p.y;
 }
 
 double getDistance(const Point& p1, const Point& p2)
@@ -32,32 +31,21 @@ struct Triangle
 	Point p3;
 };
 
-void readTriangle(Triangle& triangle)
+void readTriangle(Triangle& t)
 {
-	readPoint(triangle.p1);
-	readPoint(triangle.p2);
-	readPoint(triangle.p3);
+	readPoint(t.p1);
+	readPoint(t.p2);
+	readPoint(t.p3);
 }
 
-void printTriangle(const Triangle& triangle)
+void printTriangle(const Triangle& t)
 {
-	printPoint(triangle.p1);
+	printPoint(t.p1);
 	std::cout << " ";
-	printPoint(triangle.p2);
+	printPoint(t.p2);
 	std::cout << " ";
-	printPoint(triangle.p3);
+	printPoint(t.p3);
 	std::cout << std::endl;
-}
-
-double getArea(const Triangle& triangle)
-{
-	double sideA = getDistance(triangle.p1, triangle.p2);
-	double sideB = getDistance(triangle.p1, triangle.p3);
-	double sideC = getDistance(triangle.p2, triangle.p3);
-
-	double halfPer = (sideA + sideB + sideC) / 2.0;
-
-	return sqrt(halfPer * (halfPer - sideA) * (halfPer - sideB) * (halfPer - sideC));
 }
 
 void swap(double& first, double& second)
@@ -79,9 +67,9 @@ void selectionSort(double* areas, Triangle* triangles, size_t n)
 	for (size_t i = 0; i < n-1; i++)
 	{
 		size_t minIndex = i;
-		for (size_t j = i + 1; j < n; j++)
+		for (size_t j = i+1; j < n; j++)
 		{
-			if (areas[j] < areas[minIndex])
+			if (areas[minIndex] < areas[j])
 				minIndex = j;
 		}
 		if (minIndex != i)
@@ -92,14 +80,23 @@ void selectionSort(double* areas, Triangle* triangles, size_t n)
 	}
 }
 
+double getArea(const Triangle& t)
+{
+	double sideA = getDistance(t.p1, t.p2);
+	double sideB = getDistance(t.p1, t.p3);
+	double sideC = getDistance(t.p2, t.p3);
+
+	double halfPer = (sideA + sideB + sideC) / 2.0;
+
+	return sqrt(halfPer * (halfPer - sideA) * (halfPer - sideB) * (halfPer - sideC));
+}
+
 double* calculateAreas(const Triangle* triangles, size_t n)
 {
 	double* areas = new double[n];
 
 	for (size_t i = 0; i < n; i++)
-	{
 		areas[i] = getArea(triangles[i]);
-	}
 
 	return areas;
 }
@@ -118,4 +115,7 @@ int main()
 
 	for (size_t i = 0; i < n; i++)
 		printTriangle(triangles[i]);
+
+	delete[] areas, triangles;
+	return 0;
 }
