@@ -62,5 +62,3 @@ int main()
 {
 	Student s("Ivan", 33);
 }
-
-
