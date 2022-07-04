@@ -1,37 +1,15 @@
 #include <iostream>
-#pragma warning(disable:4996)
-using namespace std;
 
 const size_t MinAge = 5;
 const size_t MaxAge = 90;
 const size_t MaxNameLength = 20;
 
-bool isSmallLetter(char ch)
-{
-	return ch >= 'a' && ch <= 'z';
-}
-bool isCapitalLetter(char ch)
-{
-	return ch >= 'A' && ch <= 'Z';
-}
-bool containsOnlySmallChars(const char* str)
-{
-	size_t len = strlen(str);
-
-	for (size_t i = 0; i < len; i++)
-	{
-		if (!isSmallLetter(str[i]))
-			return false;
-	}
-	return true;
-}
-
 class Student
 {
-	char name[MaxNameLength];
-	int age;
+	char name[MaxNameLength + 1];
+	size_t age;
 
-	bool isValidAge(int age)
+	bool isValidAge(size_t age)
 	{
 		return age >= MinAge && age <= MaxAge;
 	}
@@ -44,24 +22,21 @@ class Student
 		if (strlen(name) >= MaxNameLength)
 			return false;
 
-		if (!isCapitalLetter(*name))
-			return false;
-		return containsOnlySmallChars(name + 1);
+		return true;
 	}
-
 public:
-	Student(const char* name, int age)
+	Student(const char* name, size_t age)
 	{
 		setName(name);
 		setAge(age);
 	}
 
-	int getAge() const //връщаме копие!!
+	size_t getAge() const
 	{
 		return age;
 	}
 
-	const char* getName() const //копие на указателя!!!
+	const char* getName() const
 	{
 		return name;
 	}
@@ -87,3 +62,5 @@ int main()
 {
 	Student s("Ivan", 33);
 }
+
+
