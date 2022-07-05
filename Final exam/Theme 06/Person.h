@@ -1,27 +1,24 @@
 #pragma once
-#include <iostream>
+
 class Person
 {
-	char* name = nullptr;
-	int age = 0;
+	char* name;
+	double* grades;
+	size_t gradesCount;
 
 	void copyFrom(const Person& other);
 	void free();
-
-public:
-	Person() = default;
-	Person(const char* name, int age);
-
+	bool isValidName(const char* name) const;
+	bool areValidGrades(const double* grades) const;
+public: 
+	Person();
 	Person(const Person& other);
 	Person& operator=(const Person& other);
-
-	const char* getName() const;
-	int getAge() const;
+	~Person();
 
 	void setName(const char* name);
-	void setAge(int age);
+	void setGrades(const double* grades, size_t gradesCount);
 
-	~Person();
-	void print() const;
-
+	const char* getName() const;
+	const double* getGrades() const;
 };
