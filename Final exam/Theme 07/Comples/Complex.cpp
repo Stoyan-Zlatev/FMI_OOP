@@ -1,10 +1,7 @@
 #include "Complex.h"
 
-Complex::Complex()
-{
-	real = 0;
-	im = 0;
-}
+Complex::Complex() : Complex(0,0){}
+
 Complex::Complex(double real, double im)
 {
 	this->real = real;
@@ -29,15 +26,14 @@ Complex& Complex::operator*=(const Complex& other)
 	im = oldReal * other.im + im * other.real;
 	return *this;
 }
-Complex& Complex::operator/=(const Complex& other) // a/=b
+Complex& Complex::operator/=(const Complex& other)
 {
-	Complex Conjugated = other.getConjugated(); //взимаме комплексно спрегнатата на другата дроб (b)
+	Complex Conjugated = other.getConjugated();
 
-	Complex otherCopy(other);// копираме другата (b), за да не я промяняме.
+	Complex otherCopy(other);
 
-	//Умножаваме двете по комплексно спрегнатата.
 	*this *= Conjugated;
-	otherCopy *= Conjugated; //Тук трябва да остане само реална част.
+	otherCopy *= Conjugated; 
 
 	if (otherCopy.real != 0)
 	{
@@ -49,16 +45,14 @@ Complex& Complex::operator/=(const Complex& other) // a/=b
 }
 
 
-//След дефинирането на +=, -=, *= и /=, можем лесно да дефинираме +, -, * и /, преизползвайки вече написаните опратори.
-Complex operator+(const Complex& lhs, const Complex& rhs) { //a+b
+Complex operator+(const Complex& lhs, const Complex& rhs) { 
 
-	Complex result(lhs); // Създаваме нов обект, който е копие на a (използваме копи-конструктора)
-	result += rhs; //към копието на a, добавяме b (Използваме вече дефинирания оператор +=)
+	Complex result(lhs); 
+	result += rhs; 
 
 	return result;
 }
 
-//Операторите -, *, / са аналогични с +. 
 Complex operator-(const Complex& lhs, const Complex& rhs) {
 	Complex result(lhs);
 	result -= rhs;
@@ -90,13 +84,11 @@ Complex Complex::getConjugated() const
 	return result;
 }
 
-// за да можем да правим  cout<<c1 или да запазваме във файл и др. 
 std::ostream& operator<<(std::ostream& ofs, const Complex& r) {
 
 	return ofs << r.real << ' ' << r.im << 'i';
 }
 
-// за да можем да правим cin>>c1 или да четем от файл и др. 
 std::istream& operator>>(std::istream& ifs, Complex& r) {
 
 	return ifs >> r.real >> r.im;
