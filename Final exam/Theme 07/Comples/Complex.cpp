@@ -45,31 +45,32 @@ Complex& Complex::operator/=(const Complex& other)
 }
 
 
-Complex operator+(const Complex& lhs, const Complex& rhs) { 
-
+Complex operator+(const Complex& lhs, const Complex& rhs) 
+{ 
 	Complex result(lhs); 
 	result += rhs; 
 
 	return result;
 }
 
-Complex operator-(const Complex& lhs, const Complex& rhs) {
+Complex operator-(const Complex& lhs, const Complex& rhs) 
+{
 	Complex result(lhs);
 	result -= rhs;
 
 	return result;
 }
 
-Complex operator*(const Complex& lhs, const Complex& rhs) {
-
+Complex operator*(const Complex& lhs, const Complex& rhs)
+{
 	Complex result(lhs);
 	result *= rhs;
 
 	return result;
 }
 
-Complex operator/(const Complex& lhs, const Complex& rhs) {
-
+Complex operator/(const Complex& lhs, const Complex& rhs) 
+{
 	Complex result(lhs);
 	result /= rhs;
 
@@ -84,12 +85,12 @@ Complex Complex::getConjugated() const
 	return result;
 }
 
-std::ostream& operator<<(std::ostream& ofs, const Complex& r) {
-
+std::ostream& operator<<(std::ostream& ofs, const Complex& r)
+{
 	return ofs << r.real << ' ' << r.im << 'i';
 }
 
-std::istream& operator>>(std::istream& ifs, Complex& r) {
-
+std::istream& operator>>(std::istream& ifs, Complex& r) 
+{
 	return ifs >> r.real >> r.im;
 }
