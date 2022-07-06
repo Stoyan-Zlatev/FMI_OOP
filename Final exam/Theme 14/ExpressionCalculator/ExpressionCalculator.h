@@ -4,32 +4,43 @@
 
 const char AND = '^';
 const char OR = 'v';
-const char IMPL = '>'; //=>
-const char IFF = '='; // <=>
+const char IMP = '>';
 const char XOR = '+';
 const char NEG = '!';
-const size_t ALPABET_LETTERS = 26;
+const char IFF = '=';
 
 class ExpressionCalculator
 {
 	class BooleanExpr
 	{
 	public:
-		const bool* getVarsArr() const
+		bool vars[26] = { false };
+		size_t countVars;
+
+		struct BooleanInterpretation
 		{
-			bool* arr = new bool[ALPABET_LETTERS];
+			bool values[26] = { false };
 
-			for (size_t i = 0; i < ALPABET_LETTERS; i++)
-				arr[i] = false;
+			BooleanInterpretation() {}
 
-			getVars(arr);
-			return arr;
-		}
+			void setValue(char ch, bool value)
+			{
+				if (!(ch <= 'Z' && ch >= 'A'))
+					throw "Error";
 
-		virtual void getVars(bool*) const = 0;
+				values[ch - 'A'] = value;
+			}
+			bool getValue(char ch) const
+			{
+				if (!(ch <= 'Z' && ch >= 'A'))
+					throw "Error";
+
+				return values[ch - 'A'];
+			}
+		};
+
+		virtual bool eval(const BooleanInterpretation& interpret) const = 0;
 		virtual BooleanExpr* clone() const = 0;
-		virtual bool eval(bool values[ALPABET_LETTERS]) const = 0;
-		
 		virtual ~BooleanExpr() = default;
 	};
 
@@ -37,21 +48,20 @@ class ExpressionCalculator
 	{
 		char ch;
 	public:
-		Variable(char ch) : ch(ch) {} ///only CAPITALS
-
-		bool eval(bool values[ALPABET_LETTERS]) const override
+		Variable(char ch) : ch(ch)
 		{
-			return values[ch - 'A'];
+			vars[ch - 'A'] = true;
+			countVars = 1;
+		}
+
+		bool eval(const BooleanInterpretation& interpret) const override
+		{
+			return interpret.getValue(ch);
 		}
 
 		BooleanExpr* clone() const override
 		{
 			return new Variable(*this);
-		}
-
-		void getVars(bool* vars)const override
-		{
-			vars[ch - 'A'] = true;
 		}
 	};
 
@@ -61,32 +71,31 @@ class ExpressionCalculator
 		char op;
 		BooleanExpr* right;
 	public:
-		BinaryOperation(BooleanExpr* left, char op, BooleanExpr* right) : left(left), op(op), right(right) {}
-		BinaryOperation(const BinaryOperation&) = delete;
-		BinaryOperation& operator=(const BinaryOperation&) = delete;
-
-		bool eval(bool values[26]) const override
+		BinaryOperation(BooleanExpr* left, char op, BooleanExpr* right) : left(left), right(right), op(op)
 		{
-			switch (op)
+			for (size_t i = 0; i < 26; i++)
 			{
-			case OR: return  left->eval(values) || right->eval(values);
-			case AND: return left->eval(values) && right->eval(values);
-			case IMPL: return !left->eval(values) || right->eval(values);
-			case IFF: bool first = left->eval(values); bool second = right->eval(values); return first == second;
-			case XOR: bool first = left->eval(values); bool second = right->eval(values); return first != second;
-			default: return false;
+				vars[i] = left->vars[i] || right->vars[i];
+				if (vars[i])
+					countVars++;
 			}
 		}
 
+		bool eval(const BooleanInterpretation& interpret) const override
+		{
+			switch (op)
+			{
+			case AND:return left->eval(interpret) && right->eval(interpret);
+			case OR:return left->eval(interpret) || right->eval(interpret);
+			case IMP: return !left->eval(interpret) || right->eval(interpret);
+			case IFF: bool first = left->eval(interpret); bool second = right->eval(interpret); return first == second;
+			case XOR:bool first = left->eval(interpret); bool second = right->eval(interpret); return first != second;
+			default: return false;
+			}
+		}
 		BooleanExpr* clone() const override
 		{
 			return new BinaryOperation(left->clone(), op, right->clone());
-		}
-
-		virtual void getVars(bool* vars) const override
-		{
-			left->getVars(vars);
-			right->getVars(vars);
 		}
 
 		~BinaryOperation()
@@ -98,46 +107,42 @@ class ExpressionCalculator
 
 	class UnaryOperation : public BooleanExpr
 	{
-		char ch; //!
+		char op;
 		BooleanExpr* expr;
-
 	public:
-		UnaryOperation(char ch, BooleanExpr* expr) : ch(ch), expr(expr) {}
-		UnaryOperation(const UnaryOperation&) = delete;
-		UnaryOperation& operator=(const UnaryOperation&) = delete;
+		UnaryOperation(BooleanExpr* expr, char op) : expr(expr), op(op)
+		{
+			for (size_t i = 0; i < 26; i++)
+			{
+				vars[i] = expr->vars[i];
+				if (vars[i])
+					countVars++;
+			}
+		}
+
+		bool eval(const BooleanInterpretation& interpret) const override
+		{
+			if (op == NEG)
+				return !expr->eval(interpret);
+			else
+				return false;
+		}
 
 		BooleanExpr* clone() const override
 		{
-			return new UnaryOperation(ch, expr->clone());
+			return new UnaryOperation(expr->clone(), op);
 		}
 
-		virtual void getVars(bool* vars) const override
-		{
-			expr->getVars(vars);
-		}
-
-		bool eval(bool values[ALPABET_LETTERS]) const
-		{
-			if (ch == '!')
-			{
-				return !expr->eval(values);
-			}
-			else
-			{
-				// 
-				return false;
-			}
-		}
 		~UnaryOperation()
 		{
 			delete expr;
 		}
 	};
 
-	void convertFromNumber(size_t number, const bool vars[ALPABET_LETTERS], bool values[ALPABET_LETTERS]) const;
+	BooleanExpr* expr;
+	BooleanExpr::BooleanInterpretation convertFromNumber(size_t number, bool vars[26]) const;
 	bool checkAll(BooleanExpr* expr, bool value) const;
 
-	BooleanExpr* expr;
 	void copyFrom(const ExpressionCalculator& other);
 	void free();
 
@@ -150,5 +155,5 @@ public:
 	bool isTautology() const;
 	bool isContradiction() const;
 
-	friend BooleanExpr* parse(const MyString& str);
+	friend ExpressionCalculator::BooleanExpr* parse(const MyString& str);
 };
