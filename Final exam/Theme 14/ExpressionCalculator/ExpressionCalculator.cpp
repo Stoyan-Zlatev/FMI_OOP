@@ -101,7 +101,7 @@ bool ExpressionCalculator::isTautology() const
 	return checkAll(expr, true);
 }
 
-bool ExpressionCalculator::isTautology()const
+bool ExpressionCalculator::isContradiction()const
 {
-	return checkAll(expr, true);
+	return checkAll(expr, false);
 }
