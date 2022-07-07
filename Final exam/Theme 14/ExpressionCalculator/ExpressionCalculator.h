@@ -1,13 +1,14 @@
+#pragma once
 #include <iostream>
 #include <exception>
 #include "MyString.h"
 
 const char AND = '^';
 const char OR = 'v';
-const char IMP = '>';
-const char XOR = '+';
-const char NEG = '!';
 const char IFF = '=';
+const char XOR = '+';
+const char IMPL = '>';
+const char NEG = '!';
 
 class ExpressionCalculator
 {
@@ -15,21 +16,20 @@ class ExpressionCalculator
 	{
 	public:
 		bool vars[26] = { false };
-		size_t countVars;
+		size_t varsCount;
 
 		struct BooleanInterpretation
 		{
 			bool values[26] = { false };
-
-			BooleanInterpretation() {}
+			BooleanInterpretation() {};
 
 			void setValue(char ch, bool value)
 			{
 				if (!(ch <= 'Z' && ch >= 'A'))
 					throw "Error";
-
 				values[ch - 'A'] = value;
 			}
+
 			bool getValue(char ch) const
 			{
 				if (!(ch <= 'Z' && ch >= 'A'))
@@ -39,27 +39,28 @@ class ExpressionCalculator
 			}
 		};
 
+		virtual ~BooleanExpr() = default;
 		virtual bool eval(const BooleanInterpretation& interpret) const = 0;
 		virtual BooleanExpr* clone() const = 0;
-		virtual ~BooleanExpr() = default;
 	};
 
-	class Variable : public BooleanExpr
+	class Variable :public BooleanExpr
 	{
 		char ch;
 	public:
+
 		Variable(char ch) : ch(ch)
 		{
 			vars[ch - 'A'] = true;
-			countVars = 1;
+			varsCount = 1;
 		}
 
-		bool eval(const BooleanInterpretation& interpret) const override
+		bool eval(const BooleanInterpretation& interpret) const
 		{
 			return interpret.getValue(ch);
 		}
 
-		BooleanExpr* clone() const override
+		BooleanExpr* clone() const
 		{
 			return new Variable(*this);
 		}
@@ -71,29 +72,27 @@ class ExpressionCalculator
 		char op;
 		BooleanExpr* right;
 	public:
-		BinaryOperation(BooleanExpr* left, char op, BooleanExpr* right) : left(left), right(right), op(op)
+		BinaryOperation(BooleanExpr* left, char op, BooleanExpr* right) : left(left), op(op), right(right)
 		{
 			for (size_t i = 0; i < 26; i++)
 			{
 				vars[i] = left->vars[i] || right->vars[i];
 				if (vars[i])
-					countVars++;
+					varsCount++;
 			}
 		}
 
-		bool eval(const BooleanInterpretation& interpret) const override
+		bool eval(const BooleanInterpretation& interpret) const
 		{
 			switch (op)
 			{
-			case AND:return left->eval(interpret) && right->eval(interpret);
-			case OR:return left->eval(interpret) || right->eval(interpret);
-			case IMP: return !left->eval(interpret) || right->eval(interpret);
-			case IFF: bool first = left->eval(interpret); bool second = right->eval(interpret); return first == second;
-			case XOR:bool first = left->eval(interpret); bool second = right->eval(interpret); return first != second;
+			case AND: return left->eval(interpret) && right->eval(interpret);
+			case OR: return left->eval(interpret) || right->eval(interpret);
 			default: return false;
 			}
 		}
-		BooleanExpr* clone() const override
+
+		BooleanExpr* clone() const
 		{
 			return new BinaryOperation(left->clone(), op, right->clone());
 		}
@@ -105,32 +104,32 @@ class ExpressionCalculator
 		}
 	};
 
-	class UnaryOperation : public BooleanExpr
+	class UnaryOperation :public BooleanExpr
 	{
 		char op;
 		BooleanExpr* expr;
 	public:
-		UnaryOperation(BooleanExpr* expr, char op) : expr(expr), op(op)
+		UnaryOperation(char op, BooleanExpr* expr) : op(op), expr(expr)
 		{
 			for (size_t i = 0; i < 26; i++)
 			{
 				vars[i] = expr->vars[i];
 				if (vars[i])
-					countVars++;
+					varsCount++;
 			}
 		}
 
-		bool eval(const BooleanInterpretation& interpret) const override
+		bool eval(const BooleanInterpretation& interpret) const
 		{
 			if (op == NEG)
-				return !expr->eval(interpret);
+				return !(expr->eval(interpret));
 			else
 				return false;
 		}
 
-		BooleanExpr* clone() const override
+		BooleanExpr* clone() const
 		{
-			return new UnaryOperation(expr->clone(), op);
+			return new UnaryOperation(op, expr->clone());
 		}
 
 		~UnaryOperation()
@@ -140,12 +139,11 @@ class ExpressionCalculator
 	};
 
 	BooleanExpr* expr;
-	BooleanExpr::BooleanInterpretation convertFromNumber(size_t number, bool vars[26]) const;
-	bool checkAll(BooleanExpr* expr, bool value) const;
-
 	void copyFrom(const ExpressionCalculator& other);
 	void free();
 
+	bool checkAll(BooleanExpr* expr, bool value) const;
+	BooleanExpr::BooleanInterpretation convertFromNumber(size_t number, bool vars[26]) const;
 public:
 	ExpressionCalculator(const MyString& str);
 	ExpressionCalculator(const ExpressionCalculator& other);
