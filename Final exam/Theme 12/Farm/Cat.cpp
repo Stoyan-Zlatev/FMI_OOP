@@ -1,4 +1,5 @@
 #include "Cat.h"
+#include <iostream>
 
 void Cat::sayHello() const
 {
@@ -7,6 +8,5 @@ void Cat::sayHello() const
 
 Animal* Cat::clone() const
 {
-	Animal* newObj = new Cat(*this); //copy constr of Mouse
-	return newObj;
+	return new Cat(*this);
 }

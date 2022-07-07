@@ -1,4 +1,5 @@
 #include "Dog.h"
+#include <iostream>
 
 void Dog::sayHello() const
 {
@@ -7,6 +8,5 @@ void Dog::sayHello() const
 
 Animal* Dog::clone() const
 {
-	Animal* newObj = new Dog(*this); //copy constr of Mouse
-	return newObj;
+	return new Dog(*this);
 }
