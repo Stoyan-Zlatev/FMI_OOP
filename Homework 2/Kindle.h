@@ -18,13 +18,13 @@ class Kindle
 public:
 	Kindle();
 	
-	void login(const MyString& userName, const MyString& password);
-	void signup(const MyString& userName, const MyString& password);
-	void logout(std::fstream& file);
+	void login(const MyString& username, const MyString& password);
+	void signup(const MyString& username, const MyString& password);
+	void logout();
 	bool exit();
 
-	void load(std::fstream& sourceFile);
-	void saveToFile(std::fstream& file);
+	void load(std::ifstream& sourceFile);
+	void saveToFile(std::ofstream& file) const;
 	
 	void view() const;
 	
@@ -49,4 +49,6 @@ public:
 
 	const MyString getCurrentUserName() const;
 	bool getIsUsed() const;
+
+	void run();
 };
