@@ -1,11 +1,10 @@
 #pragma once
 #include <iostream>
 #include <exception>
-
 template <typename T>
 class Optional
 {
-	T* data;
+	T* data; //DYN MEM
 
 	void copyFrom(const Optional<T>& other);
 	void free();
@@ -21,23 +20,38 @@ public:
 	void setData(const T& el);
 	void clear();
 
-	~Optional();
+	
 };
 
 template <typename T>
-Optional<T>::Optional() : data(nullptr) {}
+Optional<T>::Optional() : data(nullptr)
+{}
 
 template <typename T>
-Optional<T>::Optional(const T& obj)
+Optional<T>::Optional(const T& obj) : data(nullptr)
 {
 	setData(obj);
 }
 
 template <typename T>
-void Optional<T>::setData(const T& obj)
+bool Optional<T>::containsData() const
+{
+	return data != nullptr;
+}
+
+template <typename T>
+const T& Optional<T>::getData() const
+{
+	if (!containsData())
+		throw std::logic_error("No data in optional");
+	return *data;
+}
+
+template <typename T>
+void Optional<T>::setData(const T& el)
 {
 	delete data;
-	data = new T(obj);
+	data = new T(el);// copy const; 
 }
 
 template <typename T>
@@ -62,6 +76,7 @@ void Optional<T>::clear()
 	data = nullptr;
 }
 
+
 template <typename T>
 Optional<T>::Optional(const Optional<T>& other)
 {
@@ -78,10 +93,4 @@ Optional<T>& Optional<T>::operator=(const Optional<T>& other)
 		copyFrom(other);
 	}
 	return *this;
-}
-
-template <typename T>
-Optional<T>::~Optional()
-{
-	free();
 }
