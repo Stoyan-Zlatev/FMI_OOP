@@ -125,12 +125,12 @@ bool PairOfOptionals<T, D>::containsSecond() const
 template<typename T, typename D>
 void PairOfOptionals<T, D>::copyFrom(const PairOfOptionals<T, D>& other)
 {
-	if (containsFirst())
+	if (other.containsFirst())
 		first = new T(*other.first);
 	else
 		first = nullptr;
 
-	if (containsSecond())
+	if (other.containsSecond())
 		second = new D(*other.second);
 	else
 		second = nullptr;
