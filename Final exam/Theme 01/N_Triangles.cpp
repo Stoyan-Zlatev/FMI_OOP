@@ -69,7 +69,7 @@ void selectionSort(double* areas, Triangle* triangles, size_t n)
 		size_t minIndex = i;
 		for (size_t j = i+1; j < n; j++)
 		{
-			if (areas[minIndex] < areas[j])
+			if (areas[minIndex] > areas[j])
 				minIndex = j;
 		}
 		if (minIndex != i)
